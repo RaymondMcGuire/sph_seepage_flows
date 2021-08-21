@@ -1,0 +1,18 @@
+/*
+ * @Author: Xu.WANG
+ * @Date: 2020-10-18 01:10:38
+ * @LastEditTime: 2021-08-21 18:49:34
+ * @LastEditors: Xu.WANG
+ * @Description: 
+ * @FilePath: \sph_seepage_flows\configuration\root_directory.h.in
+ */
+#pragma once
+#ifndef _KIRI_GLOBRL_FILE_PATH_
+#define _KIRI_GLOBRL_FILE_PATH_
+
+const char *const ROOT_PATH = "${CMAKE_SOURCE_DIR}";
+const char *const EXPORT_PATH = "${CMAKE_SOURCE_DIR}/export/";
+const char *const MSWIN_BUILD_PATH = "${CMAKE_SOURCE_DIR}/build/bin/";
+const char *const DB_PBR_PATH = "${CMAKE_SOURCE_DIR}/resources/";
+
+#endif

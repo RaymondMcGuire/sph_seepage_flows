@@ -1,10 +1,10 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-03 22:52:09
- * @LastEditTime: 2021-04-07 19:59:21
+ * @LastEditTime: 2021-08-21 17:24:38
  * @LastEditors: Xu.WANG
  * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\system\cuda_base_system.cuh
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\system\cuda_base_system.cuh
  */
 #ifndef _CUDA_BASE_SYSTEM_CUH_
 #define _CUDA_BASE_SYSTEM_CUH_
@@ -31,10 +31,6 @@ namespace KIRI
         virtual ~CudaBaseSystem() noexcept {}
 
         float UpdateSystem(float timeIntervalInSeconds);
-        void UpdateSystemForVBO(float timeIntervalInSeconds);
-
-        inline size_t ColorsVBO() const { return mColorsVBO; }
-        inline size_t PositionsVBO() const { return mPositionsVBO; }
 
         inline bool GetAdaptiveSubTimeStep() const { return bAdaptiveSubTimeStep; }
         inline size_t GetNumOfSubTimeSteps() const { return mSolver->GetNumOfSubTimeSteps(); }
@@ -45,17 +41,10 @@ namespace KIRI
         CudaGNBoundarySearcherPtr mBoundarySearcher;
 
         virtual void OnUpdateSolver(float timeIntervalInSeconds) = 0;
-        virtual void OnTransferGPUData2VBO(float4 *cudaPositionVBO, float4 *cudaColorVBO) = 0;
 
     private:
         bool bAdaptiveSubTimeStep;
 
-        float4 *mCudaPositionVBO, *mCudaColorVBO;
-
-        // VBO for OpenGL
-        uint mPositionsVBO;
-        uint mColorsVBO;
-        struct cudaGraphicsResource *mCudaGraphPosVBORes, *mCudaGraphColorVBORes;
     };
 
     typedef SharedPtr<CudaBaseSystem> CudaBaseSystemPtr;

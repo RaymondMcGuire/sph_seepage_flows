@@ -1,10 +1,10 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-03 22:59:48
- * @LastEditTime: 2021-08-16 00:44:23
+ * @LastEditTime: 2021-08-21 17:25:08
  * @LastEditors: Xu.WANG
  * @Description: 
- * @FilePath: \KiriPBSCuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
  */
 
 #include <kiri_pbs_cuda/thrust_helper/helper_thrust.cuh>
@@ -114,21 +114,6 @@ namespace KIRI
                 }
             }
         }
-
-        cudaDeviceSynchronize();
-        KIRI_CUKERNAL();
-    }
-
-    void CudaSFSystem::OnTransferGPUData2VBO(float4 *cudaPositionVBO, float4 *cudaColorVBO)
-    {
-        TransferGPUData2VBO_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-            cudaPositionVBO,
-            cudaColorVBO,
-            mParticles->GetPosPtr(),
-            mParticles->GetColPtr(),
-            mParticles->GetRadiusPtr(),
-            mParticles->Size(),
-            mParticles->GetLabelPtr());
 
         cudaDeviceSynchronize();
         KIRI_CUKERNAL();

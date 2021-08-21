@@ -48,7 +48,6 @@ namespace KIRI
 
     protected:
         virtual void OnUpdateSolver(float timeIntervalInSeconds) override;
-        virtual void OnTransferGPUData2VBO(float4 *cudaPositionVBO, float4 *cudaColorVBO) override;
 
     private:
         const size_t mCudaGridSize;

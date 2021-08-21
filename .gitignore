@@ -1,0 +1,7 @@
+build
+.vscode
+/cmake/checkCUDA/compile/*
+!/cmake/checkCUDA/compile/.gitkeep
+/export/bgeo/**/*.bgeo
+/export/obj/**/*.obj
+/**/*.pyc

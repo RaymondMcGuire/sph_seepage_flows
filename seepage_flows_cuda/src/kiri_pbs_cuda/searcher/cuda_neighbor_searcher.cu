@@ -1,26 +1,18 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-05 12:33:37
- * @LastEditTime: 2021-08-18 09:22:59
+ * @LastEditTime: 2021-08-21 17:21:41
  * @LastEditors: Xu.WANG
  * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
  */
 
 #include <kiri_pbs_cuda/thrust_helper/helper_thrust.cuh>
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher.cuh>
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher_gpu.cuh>
 
-#include <kiri_pbs_cuda/particle/cuda_sph_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_iisph_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_sph_bn_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_dem_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_mr_dem_particles.cuh>
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
 #include <kiri_pbs_cuda/particle/cuda_iisf_particles.cuh>
-
-#include <kiri_pbs_cuda/particle/cuda_multisph_ren14_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_multisph_yan16_particles.cuh>
 
 namespace KIRI
 {
@@ -73,105 +65,7 @@ namespace KIRI
     void CudaGNSearcher::SortData(const CudaParticlesPtr &particles)
     {
 
-        if (mSearcherParticleType == SearcherParticleType::SPH)
-        {
-            auto fluids = std::dynamic_pointer_cast<CudaSphParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        fluids->GetPosPtr(),
-                                        fluids->GetVelPtr(),
-                                        fluids->GetColPtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::IISPH)
-        {
-            auto fluids = std::dynamic_pointer_cast<CudaIISphParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        fluids->GetPosPtr(),
-                                        fluids->GetVelPtr(),
-                                        fluids->GetColPtr(),
-                                        fluids->GetLastPressurePtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::DEM)
-        {
-            auto sands = std::dynamic_pointer_cast<CudaDemParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        sands->GetPosPtr(),
-                                        sands->GetVelPtr(),
-                                        sands->GetColPtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::MRDEM)
-        {
-            auto sands = std::dynamic_pointer_cast<CudaMRDemParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        sands->GetPosPtr(),
-                                        sands->GetVelPtr(),
-                                        sands->GetColPtr(),
-                                        sands->GetMassPtr(),
-                                        sands->GetRadiusPtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::BNSPH)
-        {
-            auto fluids = std::dynamic_pointer_cast<CudaSphBNParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        fluids->GetPosPtr(),
-                                        fluids->GetVelPtr(),
-                                        fluids->GetColPtr(),
-                                        fluids->GetMassPtr(),
-                                        fluids->GetRadiusPtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::MULTISPH_REN14)
-        {
-            auto ren14 = std::dynamic_pointer_cast<CudaMultiSphRen14Particles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        ren14->GetPhaseLabelPtr(),
-                                        ren14->GetPosPtr(),
-                                        ren14->GetVelPtr(),
-                                        ren14->GetAccPtr(),
-                                        ren14->GetColPtr(),
-                                        ren14->GetMixMassPtr(),
-                                        ren14->GetRen14PhasePtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::MULTISPH_YAN16)
-        {
-            auto yan16 = std::dynamic_pointer_cast<CudaMultiSphYan16Particles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        yan16->GetPhaseLabelPtr(),
-                                        yan16->GetPhaseTypePtr(),
-                                        yan16->GetPosPtr(),
-                                        yan16->GetVelPtr(),
-                                        yan16->GetAccPtr(),
-                                        yan16->GetColPtr(),
-                                        yan16->GetMixMassPtr(),
-                                        yan16->GetYan16PhasePtr())));
-        }
-        else if (mSearcherParticleType == SearcherParticleType::SEEPAGE)
+       if (mSearcherParticleType == SearcherParticleType::SEEPAGE)
         {
             auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
             thrust::sort_by_key(thrust::device,
@@ -204,25 +98,7 @@ namespace KIRI
                                         seepage_flow->GetMassPtr(),
                                         seepage_flow->GetMaxSaturationPtr())));
         }
-        else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI)
-        {
-            auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        seepage_flow->GetLabelPtr(),
-                                        seepage_flow->GetPosPtr(),
-                                        seepage_flow->GetVelPtr(),
-                                        seepage_flow->GetColPtr(),
-                                        seepage_flow->GetRadiusPtr(),
-                                        seepage_flow->GetMassPtr(),
-                                        seepage_flow->GetMaxSaturationPtr(),
-                                        seepage_flow->GetCdA0AsatPtr(),
-                                        seepage_flow->GetAmcAmcpPtr())));
-        }
-
+        
         cudaDeviceSynchronize();
         KIRI_CUKERNAL();
     }

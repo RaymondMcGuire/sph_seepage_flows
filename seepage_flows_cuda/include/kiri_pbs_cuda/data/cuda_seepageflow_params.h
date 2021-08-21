@@ -1,10 +1,10 @@
 /*** 
  * @Author: Xu.WANG
  * @Date: 2021-02-10 15:29:35
- * @LastEditTime: 2021-08-15 23:01:19
+ * @LastEditTime: 2021-08-21 18:14:53
  * @LastEditors: Xu.WANG
  * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
  */
 
 #ifndef _CUDA_SEEPAGEFLOW_PARAMS_H_
@@ -16,13 +16,6 @@
 #include <kiri_pbs_cuda/data/cuda_sph_params.h>
 namespace KIRI
 {
-
-    enum CudaSeepageflowType
-    {
-        SF,
-        MULTI_SF
-    };
-
     struct CudaSeepageflowParams
     {
         // water(SPH)
@@ -66,7 +59,6 @@ namespace KIRI
         float dt;
 
         CudaSphSolverType solver_type;
-        CudaSeepageflowType sf_type;
     };
 
     struct CudaSeepageflowAppParams

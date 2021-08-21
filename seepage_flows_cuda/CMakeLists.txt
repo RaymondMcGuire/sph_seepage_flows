@@ -1,8 +1,6 @@
 # Project Name
 set(PROJECT_NAME seepage_flows_cuda)
 
-set(EXTLIBS_INCLUDE ${CMAKE_SOURCE_DIR}/KiriExtlib/include)
-
 # CUDA PBS Library
 file(GLOB_RECURSE SOURCES "src/*.cu" "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HEADERS "include/*.cuh" "include/*.hpp" "include/*.h")
@@ -31,5 +29,4 @@ set_target_properties(
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     include
-    ${EXTLIBS_INCLUDE}
 )
