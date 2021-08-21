@@ -3,6 +3,7 @@ name: WindowsCUDA
 
 on:
   push:
+    branches: [ main ]
     paths:
       - "**"
       - "!.github/**"
