@@ -2,7 +2,7 @@
 
 *Xu Wang, Makoto Fujisawa, Masahiko Mikawa
 
-![](./pics/teaser.jpg)
+![](./pics/teaser.png)
 
 [[Paper]](https://) [[Video]](https://)
 
