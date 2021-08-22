@@ -6,7 +6,7 @@
 
 [[Paper]](https://) [[Video]](https://)
 
-[![WindowsCUDA](https://github.com/RaymondMcGuire/SPH_CUDA/actions/workflows/WindowsCUDA.yml/badge.svg?branch=master)](https://github.com/RaymondMcGuire/SPH_CUDA/actions/workflows/WindowsCUDA.yml)
+[![WindowsCUDA](https://github.com/RaymondMcGuire/sph_seepage_flows/actions/workflows/WindowsCUDA.yml/badge.svg?branch=main)](https://github.com/RaymondMcGuire/sph_seepage_flows/actions/workflows/WindowsCUDA.yml)
 
 Seepage Flows + WCSPH(CUDA version).
 
