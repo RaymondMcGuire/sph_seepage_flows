@@ -48,3 +48,7 @@ cmake .. -G"Visual Studio 16 2019" -A x64
 - cd to ./scripts folder
 - choose your visual studio version(vs15/vs17/vs19)
 - run the bat file
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details
