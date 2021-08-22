@@ -1,4 +1,10 @@
-# sph_seepage_flows
+# Visual Simulation of Soil-Structure Destruction with Seepage Flows (SCA 2021)
+
+*Xu Wang, Makoto Fujisawa, Masahiko Mikawa
+
+![](./pics/teaser.jpg)
+
+[[Paper]](https://) [[Video]](https://)
 
 [![WindowsCUDA](https://github.com/RaymondMcGuire/SPH_CUDA/actions/workflows/WindowsCUDA.yml/badge.svg?branch=master)](https://github.com/RaymondMcGuire/SPH_CUDA/actions/workflows/WindowsCUDA.yml)
 
@@ -9,7 +15,7 @@ Seepage Flows + WCSPH(CUDA version).
 - C++ & CUDA10.2
 - Install [CUDA](https://developer.nvidia.com/cuda-downloads) and [Cmake](https://cmake.org/download/) first
 
-## Setup
+## How to run
 
 ### Clone Project
 
