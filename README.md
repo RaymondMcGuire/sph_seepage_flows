@@ -17,7 +17,7 @@ Seepage Flows + WCSPH(CUDA version).
 git clone https://github.com/RaymondMcGuire/sph_seepage_flows.git --recursive
 ```
 
-### Project Initiation (CMake)
+### Project Initiation (CMake Command Line)
 
 ```rb
 cd /to/your/project/path
@@ -35,7 +35,7 @@ cd build
 cmake .. -G"Visual Studio 16 2019" -A x64
 ```
 
-### Scripts
+### Or Scripts
 
 #### For Windows
 
