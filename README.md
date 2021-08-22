@@ -17,7 +17,7 @@ Seepage Flows + WCSPH(CUDA version).
 git clone https://github.com/RaymondMcGuire/sph_seepage_flows.git --recursive
 ```
 
-### Command Line
+### Project Initiation (CMake)
 
 ```rb
 cd /to/your/project/path
