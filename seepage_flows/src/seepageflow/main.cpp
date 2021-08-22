@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xu.WANG
  * @Date: 2020-10-27 00:49:33
- * @LastEditTime: 2021-08-21 19:54:43
+ * @LastEditTime: 2021-08-22 14:32:50
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
@@ -138,6 +138,7 @@ void SetupParams()
     KIRI_LOG_INFO("Number of total particles = {0}, dt={1}", volumeData.pos.size(), CUDA_SEEPAGEFLOW_PARAMS.dt);
 
     // init spatial searcher
+    CudaSFParticlesPtr particles;
     CudaGNSearcherPtr searcher;
     searcher = std::make_shared<CudaGNSearcher>(
         CUDA_BOUNDARY_PARAMS.lowest_point,
@@ -146,8 +147,6 @@ void SetupParams()
         CUDA_BOUNDARY_PARAMS.kernel_radius,
         SearcherParticleType::SEEPAGE);
 
-    // define particles
-    CudaSFParticlesPtr particles;
     particles =
         std::make_shared<CudaSFParticles>(
             CUDA_SEEPAGEFLOW_APP_PARAMS.max_num,
