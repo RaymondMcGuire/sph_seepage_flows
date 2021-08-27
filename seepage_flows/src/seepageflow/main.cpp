@@ -1,7 +1,7 @@
 /*** 
  * @Author: Xu.WANG
  * @Date: 2020-10-27 00:49:33
- * @LastEditTime: 2021-08-22 14:32:50
+ * @LastEditTime: 2021-08-27 23:50:13
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
@@ -137,16 +137,8 @@ void SetupParams()
     CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * volumeData.sandMinRadius / std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young / CUDA_SEEPAGEFLOW_PARAMS.dem_density);
     KIRI_LOG_INFO("Number of total particles = {0}, dt={1}", volumeData.pos.size(), CUDA_SEEPAGEFLOW_PARAMS.dt);
 
-    // init spatial searcher
+    // spatial searcher & particles
     CudaSFParticlesPtr particles;
-    CudaGNSearcherPtr searcher;
-    searcher = std::make_shared<CudaGNSearcher>(
-        CUDA_BOUNDARY_PARAMS.lowest_point,
-        CUDA_BOUNDARY_PARAMS.highest_point,
-        particles->MaxSize(),
-        CUDA_BOUNDARY_PARAMS.kernel_radius,
-        SearcherParticleType::SEEPAGE);
-
     particles =
         std::make_shared<CudaSFParticles>(
             CUDA_SEEPAGEFLOW_APP_PARAMS.max_num,
@@ -155,6 +147,14 @@ void SetupParams()
             volumeData.label,
             volumeData.mass,
             volumeData.radius);
+
+    CudaGNSearcherPtr searcher;
+    searcher = std::make_shared<CudaGNSearcher>(
+        CUDA_BOUNDARY_PARAMS.lowest_point,
+        CUDA_BOUNDARY_PARAMS.highest_point,
+        particles->MaxSize(),
+        CUDA_BOUNDARY_PARAMS.kernel_radius,
+        SearcherParticleType::SEEPAGE);
 
     auto boundary_particles = std::make_shared<CudaBoundaryParticles>(boundaryData.pos, boundaryData.label);
     KIRI_LOG_INFO("Number of Boundary Particles = {0}", boundary_particles->Size());

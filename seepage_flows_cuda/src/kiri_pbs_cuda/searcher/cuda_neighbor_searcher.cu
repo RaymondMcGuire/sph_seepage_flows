@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-05 12:33:37
- * @LastEditTime: 2021-08-21 17:21:41
+ * @LastEditTime: 2021-08-27 23:44:32
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
@@ -12,7 +12,6 @@
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher_gpu.cuh>
 
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
-#include <kiri_pbs_cuda/particle/cuda_iisf_particles.cuh>
 
 namespace KIRI
 {
@@ -81,24 +80,7 @@ namespace KIRI
                                         seepage_flow->GetMassPtr(),
                                         seepage_flow->GetMaxSaturationPtr())));
         }
-        else if (mSearcherParticleType == SearcherParticleType::IISEEPAGE)
-        {
-            auto seepage_flow = std::dynamic_pointer_cast<CudaIISFParticles>(particles);
-            thrust::sort_by_key(thrust::device,
-                                mGridIdxArray.Data(),
-                                mGridIdxArray.Data() + particles->Size(),
-                                thrust::make_zip_iterator(
-                                    thrust::make_tuple(
-                                        seepage_flow->GetLastPressurePtr(),
-                                        seepage_flow->GetLabelPtr(),
-                                        seepage_flow->GetPosPtr(),
-                                        seepage_flow->GetVelPtr(),
-                                        seepage_flow->GetColPtr(),
-                                        seepage_flow->GetRadiusPtr(),
-                                        seepage_flow->GetMassPtr(),
-                                        seepage_flow->GetMaxSaturationPtr())));
-        }
-        
+
         cudaDeviceSynchronize();
         KIRI_CUKERNAL();
     }

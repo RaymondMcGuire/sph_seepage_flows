@@ -12,8 +12,6 @@
 #include <kiri_pbs_cuda/data/cuda_seepageflow_params.h>
 
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_wcsph_sf_solver.cuh>
-#include <kiri_pbs_cuda/solver/seepageflow/cuda_iisph_sf_solver.cuh>
-#include <kiri_pbs_cuda/particle/cuda_iisf_particles.cuh>
 
 #include <kiri_pbs_cuda/emitter/cuda_volume_emitter.cuh>
 #include <kiri_pbs_cuda/emitter/cuda_boundary_emitter.cuh>

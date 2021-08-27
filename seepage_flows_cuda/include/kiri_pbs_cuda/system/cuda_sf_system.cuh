@@ -18,7 +18,6 @@
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
 #include <kiri_pbs_cuda/particle/cuda_boundary_particles.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_wcsph_sf_solver.cuh>
-#include <kiri_pbs_cuda/solver/seepageflow/cuda_iisph_sf_solver.cuh>
 
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher.cuh>
 

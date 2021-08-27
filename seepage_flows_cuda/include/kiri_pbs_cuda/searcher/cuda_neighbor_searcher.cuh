@@ -1,10 +1,10 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-07-26 17:30:04
- * @LastEditTime: 2021-07-19 04:04:12
+ * @LastEditTime: 2021-08-27 23:43:18
  * @LastEditors: Xu.WANG
  * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
  */
 
 #ifndef _CUDA_NEIGHBOR_SEARCHER_CUH_
@@ -18,16 +18,7 @@ namespace KIRI
 
     enum SearcherParticleType
     {
-        SPH = 0,
-        IISPH = 1,
-        DEM = 2,
-        MRDEM = 3,
-        BNSPH = 4,
-        MULTISPH_REN14 = 5,
-        MULTISPH_YAN16 = 6,
-        SEEPAGE = 7,
-        SEEPAGE_MULTI = 8,
-        IISEEPAGE = 9
+        SEEPAGE = 0,
     };
 
     class CudaGNBaseSearcher

@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-03 22:59:48
- * @LastEditTime: 2021-08-21 17:25:08
+ * @LastEditTime: 2021-08-27 23:45:05
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
@@ -71,8 +71,6 @@ namespace KIRI
             solver = std::dynamic_pointer_cast<CudaSphSFSolver>(mSolver);
         else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == WCSPH_SOLVER)
             solver = std::dynamic_pointer_cast<CudaWCSphSFSolver>(mSolver);
-        else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == IISPH_SOLVER)
-            solver = std::dynamic_pointer_cast<CudaIISphSFSolver>(mSolver);
 
         solver->UpdateSolver(
             mParticles,
@@ -86,7 +84,7 @@ namespace KIRI
         // emitter
         if (mEmitter->GetEmitterStatus() && CUDA_SPH_EMITTER_PARAMS.run)
         {
-            if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == SPH_SOLVER || IISPH_SOLVER)
+            if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == SPH_SOLVER)
             {
                 size_t step_num = 2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius / (length(mEmitter->GetEmitterVelocity()) * CUDA_SEEPAGEFLOW_PARAMS.dt);
                 if (mEmitterCounter++ % step_num == 0)
