@@ -52,3 +52,25 @@ cmake .. -G"Visual Studio 16 2019" -A x64
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details
+
+## Bibtex
+
+```
+@article{10.1145/3480141,
+author = {Wang, Xu and Fujisawa, Makoto and Mikawa, Masahiko},
+title = {Visual Simulation of Soil-Structure Destruction with Seepage Flows},
+year = {2021},
+issue_date = {September 2021},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {4},
+number = {3},
+url = {https://doi.org/10.1145/3480141},
+doi = {10.1145/3480141},
+journal = {Proc. ACM Comput. Graph. Interact. Tech.},
+month = sep,
+articleno = {41},
+numpages = {18},
+keywords = {Seepage Flow, Capillary Action, Dam Breach, Adhesion, Discrete Element Method, Smoothed Particle Hydrodynamics}
+}
+```
