@@ -1,9 +1,9 @@
-/*** 
- * @Author: Jayden Zhang
+/***
+ * @Author: Xu.WANG
  * @Date: 2020-09-27 02:54:00
  * @LastEditTime: 2021-02-20 18:50:37
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \KiriCore\include\kiri_log.h
  */
 
