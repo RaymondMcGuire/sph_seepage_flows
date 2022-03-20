@@ -1,9 +1,9 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-07-04 14:48:23
- * @LastEditTime: 2021-06-28 17:25:20
+ * @LastEditTime: 2022-03-19 02:59:49
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\dem\cuda_dem_solver_common_gpu.cuh
  */
 
@@ -77,6 +77,8 @@ namespace KIRI
             // float coeff_c = csat + (1.f - sr) * (c0 - csat);
             float coeff_c = G(sr);
 
+            // printf("cohesive=%.3f \n", coeff_c);
+
             float d = -H + sqrtf(H * H + volume_liquid_bridge / (KIRI_PI * radiusi));
             float phi = sqrtf(2.f * H / radiusi * (-1.f + sqrtf(1.f + volume_liquid_bridge / (KIRI_PI * radiusi * H * H))));
             float neck_curvature_pressure = -2.f * KIRI_PI * coeff_c * radiusi * cosf(contact_angle) / (1.f + H / (2.f * d));
@@ -114,7 +116,7 @@ namespace KIRI
             float3 vij_normal = dot_epslion * N;
             float3 vij_tangential = vij - dot_epslion * N;
 
-            //float coeff_c = csat + (1.f - sr) * (c0 - csat);
+            // float coeff_c = csat + (1.f - sr) * (c0 - csat);
             float coeff_c = G(sr);
 
             float d = -H + sqrtf(H * H + volume_liquid_bridge / (KIRI_PI * avg_radius));
@@ -155,42 +157,42 @@ namespace KIRI
         {
             N = make_float3(1.f, 0.f, 0.f);
             diff = abs(posi.x - highestPoint.x);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         if (posi.x < lowestPoint.x + rij)
         {
             N = make_float3(-1.f, 0.f, 0.f);
             diff = abs(posi.x - lowestPoint.x);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         if (posi.y > highestPoint.y - rij)
         {
             N = make_float3(0.f, 1.f, 0.f);
             diff = abs(posi.y - highestPoint.y);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         if (posi.y < lowestPoint.y + rij)
         {
             N = make_float3(0.f, -1.f, 0.f);
             diff = abs(posi.y - lowestPoint.y);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         if (posi.z > highestPoint.z - rij)
         {
             N = make_float3(0.f, 0.f, 1.f);
             diff = abs(posi.z - highestPoint.z);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         if (posi.z < lowestPoint.z + 2 * rij)
         {
             N = make_float3(0.f, 0.f, -1.f);
             diff = abs(posi.z - lowestPoint.z);
-            *f += ComputeDemForces(N * diff, veli, rij, kn, ks, tanFrictionAngle);
+            *f += ComputeDemForces(N * diff, -veli, rij, kn, ks, tanFrictionAngle);
         }
 
         return;

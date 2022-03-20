@@ -1,9 +1,9 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-07-04 14:48:23
- * @LastEditTime: 2021-07-18 20:03:44
+ * @LastEditTime: 2022-02-13 17:41:28
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\sph\cuda_sph_solver_common_gpu.cuh
  */
 
@@ -32,6 +32,9 @@ namespace KIRI
 
         if (pressure[i] < 0.f)
             pressure[i] *= negativeScale;
+
+        // if (i == 1000)
+        //     printf("pressure = %.3f \n", pressure[i]);
 
         return;
     }
@@ -141,7 +144,7 @@ namespace KIRI
         while (j < cellEnd)
         {
             if (i != j)
-                *a += -mass[j] * (pressure[i] / fmaxf(KIRI_EPSILON, density[i] * density[i]) + pressure[j] / fmaxf(KIRI_EPSILON, density[j] * density[j])) * nablaW(pos[i] - pos[j]);
+                *a -= mass[j] * (pressure[i] / fmaxf(KIRI_EPSILON, density[i] * density[i]) + pressure[j] / fmaxf(KIRI_EPSILON, density[j] * density[j])) * nablaW(pos[i] - pos[j]);
             ++j;
         }
 

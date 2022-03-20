@@ -1,9 +1,9 @@
-/*** 
+/***
  * @Author: Jayden Zhang
  * @Date: 2020-09-27 02:54:00
  * @LastEditTime: 2021-08-21 19:46:42
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \sph_seepage_flows\seepage_flows\include\kiri_utils.h
  */
 
@@ -30,7 +30,65 @@ namespace KIRI
         return String(output);
     };
 
-    Vector<float4> ReadMultiBgeoFilesForGPU(
+    Vec_Float4 ReadBgeoFileForGPU(
+        String Folder,
+        String Name,
+        bool flip_yz = false)
+    {
+        String root_folder = "bgeo";
+        String extension = ".bgeo";
+        String file_path = String(DB_PBR_PATH) + root_folder + "/" + Folder + "/" + Name + extension;
+        Partio::ParticlesDataMutable *data = Partio::read(file_path.c_str());
+
+        Partio::ParticleAttribute pos_attr;
+        Partio::ParticleAttribute pscale_attr;
+        if (!data->attributeInfo("position", pos_attr) || (pos_attr.type != Partio::FLOAT && pos_attr.type != Partio::VECTOR) || pos_attr.count != 3)
+        {
+            KIRI_LOG_ERROR("Failed to Get Proper Position Attribute");
+        }
+
+        bool pscaleLoaded = data->attributeInfo("pscale", pscale_attr);
+
+        Vec_Float4 pos_array;
+        for (Int i = 0; i < data->numParticles(); i++)
+        {
+            const float *pos = data->data<float>(pos_attr, i);
+            if (pscaleLoaded)
+            {
+                const float *pscale = data->data<float>(pscale_attr, i);
+                if (i == 0)
+                {
+                    KIRI_LOG_INFO("pscale={0}", *pscale);
+                }
+
+                if (flip_yz)
+                {
+                    pos_array.push_back(make_float4(pos[0], pos[2], pos[1], *pscale));
+                }
+                else
+                {
+                    pos_array.push_back(make_float4(pos[0], pos[1], pos[2], *pscale));
+                }
+            }
+            else
+            {
+                if (flip_yz)
+                {
+                    pos_array.push_back(make_float4(pos[0], pos[2], pos[1], 0.01f));
+                }
+                else
+                {
+                    pos_array.push_back(make_float4(pos[0], pos[1], pos[2], 0.01f));
+                }
+            }
+        }
+
+        data->release();
+
+        return pos_array;
+    }
+
+    Vec_Float4 ReadMultiBgeoFilesForGPU(
         Vec_String folders,
         Vec_String file_names,
         bool flip_yz = false)
@@ -38,7 +96,7 @@ namespace KIRI
         auto root_folder = "bgeo";
         auto extension = ".bgeo";
 
-        Vector<float4> pos_array;
+        Vec_Float4 pos_array;
         for (auto n = 0; n < folders.size(); n++)
         {
             auto file_path = String(DB_PBR_PATH) + root_folder + "/" + folders[n] + "/" + file_names[n] + extension;

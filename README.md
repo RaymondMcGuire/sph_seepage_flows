@@ -1,3 +1,10 @@
+<!--
+ * @Author: Xu.WANG
+ * @Date: 2021-10-05 21:02:47
+ * @LastEditTime: 2022-03-20 17:04:55
+ * @LastEditors: Xu.WANG
+ * @Description: 
+-->
 # Visual Simulation of Soil-Structure Destruction with Seepage Flows (SCA 2021)
 
 *Xu Wang, Makoto Fujisawa, Masahiko Mikawa
@@ -8,11 +15,11 @@
 
 [![WindowsCUDA](https://github.com/RaymondMcGuire/sph_seepage_flows/actions/workflows/WindowsCUDA.yml/badge.svg?branch=main)](https://github.com/RaymondMcGuire/sph_seepage_flows/actions/workflows/WindowsCUDA.yml)
 
-Seepage Flows + WCSPH(CUDA version).
+Seepage Flows + WCSPH
 
 ## Environment
 
-- C++ & CUDA10.2
+- C++, CUDA
 - Install [CUDA](https://developer.nvidia.com/cuda-downloads) and [Cmake](https://cmake.org/download/) first
 
 ## How to run
@@ -46,7 +53,7 @@ cmake .. -G"Visual Studio 16 2019" -A x64
 #### For Windows
 
 - cd to ./scripts folder
-- choose your visual studio version(vs15/vs17/vs19)
+- choose your visual studio version(vs15/vs17/vs19/vs22)
 - run the bat file
 
 ## License

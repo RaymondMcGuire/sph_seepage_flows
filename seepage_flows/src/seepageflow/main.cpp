@@ -1,9 +1,9 @@
-/*** 
+/***
  * @Author: Xu.WANG
  * @Date: 2020-10-27 00:49:33
  * @LastEditTime: 2021-08-27 23:50:13
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
  */
 
@@ -26,6 +26,7 @@ void SetupParams()
 {
     KIRI_LOG_DEBUG("Seepageflow: SetupParams");
 
+    // export path
     strcpy(CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder, (String(EXPORT_PATH) + "bgeo/seepageflow_bunny_wcsph").c_str());
 
     // scene config
@@ -114,39 +115,73 @@ void SetupParams()
 
     boundaryEmitter->BuildWorldBoundary(boundaryData, CUDA_BOUNDARY_PARAMS.lowest_point, CUDA_BOUNDARY_PARAMS.highest_point, CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
 
+    // material type (SF: unified material; MULTI_SF: multiple types of materials)
+    CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
+
     // shape sampling
-    SeepageflowVolumeData volumeData;
+    auto offset2Ground = true;
+    SeepageflowMultiVolumeData multiVolumeData;
     auto volumeEmitter = std::make_shared<CudaVolumeEmitter>();
 
+    // multiple sand objects
     Vec_String shape_folders, shape_files;
+
+    // object 1: bunny/bunny.bego
     shape_folders.emplace_back("bunny");
     shape_files.emplace_back("bunny");
 
-    auto sandShapes = ReadMultiBgeoFilesForGPU(shape_folders, shape_files);
+    // object 2: dam/dam2.bego
+    // shape_folders.emplace_back("dam");
+    // shape_files.emplace_back("dam2");
 
-    volumeEmitter->BuildSeepageflowShapeVolume(
-        volumeData,
-        sandShapes,
-        CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
-        CUDA_SEEPAGEFLOW_PARAMS.dem_density,
-        true,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y);
+    std::vector<float3> cd_a0_asat;
+    std::vector<float2> amc_amcp;
+
+    // params(cd, a0, asat, amc, amcp) for object1
+    cd_a0_asat.emplace_back(make_float3(CUDA_SEEPAGEFLOW_PARAMS.sf_cd, CUDA_SEEPAGEFLOW_PARAMS.sf_a0, CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
+    // params for object1
+    amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc, CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
+
+    // params(cd, a0, asat, amc, amcp) for object2
+    // cd_a0_asat.emplace_back(make_float3(cd,a0,asat));
+    // amc_amcp.emplace_back(make_float2(amc,amcp));
+
+    for (auto i = 0; i < shape_folders.size(); i++)
+    {
+        auto cda0asat = cd_a0_asat[i];
+        auto amcamcp = amc_amcp[i];
+        auto sandShape = ReadBgeoFileForGPU(shape_folders[i], shape_files[i]);
+
+        volumeEmitter->BuildSeepageflowShapeMultiVolume(
+            multiVolumeData,
+            sandShape,
+            CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
+            CUDA_SEEPAGEFLOW_PARAMS.dem_density,
+            cda0asat,
+            amcamcp,
+            offset2Ground,
+            CUDA_BOUNDARY_PARAMS.lowest_point.y);
+
+        KIRI_LOG_DEBUG("Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}", i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x, amcamcp.y);
+    }
 
     // dt
-    CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius = volumeData.sandMinRadius;
-    CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * volumeData.sandMinRadius / std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young / CUDA_SEEPAGEFLOW_PARAMS.dem_density);
-    KIRI_LOG_INFO("Number of total particles = {0}, dt={1}", volumeData.pos.size(), CUDA_SEEPAGEFLOW_PARAMS.dt);
+    CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius = multiVolumeData.sandMinRadius;
+    CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius / std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young / CUDA_SEEPAGEFLOW_PARAMS.dem_density);
+    KIRI_LOG_INFO("Number of total particles = {0}", multiVolumeData.pos.size());
 
     // spatial searcher & particles
     CudaSFParticlesPtr particles;
     particles =
         std::make_shared<CudaSFParticles>(
             CUDA_SEEPAGEFLOW_APP_PARAMS.max_num,
-            volumeData.pos,
-            volumeData.col,
-            volumeData.label,
-            volumeData.mass,
-            volumeData.radius);
+            multiVolumeData.pos,
+            multiVolumeData.col,
+            multiVolumeData.label,
+            multiVolumeData.mass,
+            multiVolumeData.radius,
+            multiVolumeData.cda0asat,
+            multiVolumeData.amcamcp);
 
     CudaGNSearcherPtr searcher;
     searcher = std::make_shared<CudaGNSearcher>(
@@ -154,7 +189,7 @@ void SetupParams()
         CUDA_BOUNDARY_PARAMS.highest_point,
         particles->MaxSize(),
         CUDA_BOUNDARY_PARAMS.kernel_radius,
-        SearcherParticleType::SEEPAGE);
+        SearcherParticleType::SEEPAGE_MULTI);
 
     auto boundary_particles = std::make_shared<CudaBoundaryParticles>(boundaryData.pos, boundaryData.label);
     KIRI_LOG_INFO("Number of Boundary Particles = {0}", boundary_particles->Size());

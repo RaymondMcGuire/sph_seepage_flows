@@ -1,9 +1,9 @@
-/*** 
+/***
  * @Author: Xu.WANG
  * @Date: 2021-03-19 22:04:26
  * @LastEditTime: 2021-08-18 08:58:58
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
  */
 #include <random>
@@ -174,11 +174,9 @@ namespace KIRI
 
         if (offsetY)
         {
-            float offsetYVal = minY - (worldLowestY + data.sandMinRadius);
+            float offsetYVal = minY - (worldLowestY + data.sandMinRadius * 5.f);
             for (size_t i = 0; i < data.pos.size(); i++)
-            {
                 data.pos[i] -= make_float3(0.f, offsetYVal, 0.f);
-            }
         }
     }
 
@@ -216,7 +214,7 @@ namespace KIRI
 
         if (offsetY)
         {
-            float offsetYVal = minY - (worldLowestY + data.sandMinRadius);
+            float offsetYVal = minY - (worldLowestY + data.sandMinRadius * 5.f);
             for (size_t i = 0; i < data.pos.size(); i++)
                 data.pos[i] -= make_float3(0.f, offsetYVal, 0.f);
         }

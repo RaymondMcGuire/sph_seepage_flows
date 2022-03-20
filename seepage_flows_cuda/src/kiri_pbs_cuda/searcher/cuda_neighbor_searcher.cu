@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-05 12:33:37
- * @LastEditTime: 2021-08-27 23:44:32
+ * @LastEditTime: 2022-03-20 16:56:46
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
@@ -36,14 +36,14 @@ namespace KIRI
     void CudaGNBaseSearcher::BuildGNSearcher(const CudaParticlesPtr &particles)
     {
         thrust::transform(thrust::device,
-                          particles->GetPosPtr(), particles->GetPosPtr() + particles->Size(),
-                          mGridIdxArray.Data(),
-                          ThrustHelper::Pos2GridHash<float3>(mLowestPoint, mCellSize, mGridSize));
+            particles->GetPosPtr(), particles->GetPosPtr() + particles->Size(),
+            particles->GetParticle2CellPtr(),
+            ThrustHelper::Pos2GridHash<float3>(mLowestPoint, mCellSize, mGridSize));
 
         this->SortData(particles);
 
         thrust::fill(thrust::device, mCellStart.Data(), mCellStart.Data() + mNumOfGridCells, 0);
-        CountingInCell_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(mCellStart.Data(), mGridIdxArray.Data(), particles->Size());
+        CountingInCell_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(mCellStart.Data(), particles->GetParticle2CellPtr(), particles->Size());
         thrust::exclusive_scan(thrust::device, mCellStart.Data(), mCellStart.Data() + mNumOfGridCells, mCellStart.Data());
 
         cudaDeviceSynchronize();
@@ -67,6 +67,8 @@ namespace KIRI
        if (mSearcherParticleType == SearcherParticleType::SEEPAGE)
         {
             auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
+
+            KIRI_CUCALL(cudaMemcpy(mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(), sizeof(size_t) * particles->Size(), cudaMemcpyDeviceToDevice));
             thrust::sort_by_key(thrust::device,
                                 mGridIdxArray.Data(),
                                 mGridIdxArray.Data() + particles->Size(),
@@ -79,6 +81,34 @@ namespace KIRI
                                         seepage_flow->GetRadiusPtr(),
                                         seepage_flow->GetMassPtr(),
                                         seepage_flow->GetMaxSaturationPtr())));
+        }
+        else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI)
+        {
+
+            auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
+
+            KIRI_CUCALL(cudaMemcpy(mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(), sizeof(size_t) * particles->Size(), cudaMemcpyDeviceToDevice));
+            thrust::sort_by_key(thrust::device,
+                                mGridIdxArray.Data(),
+                                mGridIdxArray.Data() + particles->Size(),
+                                thrust::make_zip_iterator(
+                                    thrust::make_tuple(
+                                        seepage_flow->GetLabelPtr(),
+                                        seepage_flow->GetPosPtr(),
+                                        seepage_flow->GetVelPtr(),
+                                        seepage_flow->GetColPtr(),
+                                        seepage_flow->GetRadiusPtr(),
+                                        seepage_flow->GetMassPtr())));
+
+            KIRI_CUCALL(cudaMemcpy(mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(), sizeof(size_t) * particles->Size(), cudaMemcpyDeviceToDevice));
+            thrust::sort_by_key(thrust::device,
+                                mGridIdxArray.Data(),
+                                mGridIdxArray.Data() + particles->Size(),
+                                thrust::make_zip_iterator(
+                                    thrust::make_tuple(
+                                        seepage_flow->GetMaxSaturationPtr(),
+                                        seepage_flow->GetCdA0AsatPtr(),
+                                        seepage_flow->GetAmcAmcpPtr())));
         }
 
         cudaDeviceSynchronize();
@@ -95,6 +125,7 @@ namespace KIRI
     void CudaGNBoundarySearcher::SortData(const CudaParticlesPtr &particles)
     {
         auto boundaries = std::dynamic_pointer_cast<CudaBoundaryParticles>(particles);
+        KIRI_CUCALL(cudaMemcpy(mGridIdxArray.Data(), boundaries->GetParticle2CellPtr(), sizeof(size_t) * particles->Size(), cudaMemcpyDeviceToDevice));
         thrust::sort_by_key(thrust::device,
                             mGridIdxArray.Data(),
                             mGridIdxArray.Data() + particles->Size(),

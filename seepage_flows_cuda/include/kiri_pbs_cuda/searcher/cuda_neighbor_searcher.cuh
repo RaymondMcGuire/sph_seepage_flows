@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-07-26 17:30:04
- * @LastEditTime: 2021-08-27 23:43:18
+ * @LastEditTime: 2022-03-20 11:26:59
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
@@ -19,6 +19,7 @@ namespace KIRI
     enum SearcherParticleType
     {
         SEEPAGE = 0,
+        SEEPAGE_MULTI = 1
     };
 
     class CudaGNBaseSearcher

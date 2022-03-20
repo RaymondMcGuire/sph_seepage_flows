@@ -41,7 +41,7 @@ endif()
 # For Visual Studio
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	# Optimization options for C/C++
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /wd4819 /wd26812 /wd26495 /O2 /Ob2 /Ot /Oi /Gy /MP")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /wd4819 /wd4068 /wd26812 /wd26495 /O2 /Ob2 /Ot /Oi /Gy /MP")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
 

@@ -1,9 +1,9 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-07-04 14:48:23
- * @LastEditTime: 2021-08-19 00:30:50
+ * @LastEditTime: 2022-03-19 02:53:40
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
  */
 
@@ -67,12 +67,12 @@ namespace KIRI
             // only collide scene boundary particles
             if (bLabel[j] == 1)
             {
-                float3 dij = bpos[j] - posi;
+                float3 dij = posi - bpos[j];
                 float rij = 2.f * radius;
-                float3 vij = veli;
                 float kn = young * radius;
                 float ks = kn * poisson;
 
+                float3 vij = make_float3(-veli.x, -veli.y, -veli.z);
                 *f += ComputeDemForces(dij, vij, rij, kn, ks, tanFrictionAngle);
             }
             ++j;
@@ -157,13 +157,13 @@ namespace KIRI
 
             if (label[i] == 1 && label[j] == 0)
             {
-                //avg flow for soild
+                // avg flow for soild
                 *avgVelS += vel[j] * vj * wij;
                 *vS += vj * wij;
             }
             else if (label[i] == 0 && label[j] == 1)
             {
-                //avg flow for fluid
+                // avg flow for fluid
                 *avgVelW += vel[j] * vj * wij;
                 *vW += vj * wij;
             }
@@ -430,7 +430,7 @@ namespace KIRI
     }
 
     /**
-     * @description: 
+     * @description:
      * @param {rho0: water; rho1: sand; label: 0=water 1=sand}
      * @return {*}
      */
@@ -784,10 +784,10 @@ namespace KIRI
             ComputeSFSandAdhesionTerm(&f, i, label, pos, mass, density, avgAdhesionForce, cellStart[hash_idx], cellStart[hash_idx + 1], W);
 
             // scene boundary particles interactive
-            ComputeSFUniRadiusDemBoundaryForces(&f, pos[i], -vel[i], bLabel, bPos, sandRadius, young, poisson, tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
+            ComputeSFUniRadiusDemBoundaryForces(&f, pos[i], vel[i], bLabel, bPos, sandRadius, young, poisson, tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
         }
 
-        ComputeDemWorldBoundaryForces(&f, pos[i], -vel[i], sandRadius, waterRadius, young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
+        ComputeDemWorldBoundaryForces(&f, pos[i], vel[i], sandRadius, waterRadius, young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
         // sand-water interactive(drag term)
         if (voidage[i] < 1.f && voidage[i] > 0.f)
@@ -872,10 +872,10 @@ namespace KIRI
             ComputeSFSandAdhesionTerm(&f, i, label, pos, mass, density, avgAdhesionForce, cellStart[hash_idx], cellStart[hash_idx + 1], W);
 
             // scene boundary particles interactive
-            ComputeSFUniRadiusDemBoundaryForces(&f, pos[i], -vel[i], bLabel, bPos, sandRadius, young, poisson, tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
+            ComputeSFUniRadiusDemBoundaryForces(&f, pos[i], vel[i], bLabel, bPos, sandRadius, young, poisson, tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
         }
 
-        ComputeDemWorldBoundaryForces(&f, pos[i], -vel[i], sandRadius, waterRadius, young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
+        ComputeDemWorldBoundaryForces(&f, pos[i], vel[i], sandRadius, waterRadius, young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
         // sand-water interactive(drag term)
         if (voidage[i] < 1.f && voidage[i] > 0.f)

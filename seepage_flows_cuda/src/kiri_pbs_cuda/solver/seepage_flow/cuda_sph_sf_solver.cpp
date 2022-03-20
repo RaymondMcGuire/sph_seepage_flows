@@ -55,7 +55,8 @@ namespace KIRI
             bparams.kernel_radius,
             bparams.grid_size);
 
- 
+        if (params.sf_type == SF)
+        {
             ComputeSFWaterAdhesion(
                 particles,
                 cellStart,
@@ -88,7 +89,37 @@ namespace KIRI
                 bparams.highest_point,
                 bparams.kernel_radius,
                 bparams.grid_size);
-      
+        }
+        else if (params.sf_type == MULTI_SF)
+        {
+            ComputeMultiSFWaterAdhesion(
+                particles,
+                cellStart,
+                bparams.lowest_point,
+                bparams.kernel_radius,
+                bparams.grid_size);
+
+            ComputeMultiSFSandLinearMomentum(
+                particles,
+                boundaries,
+                cellStart,
+                boundaryCellStart,
+                params.dem_particle_radius,
+                params.sph_particle_radius,
+                params.dem_young,
+                params.dem_poisson,
+                params.dem_tan_friction_angle,
+                params.sf_c0,
+                params.sf_csat,
+                params.sf_cmc,
+                params.sf_cmc_p,
+                abs(params.gravity.y),
+                params.sph_density,
+                bparams.lowest_point,
+                bparams.highest_point,
+                bparams.kernel_radius,
+                bparams.grid_size);
+        }
 
         ComputeSFWaterLinearMomentum(
             particles,
