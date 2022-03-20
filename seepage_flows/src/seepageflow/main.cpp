@@ -138,13 +138,12 @@ void SetupParams()
     std::vector<float2> amc_amcp;
 
     // params(cd, a0, asat, amc, amcp) for object1
-    cd_a0_asat.emplace_back(make_float3(CUDA_SEEPAGEFLOW_PARAMS.sf_cd, CUDA_SEEPAGEFLOW_PARAMS.sf_a0, CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
-    // params for object1
+    cd_a0_asat.emplace_back(make_float3(0.5f, CUDA_SEEPAGEFLOW_PARAMS.sf_a0, CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
     amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc, CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
 
     // params(cd, a0, asat, amc, amcp) for object2
-    // cd_a0_asat.emplace_back(make_float3(cd,a0,asat));
-    // amc_amcp.emplace_back(make_float2(amc,amcp));
+    // cd_a0_asat.emplace_back(make_float3(0.015f, CUDA_SEEPAGEFLOW_PARAMS.sf_a0, CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
+    // amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc, CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
 
     for (auto i = 0; i < shape_folders.size(); i++)
     {
