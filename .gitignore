@@ -3,6 +3,7 @@ build
 /cmake/checkCUDA/compile/*
 !/cmake/checkCUDA/compile/.gitkeep
 /export/bgeo/**/*.bgeo
+/export/bgeo/**/*.vtk
 /export/obj/**/*.obj
 /houdini_template/backup
 /**/*.pyc

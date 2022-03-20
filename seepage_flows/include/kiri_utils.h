@@ -1,5 +1,4 @@
 /***
- * @Author: Jayden Zhang
  * @Date: 2020-09-27 02:54:00
  * @LastEditTime: 2021-08-21 19:46:42
  * @LastEditors: Xu.WANG
@@ -19,9 +18,21 @@
 #include <filesystem>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <regex>
 
 namespace KIRI
 {
+
+    struct Vec3f
+    {
+        float data[3];
+    };
+
+    struct Vec2i
+    {
+        int data[2];
+    };
+
     String UInt2Str4Digit(
         UInt input)
     {
@@ -29,6 +40,214 @@ namespace KIRI
         snprintf(output, 5, "%04d", input);
         return String(output);
     };
+
+    template <typename T>
+    inline void swapByteOrder(T *v)
+    {
+        constexpr size_t n = sizeof(T);
+        uint8_t out[n];
+        for (unsigned int c = 0; c < n; c++)
+            out[c] = reinterpret_cast<uint8_t *>(v)[n - c - 1];
+        std::memcpy(v, out, n);
+    }
+
+    void Partio2VTK(
+        const std::string &file_path,
+        const Partio::ParticlesDataMutable *partioData)
+    {
+        const unsigned int numParticles = partioData->numParticles();
+        if (0 == numParticles)
+            return;
+
+        KIRI_LOG_INFO("start convert bgeo to vtk !");
+
+        std::ofstream outfile{file_path, std::ios::binary};
+
+        outfile << "# vtk DataFile Version 4.1\n";
+        outfile << "Seepage Flow Framework Particles Data\n";
+        outfile << "BINARY\n";
+        outfile << "DATASET UNSTRUCTURED_GRID\n";
+
+        // find indices of position and ID attribute
+        unsigned int posIndex = 0xffffffff;
+        unsigned int idIndex = 0xffffffff;
+        for (int i = 0; i < partioData->numAttributes(); i++)
+        {
+            Partio::ParticleAttribute attr;
+            partioData->attributeInfo(i, attr);
+            if (attr.name == "position")
+                posIndex = i;
+            else if (attr.name == "id")
+                idIndex = i;
+        }
+
+        // export position attribute as POINTS
+        if (0xffffffff != posIndex)
+        {
+            // copy from partio data
+            std::vector<Vec3f> positions;
+            positions.reserve(numParticles);
+            Partio::ParticleAttribute attr;
+            partioData->attributeInfo(posIndex, attr);
+            for (unsigned int i = 0u; i < numParticles; i++)
+            {
+                auto partio_pos = partioData->data<float>(attr, i);
+                Vec3f v3;
+                v3.data[0] = partio_pos[0];
+                v3.data[1] = partio_pos[1];
+                v3.data[2] = partio_pos[2];
+                positions.emplace_back(v3);
+            }
+
+            // swap endianess
+            for (unsigned int i = 0; i < numParticles; i++)
+                for (unsigned int c = 0; c < 3; c++)
+                    swapByteOrder(&positions[i].data[c]);
+
+            // export to vtk
+            outfile << "POINTS " << numParticles << " float\n";
+            outfile.write(reinterpret_cast<char *>(positions[0].data), 3 * numParticles * sizeof(float));
+            outfile << "\n";
+        }
+        else
+        {
+            KIRI_LOG_ERROR("not found particle data!");
+            return;
+        }
+
+        // export particle IDs as CELLS
+        {
+            std::vector<Vec2i> cells;
+            cells.reserve(numParticles);
+            int nodes_per_cell_swapped = 1;
+            swapByteOrder(&nodes_per_cell_swapped);
+            if (0xffffffff != idIndex)
+            {
+                // load IDs from partio
+                Partio::ParticleAttribute attr;
+                partioData->attributeInfo(idIndex, attr);
+                for (unsigned int i = 0u; i < numParticles; i++)
+                {
+                    int idSwapped = *partioData->data<int>(attr, i);
+                    swapByteOrder(&idSwapped);
+                    Vec2i v2i;
+                    v2i.data[0] = nodes_per_cell_swapped;
+                    v2i.data[1] = idSwapped;
+                    cells.emplace_back(v2i);
+                }
+            }
+            else
+            {
+                // generate IDs
+                for (unsigned int i = 0u; i < numParticles; i++)
+                {
+                    int idSwapped = i;
+                    swapByteOrder(&idSwapped);
+                    Vec2i v2i;
+                    v2i.data[0] = nodes_per_cell_swapped;
+                    v2i.data[1] = idSwapped;
+                    cells.emplace_back(v2i);
+                }
+            }
+
+            // particles are cells with one element and the index of the particle
+            outfile << "CELLS " << numParticles << " " << 2 * numParticles << "\n";
+            outfile.write(reinterpret_cast<char *>(cells[0].data), 2 * numParticles * sizeof(int));
+            outfile << "\n";
+        }
+
+        // export cell types
+        {
+            // the type of a particle cell is always 1
+            std::vector<int> cellTypes;
+            unsigned int cellTypeSwapped = 1;
+            swapByteOrder(&cellTypeSwapped);
+            cellTypes.resize(numParticles, cellTypeSwapped);
+            outfile << "CELL_TYPES " << numParticles << "\n";
+            outfile.write(reinterpret_cast<char *>(cellTypes.data()), numParticles * sizeof(int));
+            outfile << "\n";
+        }
+
+        // write additional attributes as per-particle data
+        outfile << "POINT_DATA " << numParticles << "\n";
+        // per point fields (all attributes except for positions and IDs)
+        const unsigned int numFields = partioData->numAttributes() - static_cast<int>(0xffffffff != posIndex) - static_cast<int>(0xffffffff != idIndex);
+        outfile << "FIELD FieldData " << std::to_string(numFields) << "\n";
+        // iterate over attributes
+        for (int a = 0; a < partioData->numAttributes(); a++)
+        {
+            if (posIndex == a || idIndex == a)
+                continue;
+
+            Partio::ParticleAttribute attr;
+            partioData->attributeInfo(a, attr);
+            std::string attrNameVTK;
+            std::regex_replace(std::back_inserter(attrNameVTK), attr.name.begin(), attr.name.end(), std::regex("\\s+"), "_");
+            // write header information
+            outfile << attrNameVTK << " " << attr.count << " " << numParticles;
+            // write depending on data type
+            if (attr.type == Partio::ParticleAttributeType::FLOAT)
+            {
+                outfile << " float\n";
+                // copy from partio data
+                std::vector<float> attrData;
+                attrData.reserve(partioData->numParticles());
+                for (unsigned int i = 0u; i < numParticles; i++)
+                    attrData.emplace_back(*partioData->data<float>(attr, i));
+                // swap endianess
+                for (unsigned int i = 0; i < numParticles; i++)
+                    swapByteOrder(&attrData[i]);
+                // export to vtk
+                outfile.write(reinterpret_cast<char *>(attrData.data()), numParticles * sizeof(float));
+            }
+            else if (attr.type == Partio::ParticleAttributeType::VECTOR)
+            {
+                outfile << " float\n";
+                // copy from partio data
+                std::vector<Vec3f> attrData;
+                attrData.reserve(partioData->numParticles());
+                for (unsigned int i = 0u; i < numParticles; i++)
+                {
+                    Vec3f v3;
+                    auto partio_attr = partioData->data<float>(attr, i);
+                    v3.data[0] = partio_attr[0];
+                    v3.data[1] = partio_attr[1];
+                    v3.data[2] = partio_attr[2];
+                    attrData.emplace_back(v3);
+                }
+
+                // swap endianess
+                for (unsigned int i = 0; i < numParticles; i++)
+                    for (unsigned int c = 0; c < 3; c++)
+                        swapByteOrder(&attrData[i].data[c]);
+
+                // export to vtk
+                outfile.write(reinterpret_cast<char *>(attrData[0].data), 3 * numParticles * sizeof(float));
+            }
+            else if (attr.type == Partio::ParticleAttributeType::INT)
+            {
+                outfile << " int\n";
+                // copy from partio data
+                std::vector<int> attrData;
+                attrData.reserve(partioData->numParticles());
+                for (unsigned int i = 0u; i < numParticles; i++)
+                    attrData.emplace_back(*partioData->data<int>(attr, i));
+                // swap endianess
+                for (unsigned int i = 0; i < numParticles; i++)
+                    swapByteOrder(&attrData[i]);
+                // export to vtk
+                outfile.write(reinterpret_cast<char *>(attrData.data()), numParticles * sizeof(int));
+            }
+            else
+            {
+                KIRI_LOG_INFO("unsupport type!");
+                continue;
+            }
+            // end of block
+            outfile << "\n";
+        }
+        outfile.close();
+    }
 
     Vec_Float4 ReadBgeoFileForGPU(
         String Folder,
@@ -99,7 +318,7 @@ namespace KIRI
         Vec_Float4 pos_array;
         for (auto n = 0; n < folders.size(); n++)
         {
-            auto file_path = String(DB_PBR_PATH) + root_folder + "/" + folders[n] + "/" + file_names[n] + extension;
+            auto file_path = std::string(DB_PBR_PATH) + root_folder + "/" + folders[n] + "/" + file_names[n] + extension;
             Partio::ParticlesDataMutable *data = Partio::read(file_path.c_str());
 
             Partio::ParticleAttribute pos_attr;
@@ -129,7 +348,6 @@ namespace KIRI
                 {
                     if (flip_yz)
                         pos_array.push_back(make_float4(pos[0], pos[2], pos[1], 0.01f));
-
                     else
                         pos_array.push_back(make_float4(pos[0], pos[1], pos[2], 0.01f));
                 }
@@ -144,16 +362,16 @@ namespace KIRI
     }
 
     void ExportBgeoFileCUDA(
-        String folder_path,
-        String file_name,
-        float3 *positions,
-        float3 *colors,
-        float *radius,
-        size_t *labels,
-        UInt particles_num)
+        const std::string &folder_path,
+        const std::string &file_name,
+        const float3 *positions,
+        const float3 *colors,
+        const float *radius,
+        const size_t *labels,
+        const size_t particles_num)
     {
-        String export_file = folder_path + "/" + file_name + ".bgeo";
-
+        std::string export_bgeo = folder_path + "/" + file_name + ".bgeo";
+        std::string export_vtk = folder_path + "/" + file_name + ".vtk";
         try
         {
 
@@ -190,7 +408,7 @@ namespace KIRI
             cudaMemcpy(cpu_radius, radius, fbytes, cudaMemcpyDeviceToHost);
             cudaMemcpy(cpu_labels, labels, uintbytes, cudaMemcpyDeviceToHost);
 
-            for (UInt i = 0; i < particles_num; i++)
+            for (size_t i = 0; i < particles_num; i++)
             {
                 Int particle = p->addParticle();
                 float *pos = p->dataWrite<float>(position_attr, particle);
@@ -205,13 +423,14 @@ namespace KIRI
                 col[1] = cpu_colors[i].y;
                 col[2] = cpu_colors[i].z;
 
-                // TODO
                 *pscale = cpu_radius[i];
 
                 *label = cpu_labels[i];
             }
 
-            Partio::write(export_file.c_str(), *p);
+            Partio2VTK(export_vtk, p);
+
+            Partio::write(export_bgeo.c_str(), *p);
 
             p->release();
 
@@ -220,7 +439,7 @@ namespace KIRI
             free(cpu_labels);
             free(cpu_radius);
 
-            KIRI_LOG_INFO("Successfully saved bgeo file:{0}", export_file);
+            KIRI_LOG_INFO("successfully saved bgeo file:{0}", export_bgeo);
         }
         catch (std::exception &e)
         {
