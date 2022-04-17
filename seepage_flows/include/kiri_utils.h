@@ -365,8 +365,10 @@ namespace KIRI
         const std::string &folder_path,
         const std::string &file_name,
         const float3 *positions,
+        const float3 *velocities,
         const float3 *colors,
         const float *radius,
+        const float *pressure,
         const size_t *labels,
         const size_t particles_num)
     {
@@ -389,8 +391,10 @@ namespace KIRI
 
             Partio::ParticlesDataMutable *p = Partio::create();
             Partio::ParticleAttribute position_attr = p->addAttribute("position", Partio::VECTOR, 3);
+            Partio::ParticleAttribute velocity_attr = p->addAttribute("v", Partio::VECTOR, 3);
             Partio::ParticleAttribute color_attr = p->addAttribute("Cd", Partio::FLOAT, 3);
             Partio::ParticleAttribute pscale_attr = p->addAttribute("pscale", Partio::FLOAT, 1);
+            Partio::ParticleAttribute pressure_attr = p->addAttribute("pressure", Partio::FLOAT, 1);
             Partio::ParticleAttribute label_attr = p->addAttribute("label", Partio::INT, 1);
 
             // transfer GPU data to CPU
@@ -399,31 +403,44 @@ namespace KIRI
             size_t uintbytes = particles_num * sizeof(size_t);
 
             float3 *cpu_positions = (float3 *)malloc(f3bytes);
+            float3 *cpu_velocities = (float3 *)malloc(f3bytes);
             float3 *cpu_colors = (float3 *)malloc(f3bytes);
             float *cpu_radius = (float *)malloc(fbytes);
+            float *cpu_pressure = (float *)malloc(fbytes);
             size_t *cpu_labels = (size_t *)malloc(uintbytes);
 
             cudaMemcpy(cpu_positions, positions, f3bytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_velocities, velocities, f3bytes, cudaMemcpyDeviceToHost);
             cudaMemcpy(cpu_colors, colors, f3bytes, cudaMemcpyDeviceToHost);
             cudaMemcpy(cpu_radius, radius, fbytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_pressure, pressure, fbytes, cudaMemcpyDeviceToHost);
             cudaMemcpy(cpu_labels, labels, uintbytes, cudaMemcpyDeviceToHost);
 
             for (size_t i = 0; i < particles_num; i++)
             {
                 Int particle = p->addParticle();
                 float *pos = p->dataWrite<float>(position_attr, particle);
+                float *vel = p->dataWrite<float>(velocity_attr, particle);
                 float *col = p->dataWrite<float>(color_attr, particle);
                 float *pscale = p->dataWrite<float>(pscale_attr, particle);
+                float *press = p->dataWrite<float>(pressure_attr, particle);
                 int *label = p->dataWrite<int>(label_attr, particle);
 
                 pos[0] = cpu_positions[i].x;
                 pos[1] = cpu_positions[i].y;
                 pos[2] = cpu_positions[i].z;
+
+                vel[0] = cpu_velocities[i].x;
+                vel[1] = cpu_velocities[i].y;
+                vel[2] = cpu_velocities[i].z;
+
                 col[0] = cpu_colors[i].x;
                 col[1] = cpu_colors[i].y;
                 col[2] = cpu_colors[i].z;
 
                 *pscale = cpu_radius[i];
+
+                *press = cpu_pressure[i];
 
                 *label = cpu_labels[i];
             }

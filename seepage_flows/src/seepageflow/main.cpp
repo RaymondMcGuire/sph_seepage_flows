@@ -268,8 +268,10 @@ void Update()
                 CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
                 UInt2Str4Digit(SimCount - RunLiquidNumber),
                 particles->GetPosPtr(),
+                particles->GetVelPtr(),
                 particles->GetColPtr(),
                 particles->GetRadiusPtr(),
+                particles->GetPressurePtr(),
                 particles->GetLabelPtr(),
                 particles->Size());
         }

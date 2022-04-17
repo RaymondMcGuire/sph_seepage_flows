@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-01 14:31:30
- * @LastEditTime: 2021-04-08 00:03:29
+ * @LastEditTime: 2022-04-17 15:55:01
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_wcsph_sf_solver.cuh
@@ -21,7 +21,7 @@ namespace KIRI
     public:
         explicit CudaWCSphSFSolver(
             const size_t num,
-            const float negativeScale = 0.f,
+            const float negativeScale = 1.f,
             const float timeStepLimitScale = 3.f,
             const float speedOfSound = 100.f)
             : CudaSphSFSolver(num),
