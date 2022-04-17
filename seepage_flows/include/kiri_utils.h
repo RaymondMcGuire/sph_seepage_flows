@@ -371,7 +371,7 @@ namespace KIRI
         const size_t particles_num)
     {
         std::string export_bgeo = folder_path + "/" + file_name + ".bgeo";
-        std::string export_vtk = folder_path + "/" + file_name + ".vtk";
+        // std::string export_vtk = folder_path + "/" + file_name + ".vtk";
         try
         {
 
@@ -428,7 +428,7 @@ namespace KIRI
                 *label = cpu_labels[i];
             }
 
-            Partio2VTK(export_vtk, p);
+            // Partio2VTK(export_vtk, p);
 
             Partio::write(export_bgeo.c_str(), *p);
 
