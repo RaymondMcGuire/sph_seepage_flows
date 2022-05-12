@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-03 22:52:09
- * @LastEditTime: 2021-07-19 04:25:34
+ * @LastEditTime: 2022-05-12 22:27:56
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\system\cuda_sf_system.cuh
@@ -44,6 +44,7 @@ namespace KIRI
         inline size_t MaxNumOfParticles() const { return (*mParticles).MaxSize(); }
 
         inline CudaSFParticlesPtr GetSFParticles() const { return mParticles; }
+        inline void UpdateEmitterVelocity(float3 velocity){mEmitter->UpdateEmitterVelocity(velocity);}
 
     protected:
         virtual void OnUpdateSolver(float timeIntervalInSeconds) override;
