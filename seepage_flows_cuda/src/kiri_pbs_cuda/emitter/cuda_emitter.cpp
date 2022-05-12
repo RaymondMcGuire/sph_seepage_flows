@@ -1,12 +1,10 @@
-/*** 
+/***
  * @Author: Xu.WANG
- * @Date: 2021-03-19 22:04:26
- * @LastEditTime: 2021-03-19 22:34:27
+ * @Date: 2022-04-17 15:08:41
+ * @LastEditTime: 2022-05-12 22:16:02
  * @LastEditors: Xu.WANG
- * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\emitter\cuda_emitter.cpp
+ * @Description:
  */
-
 #include <kiri_pbs_cuda/emitter/cuda_emitter.cuh>
 namespace KIRI
 {
@@ -22,6 +20,23 @@ namespace KIRI
             emitPoints.emplace_back(p);
         }
         return emitPoints;
+    }
+
+    void CudaEmitter::UpdateEmitterVelocity(float3 emitVelocity)
+    {
+        mEmitVelocity = emitVelocity;
+        float3 axis = normalize(mEmitVelocity);
+
+        if (abs(axis.x) == 1.f && abs(axis.y) == 0.f && abs(axis.z) == 0.f)
+        {
+            mEmitAxis1 = normalize(cross(axis, make_float3(0.f, 1.f, 0.f)));
+        }
+        else
+        {
+            mEmitAxis1 = normalize(cross(axis, make_float3(1.f, 0.f, 0.f)));
+        }
+
+        mEmitAxis2 = normalize(cross(axis, mEmitAxis1));
     }
 
     void CudaEmitter::BuildSquareEmitter(float particleRadius, float emitterRadius)
@@ -41,6 +56,7 @@ namespace KIRI
         if (!mSamples.empty())
             bBuild = true;
     }
+
     void CudaEmitter::BuildCircleEmitter(float particleRadius, float emitterRadius)
     {
         mSamples.clear();

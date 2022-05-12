@@ -1,7 +1,7 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2021-03-20 00:26:31
+ * @LastEditTime: 2022-05-12 22:19:01
  * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\emitter\cuda_emitter.cuh
@@ -62,6 +62,8 @@ namespace KIRI
         Vec_Float3 Emit();
 
         inline void SetEmitterStatus(const bool enable) { bEnable = enable; }
+
+        void UpdateEmitterVelocity(float3 emitVelocity);
 
         void BuildSquareEmitter(float particleRadius, float emitterRadius);
         void BuildCircleEmitter(float particleRadius, float emitterRadius);
