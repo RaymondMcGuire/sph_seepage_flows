@@ -1,10 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-05 12:33:37
- * @LastEditTime: 2022-03-20 16:56:46
- * @LastEditors: Xu.WANG
- * @Description: 
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:26:11
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:39:42
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 
 #include <kiri_pbs_cuda/thrust_helper/helper_thrust.cuh>
@@ -36,9 +37,9 @@ namespace KIRI
     void CudaGNBaseSearcher::BuildGNSearcher(const CudaParticlesPtr &particles)
     {
         thrust::transform(thrust::device,
-            particles->GetPosPtr(), particles->GetPosPtr() + particles->Size(),
-            particles->GetParticle2CellPtr(),
-            ThrustHelper::Pos2GridHash<float3>(mLowestPoint, mCellSize, mGridSize));
+                          particles->GetPosPtr(), particles->GetPosPtr() + particles->Size(),
+                          particles->GetParticle2CellPtr(),
+                          ThrustHelper::Pos2GridHash<float3>(mLowestPoint, mCellSize, mGridSize));
 
         this->SortData(particles);
 
@@ -64,7 +65,7 @@ namespace KIRI
     void CudaGNSearcher::SortData(const CudaParticlesPtr &particles)
     {
 
-       if (mSearcherParticleType == SearcherParticleType::SEEPAGE)
+        if (mSearcherParticleType == SearcherParticleType::SEEPAGE)
         {
             auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
 
@@ -74,6 +75,7 @@ namespace KIRI
                                 mGridIdxArray.Data() + particles->Size(),
                                 thrust::make_zip_iterator(
                                     thrust::make_tuple(
+                                        seepage_flow->GetIdPtr(),
                                         seepage_flow->GetLabelPtr(),
                                         seepage_flow->GetPosPtr(),
                                         seepage_flow->GetVelPtr(),
@@ -93,6 +95,7 @@ namespace KIRI
                                 mGridIdxArray.Data() + particles->Size(),
                                 thrust::make_zip_iterator(
                                     thrust::make_tuple(
+                                        seepage_flow->GetIdPtr(),
                                         seepage_flow->GetLabelPtr(),
                                         seepage_flow->GetPosPtr(),
                                         seepage_flow->GetVelPtr(),

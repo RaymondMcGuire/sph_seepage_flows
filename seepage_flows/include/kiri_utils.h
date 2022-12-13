@@ -1,9 +1,11 @@
 /***
- * @Date: 2020-09-27 02:54:00
- * @LastEditTime: 2021-08-21 19:46:42
- * @LastEditors: Xu.WANG
- * @Description:
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-12-13 20:57:45
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:02:23
  * @FilePath: \sph_seepage_flows\seepage_flows\include\kiri_utils.h
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 
 #ifndef _KIRI_UTILS_H_
@@ -19,6 +21,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <regex>
+
+#include <file_io.hpp>
 
 namespace KIRI
 {
@@ -457,6 +461,114 @@ namespace KIRI
             free(cpu_radius);
 
             KIRI_LOG_INFO("successfully saved bgeo file:{0}", export_bgeo);
+        }
+        catch (std::exception &e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
+
+    void ExportData2DatFile(
+        const std::string &folder_path,
+        const std::string &file_name,
+        const float3 *positions,
+        const float3 *velocities,
+        const size_t *labels,
+        const float *density,
+        const float3 *acc,
+        const size_t *id,
+        const float young,
+        const float cd,
+        const size_t particles_num)
+    {
+        std::string export_dat = folder_path + "/" + file_name + ".dat";
+        auto dat_file = evt::FileIO::plainText(export_dat);
+        try
+        {
+
+            struct stat info;
+
+            if (stat(folder_path.c_str(), &info) != 0)
+            {
+                std::error_code ec;
+                bool success = std::filesystem::create_directories(folder_path, ec);
+                if (!success)
+                {
+                    std::cout << ec.message() << std::endl;
+                }
+            }
+
+            // transfer GPU data to CPU
+            size_t fbytes = particles_num * sizeof(float);
+            size_t f3bytes = particles_num * sizeof(float3);
+            size_t uintbytes = particles_num * sizeof(size_t);
+
+            float3 *cpu_positions = (float3 *)malloc(f3bytes);
+            float3 *cpu_velocities = (float3 *)malloc(f3bytes);
+            float3 *cpu_acc = (float3 *)malloc(f3bytes);
+
+            float *cpu_density = (float *)malloc(fbytes);
+
+            size_t *cpu_id = (size_t *)malloc(uintbytes);
+            size_t *cpu_labels = (size_t *)malloc(uintbytes);
+
+            cudaMemcpy(cpu_positions, positions, f3bytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_velocities, velocities, f3bytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_acc, acc, f3bytes, cudaMemcpyDeviceToHost);
+
+            cudaMemcpy(cpu_density, density, fbytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_id, id, uintbytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_labels, labels, uintbytes, cudaMemcpyDeviceToHost);
+
+            for (size_t i = 0; i < particles_num; i++)
+            {
+                if (i != 0)
+                    dat_file.write("\n");
+
+                dat_file.write(cpu_positions[i].x);
+                dat_file.write(" ");
+                dat_file.write(cpu_positions[i].y);
+                dat_file.write(" ");
+                dat_file.write(cpu_positions[i].z);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_velocities[i].x);
+                dat_file.write(" ");
+                dat_file.write(cpu_velocities[i].y);
+                dat_file.write(" ");
+                dat_file.write(cpu_velocities[i].z);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_labels[i]);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_density[i]);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_acc[i].x);
+                dat_file.write(" ");
+                dat_file.write(cpu_acc[i].y);
+                dat_file.write(" ");
+                dat_file.write(cpu_acc[i].z);
+                dat_file.write(" ");
+
+                dat_file.write(young);
+                dat_file.write(" ");
+
+                dat_file.write(cd);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_id[i]);
+            }
+
+            free(cpu_positions);
+            free(cpu_acc);
+            free(cpu_labels);
+            free(cpu_velocities);
+            free(cpu_id);
+            free(cpu_density);
+
+            KIRI_LOG_INFO("successfully saved dat file:{0}", export_dat);
         }
         catch (std::exception &e)
         {

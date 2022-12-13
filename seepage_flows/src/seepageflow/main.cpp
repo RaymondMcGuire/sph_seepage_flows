@@ -1,12 +1,12 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2020-10-27 00:49:33
- * @LastEditTime: 2021-08-27 23:50:13
- * @LastEditors: Xu.WANG
- * @Description:
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-12-13 20:57:45
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:36:01
  * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
-
 #include <sf_cuda_define.h>
 #include <kiri_utils.h>
 
@@ -27,7 +27,7 @@ void SetupParams()
     KIRI_LOG_DEBUG("Seepageflow: SetupParams");
 
     // export path
-    strcpy(CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder, (String(EXPORT_PATH) + "bgeo/seepageflow_bunny_wcsph").c_str());
+    strcpy(CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder, (String(EXPORT_PATH) + "dat/seepageflow_bunny_wcsph").c_str());
 
     // scene config
     auto cuda_lowest_point = make_float3(0.f);
@@ -174,6 +174,7 @@ void SetupParams()
     particles =
         std::make_shared<CudaSFParticles>(
             CUDA_SEEPAGEFLOW_APP_PARAMS.max_num,
+            multiVolumeData.id,
             multiVolumeData.pos,
             multiVolumeData.col,
             multiVolumeData.label,
@@ -264,15 +265,28 @@ void Update()
         if (CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export)
         {
             auto particles = SFSystem->GetSFParticles();
-            ExportBgeoFileCUDA(
+            // ExportBgeoFileCUDA(
+            //     CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
+            //     UInt2Str4Digit(SimCount - RunLiquidNumber),
+            //     particles->GetPosPtr(),
+            //     particles->GetVelPtr(),
+            //     particles->GetColPtr(),
+            //     particles->GetRadiusPtr(),
+            //     particles->GetPressurePtr(),
+            //     particles->GetLabelPtr(),
+            //     particles->Size());
+
+            ExportData2DatFile(
                 CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
                 UInt2Str4Digit(SimCount - RunLiquidNumber),
                 particles->GetPosPtr(),
                 particles->GetVelPtr(),
-                particles->GetColPtr(),
-                particles->GetRadiusPtr(),
-                particles->GetPressurePtr(),
                 particles->GetLabelPtr(),
+                particles->GetDensityPtr(),
+                particles->GetAccPtr(),
+                particles->GetIdPtr(),
+                CUDA_SEEPAGEFLOW_PARAMS.dem_young,
+                CUDA_SEEPAGEFLOW_PARAMS.sf_cd,
                 particles->Size());
         }
     }

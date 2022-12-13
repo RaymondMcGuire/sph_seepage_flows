@@ -1,10 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-03 17:49:11
- * @LastEditTime: 2021-08-18 21:33:09
- * @LastEditors: Xu.WANG
- * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cu
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:08:41
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 23:04:36
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cu
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver.cuh>
@@ -380,8 +381,6 @@ namespace KIRI
         ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
         ThrustHelper::GridXYZ2GridHash(gridSize));
 
-    thrust::fill(thrust::device, particles->GetDensityPtr(), particles->GetDensityPtr() + num, 0.f);
-    thrust::fill(thrust::device, particles->GetAccPtr(), particles->GetAccPtr() + num, make_float3(0.f));
     thrust::fill(thrust::device, particles->GetAdhesionForcePtr(), particles->GetAdhesionForcePtr() + num, make_float3(0.f));
     thrust::fill(thrust::device, particles->GetAvgAdhesionForcePtr(), particles->GetAvgAdhesionForcePtr() + num, make_float3(0.f));
     KIRI_CUCALL(cudaDeviceSynchronize());
@@ -392,6 +391,7 @@ namespace KIRI
       CudaSFParticlesPtr &particles,
       const float3 gravity)
   {
+    thrust::fill(thrust::device, particles->GetAccPtr(), particles->GetAccPtr() + particles->Size(), make_float3(0.f));
     thrust::transform(thrust::device,
                       particles->GetAccPtr(), particles->GetAccPtr() + particles->Size(),
                       particles->GetAccPtr(),

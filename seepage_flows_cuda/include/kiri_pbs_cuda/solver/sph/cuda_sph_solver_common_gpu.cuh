@@ -1,12 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2020-07-04 14:48:23
- * @LastEditTime: 2022-02-13 17:41:28
- * @LastEditors: Xu.WANG
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:26:11
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 23:01:36
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\solver\sph\cuda_sph_solver_common_gpu.cuh
  * @Description:
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\sph\cuda_sph_solver_common_gpu.cuh
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
-
 #ifndef _CUDA_SPH_SOLVER_COMMON_GPU_CUH_
 #define _CUDA_SPH_SOLVER_COMMON_GPU_CUH_
 
@@ -226,6 +226,7 @@ namespace KIRI
             return;
 
         int3 grid_xyz = p2xyz(pos[i]);
+        density[i] = mass[i] * W(0.f);
 
 #pragma unroll
         for (int m = 0; m < 27; ++m)

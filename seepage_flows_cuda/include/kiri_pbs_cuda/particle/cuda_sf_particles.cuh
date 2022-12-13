@@ -1,10 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2021-08-18 09:11:50
- * @LastEditors: Xu.WANG
- * @Description: Seepage flow particles
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\particle\cuda_sf_particles.cuh
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:08:41
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:34:12
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\particle\cuda_sf_particles.cuh
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 
 #ifndef _CUDA_SEEPAGEFLOW_PARTICLES_CUH_
@@ -45,6 +46,7 @@ namespace KIRI
 		explicit CudaSFParticles::CudaSFParticles(
 			const size_t numOfMaxParticles)
 			: CudaParticles(numOfMaxParticles),
+			  mId(numOfMaxParticles),
 			  mLabel(numOfMaxParticles),
 			  mRadius(numOfMaxParticles),
 			  mVel(numOfMaxParticles),
@@ -66,12 +68,14 @@ namespace KIRI
 		}
 
 		explicit CudaSFParticles::CudaSFParticles(
+			const Vec_SizeT &id,
 			const Vec_Float3 &p,
 			const Vec_Float3 &col,
 			const Vec_SizeT &label,
 			const Vec_Float &mass,
 			const Vec_Float &radius)
 			: CudaParticles(p),
+			  mId(p.size()),
 			  mLabel(p.size()),
 			  mRadius(p.size()),
 			  mVel(p.size()),
@@ -90,6 +94,7 @@ namespace KIRI
 			  mCdA0Asat(p.size()),
 			  mAmcAmcp(p.size())
 		{
+			KIRI_CUCALL(cudaMemcpy(mId.Data(), &id[0], sizeof(size_t) * id.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mCol.Data(), &col[0], sizeof(float3) * col.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mRadius.Data(), &radius[0], sizeof(float) * radius.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mMass.Data(), &mass[0], sizeof(float) * mass.size(), cudaMemcpyHostToDevice));
@@ -98,12 +103,14 @@ namespace KIRI
 
 		explicit CudaSFParticles::CudaSFParticles(
 			const size_t numOfMaxParticles,
+			const Vec_SizeT &id,
 			const Vec_Float3 &p,
 			const Vec_Float3 &col,
 			const Vec_SizeT &label,
 			const Vec_Float &mass,
 			const Vec_Float &radius)
 			: CudaParticles(numOfMaxParticles, p),
+			  mId(numOfMaxParticles),
 			  mLabel(numOfMaxParticles),
 			  mRadius(numOfMaxParticles),
 			  mVel(numOfMaxParticles),
@@ -122,6 +129,7 @@ namespace KIRI
 			  mCdA0Asat(numOfMaxParticles),
 			  mAmcAmcp(numOfMaxParticles)
 		{
+			KIRI_CUCALL(cudaMemcpy(mId.Data(), &id[0], sizeof(size_t) * id.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mCol.Data(), &col[0], sizeof(float3) * col.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mRadius.Data(), &radius[0], sizeof(float) * radius.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mMass.Data(), &mass[0], sizeof(float) * mass.size(), cudaMemcpyHostToDevice));
@@ -130,6 +138,7 @@ namespace KIRI
 
 		explicit CudaSFParticles::CudaSFParticles(
 			const size_t numOfMaxParticles,
+			const Vec_SizeT &id,
 			const Vec_Float3 &p,
 			const Vec_Float3 &col,
 			const Vec_SizeT &label,
@@ -138,6 +147,7 @@ namespace KIRI
 			const Vec_Float3 &cda0asat,
 			const Vec_Float2 &amcamcp)
 			: CudaParticles(numOfMaxParticles, p),
+			  mId(numOfMaxParticles),
 			  mLabel(numOfMaxParticles),
 			  mRadius(numOfMaxParticles),
 			  mVel(numOfMaxParticles),
@@ -156,6 +166,7 @@ namespace KIRI
 			  mCdA0Asat(numOfMaxParticles),
 			  mAmcAmcp(numOfMaxParticles)
 		{
+			KIRI_CUCALL(cudaMemcpy(mId.Data(), &id[0], sizeof(size_t) * id.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mCol.Data(), &col[0], sizeof(float3) * col.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mRadius.Data(), &radius[0], sizeof(float) * radius.size(), cudaMemcpyHostToDevice));
 			KIRI_CUCALL(cudaMemcpy(mMass.Data(), &mass[0], sizeof(float) * mass.size(), cudaMemcpyHostToDevice));
@@ -167,6 +178,7 @@ namespace KIRI
 		CudaSFParticles(const CudaSFParticles &) = delete;
 		CudaSFParticles &operator=(const CudaSFParticles &) = delete;
 
+		inline size_t *GetIdPtr() const { return mId.Data(); }
 		size_t *GetLabelPtr() const { return mLabel.Data(); }
 		float *GetRadiusPtr() const { return mRadius.Data(); }
 
@@ -196,6 +208,7 @@ namespace KIRI
 		void AddSphParticles(Vec_Float3 pos, float3 col, float3 vel, float mass, float radius);
 
 	protected:
+		CudaArray<size_t> mId;
 		CudaArray<size_t> mLabel;
 		CudaArray<float> mRadius;
 

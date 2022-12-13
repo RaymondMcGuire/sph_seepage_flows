@@ -7,3 +7,4 @@ build
 /export/obj/**/*.obj
 /houdini_template/backup
 /**/*.pyc
+/**/*.dat

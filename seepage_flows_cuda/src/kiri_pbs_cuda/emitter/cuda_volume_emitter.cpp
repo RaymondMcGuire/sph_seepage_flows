@@ -1,10 +1,11 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2021-03-19 22:04:26
- * @LastEditTime: 2021-08-18 08:58:58
- * @LastEditors: Xu.WANG
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:26:11
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:37:05
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
  * @Description:
- * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 #include <random>
 #include <kiri_pbs_cuda/emitter/cuda_volume_emitter.cuh>
@@ -163,6 +164,7 @@ namespace KIRI
         for (size_t i = 0; i < shape.size(); i++)
         {
             float radius = shape[i].w;
+            data.id.emplace_back(i + 1);
             data.pos.emplace_back(make_float3(shape[i].x, shape[i].y, shape[i].z));
             data.col.emplace_back(color);
             data.label.emplace_back(1);
@@ -201,6 +203,7 @@ namespace KIRI
         for (size_t i = 0; i < shape.size(); i++)
         {
             float radius = shape[i].w;
+            data.id.emplace_back(i + 1);
             data.pos.emplace_back(make_float3(shape[i].x, shape[i].y, shape[i].z));
             data.col.emplace_back(color);
             data.label.emplace_back(1);

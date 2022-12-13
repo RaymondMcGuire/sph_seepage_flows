@@ -1,10 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2021-08-18 08:59:13
- * @LastEditors: Xu.WANG
- * @Description: 
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\emitter\cuda_volume_emitter.cuh
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2022-04-17 15:08:41
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2022-12-13 22:36:41
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\emitter\cuda_volume_emitter.cuh
+ * @Description:
+ * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 
 #ifndef _CUDA_VOLUME_EMITTER_CUH_
@@ -59,6 +60,7 @@ namespace KIRI
     struct SeepageflowVolumeData
     {
         float sandMinRadius;
+        Vec_SizeT id;
         Vec_Float3 pos;
         Vec_Float3 col;
         Vec_Float mass;
@@ -69,6 +71,7 @@ namespace KIRI
     struct SeepageflowMultiVolumeData
     {
         float sandMinRadius;
+        Vec_SizeT id;
         Vec_Float3 pos;
         Vec_Float3 col;
         Vec_Float mass;
