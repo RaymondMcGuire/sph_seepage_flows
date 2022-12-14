@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2022-12-13 20:57:45
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2022-12-13 22:36:01
+ * @LastEditTime: 2022-12-14 19:23:49
  * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
  * @Description:
  * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
@@ -285,6 +285,7 @@ void Update()
                 particles->GetDensityPtr(),
                 particles->GetAccPtr(),
                 particles->GetIdPtr(),
+                particles->GetSaturationPtr(),
                 CUDA_SEEPAGEFLOW_PARAMS.dem_young,
                 CUDA_SEEPAGEFLOW_PARAMS.sf_cd,
                 particles->Size());

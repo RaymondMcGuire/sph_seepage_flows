@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2022-12-13 20:57:45
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2022-12-13 22:02:23
+ * @LastEditTime: 2022-12-14 19:24:42
  * @FilePath: \sph_seepage_flows\seepage_flows\include\kiri_utils.h
  * @Description:
  * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
@@ -477,6 +477,7 @@ namespace KIRI
         const float *density,
         const float3 *acc,
         const size_t *id,
+        const float *saturation,
         const float young,
         const float cd,
         const size_t particles_num)
@@ -508,6 +509,7 @@ namespace KIRI
             float3 *cpu_acc = (float3 *)malloc(f3bytes);
 
             float *cpu_density = (float *)malloc(fbytes);
+            float *cpu_saturation = (float *)malloc(fbytes);
 
             size_t *cpu_id = (size_t *)malloc(uintbytes);
             size_t *cpu_labels = (size_t *)malloc(uintbytes);
@@ -517,6 +519,8 @@ namespace KIRI
             cudaMemcpy(cpu_acc, acc, f3bytes, cudaMemcpyDeviceToHost);
 
             cudaMemcpy(cpu_density, density, fbytes, cudaMemcpyDeviceToHost);
+            cudaMemcpy(cpu_saturation, saturation, fbytes, cudaMemcpyDeviceToHost);
+
             cudaMemcpy(cpu_id, id, uintbytes, cudaMemcpyDeviceToHost);
             cudaMemcpy(cpu_labels, labels, uintbytes, cudaMemcpyDeviceToHost);
 
@@ -559,6 +563,9 @@ namespace KIRI
                 dat_file.write(" ");
 
                 dat_file.write(cpu_id[i]);
+                dat_file.write(" ");
+
+                dat_file.write(cpu_saturation[i]);
             }
 
             free(cpu_positions);
