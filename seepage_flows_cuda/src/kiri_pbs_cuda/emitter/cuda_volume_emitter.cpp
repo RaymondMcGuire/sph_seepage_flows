@@ -1,10 +1,11 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2021-03-19 22:04:26
- * @LastEditTime: 2021-08-18 08:58:58
- * @LastEditors: Xu.WANG
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-01-12 14:57:38
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-01-12 14:59:11
+ * @FilePath: \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
  * @Description:
- * @FilePath: \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
+ * @Copyright (c) 2023 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
  */
 #include <random>
 #include <kiri_pbs_cuda/emitter/cuda_volume_emitter.cuh>
@@ -27,53 +28,6 @@ namespace KIRI
 
                     data.pos.emplace_back(p);
                     data.col.emplace_back(color);
-                }
-            }
-        }
-    }
-
-    void CudaVolumeEmitter::BuildMultiSphRen14Volume(MultiSphRen14VolumeData &data, float3 lowest, int3 vsize, float particleRadius, float3 color, float mass, size_t phaseIdx)
-    {
-        if (!bEnable)
-            return;
-
-        float offset = 2.f * particleRadius;
-        for (size_t i = 0; i < static_cast<size_t>(vsize.x); ++i)
-        {
-            for (size_t j = 0; j < static_cast<size_t>(vsize.y); ++j)
-            {
-                for (size_t k = 0; k < static_cast<size_t>(vsize.z); ++k)
-                {
-                    float3 p = make_float3(lowest.x + i * offset, lowest.y + j * offset, lowest.z + k * offset);
-
-                    data.pos.emplace_back(p);
-                    data.col.emplace_back(color);
-                    data.mass.emplace_back(mass);
-                    data.phaseLabel.emplace_back(phaseIdx);
-                }
-            }
-        }
-    }
-
-    void CudaVolumeEmitter::BuildMultiSphYan16Volume(MultiSphYan16VolumeData &data, float3 lowest, int3 vsize, float particleRadius, float3 color, float mass, size_t phaseIdx, size_t phaseType)
-    {
-        if (!bEnable)
-            return;
-
-        float offset = 2.f * particleRadius;
-        for (size_t i = 0; i < static_cast<size_t>(vsize.x); ++i)
-        {
-            for (size_t j = 0; j < static_cast<size_t>(vsize.y); ++j)
-            {
-                for (size_t k = 0; k < static_cast<size_t>(vsize.z); ++k)
-                {
-                    float3 p = make_float3(lowest.x + i * offset, lowest.y + j * offset, lowest.z + k * offset);
-
-                    data.pos.emplace_back(p);
-                    data.col.emplace_back(color);
-                    data.mass.emplace_back(mass);
-                    data.phaseLabel.emplace_back(phaseIdx);
-                    data.phaseType.emplace_back(phaseType);
                 }
             }
         }
