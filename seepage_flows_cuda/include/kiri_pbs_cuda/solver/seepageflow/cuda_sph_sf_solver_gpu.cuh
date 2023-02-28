@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-01-12 14:57:38
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-02-28 21:59:01
+ * @LastEditTime: 2023-02-28 22:38:56
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -567,10 +567,7 @@ namespace KIRI
         voidage[i] = 1.f - sand_volume;
 
         // saturation for sand
-        if(label[i] == 1)
-            saturation[i] = v_s;
-        else if(label[i] == 0)
-            saturation[i] = 1.f;
+        saturation[i] = v_s;
         return;
     }
 
