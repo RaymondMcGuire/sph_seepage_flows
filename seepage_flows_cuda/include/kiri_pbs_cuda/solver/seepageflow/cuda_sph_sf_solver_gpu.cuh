@@ -1,11 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2022-04-17 15:54:40
+ * @Date: 2023-02-28 22:51:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2022-12-13 23:03:15
+ * @LastEditTime: 2023-02-28 22:54:53
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
- * @Description:
- * @Copyright (c) 2022 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
@@ -972,7 +972,9 @@ namespace KIRI
 
             if (maxSaturation[i] < saturation[i])
                 maxSaturation[i] = saturation[i];
-        }
+        }else if(label[i] == 0)
+            saturation[i]=1.f;
+
 
         return;
     }
