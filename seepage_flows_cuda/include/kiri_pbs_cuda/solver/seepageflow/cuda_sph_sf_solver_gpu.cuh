@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-01-12 14:57:38
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-02-28 22:38:56
+ * @LastEditTime: 2023-02-28 22:56:45
  * @FilePath: \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -463,7 +463,7 @@ namespace KIRI
         }
 
         int3 grid_xyz = p2xyz(pos[i]);
-
+        density[i] = mass[i] * W(0.f);
 #pragma unroll
         for (size_t m = 0; m < 27; ++m)
         {
