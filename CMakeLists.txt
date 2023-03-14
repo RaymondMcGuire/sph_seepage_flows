@@ -56,6 +56,6 @@ endif()
 
 
 # Sub Projects
-add_subdirectory(KiriMathMini)
+add_subdirectory(math)
 add_subdirectory(seepage_flows_cuda)
 add_subdirectory(seepage_flows)

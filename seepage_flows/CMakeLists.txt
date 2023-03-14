@@ -11,7 +11,7 @@ link_directories(${EXTLIBS_LIB})
 set(KIRI_PBS_CUDA_LIB_INLCUDE ${CMAKE_BINARY_DIR}/seepage_flows_cuda/include)
 
 # Kiri Math Library
-set(KIRI_MATH_LIB_INLCUDE ${CMAKE_SOURCE_DIR}/KiriMathMini/include)
+set(KIRI_MATH_LIB_INLCUDE ${CMAKE_SOURCE_DIR}/math/include)
 
 # Configuration File
 configure_file(${CMAKE_SOURCE_DIR}/configuration/root_directory.h.in  ${CMAKE_BINARY_DIR}/configuration/root_directory.h)
