@@ -1,8 +1,8 @@
 /*
  * @Author: Xu.WANG
  * @Date: 2020-10-18 01:10:38
- * @LastEditTime: 2023-03-15 01:29:37
- * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2021-08-21 18:49:34
+ * @LastEditors: Xu.WANG
  * @Description: 
  * @FilePath: \sph_seepage_flows\configuration\root_directory.h.in
  */
@@ -14,4 +14,5 @@ const char *const ROOT_PATH = "${CMAKE_SOURCE_DIR}";
 const char *const EXPORT_PATH = "${CMAKE_SOURCE_DIR}/export/";
 const char *const MSWIN_BUILD_PATH = "${CMAKE_SOURCE_DIR}/build/bin/";
 const char *const DB_PBR_PATH = "${CMAKE_SOURCE_DIR}/resources/";
+
 #endif
