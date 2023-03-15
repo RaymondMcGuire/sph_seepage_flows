@@ -11,22 +11,22 @@
 #define _KIRI_LOG_H_
 
 #pragma once
-
+// clang-format off
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+// clang-format on
+namespace KIRI {
+class KiriLog {
+public:
+  static void Init();
 
-namespace KIRI
-{
-    class KiriLog
-    {
-    public:
-        static void Init();
+  inline static std::shared_ptr<spdlog::logger> &GetLogger() {
+    return mLogger;
+  };
 
-        inline static std::shared_ptr<spdlog::logger> &GetLogger() { return mLogger; };
-
-    private:
-        static std::shared_ptr<spdlog::logger> mLogger;
-    };
+private:
+  static std::shared_ptr<spdlog::logger> mLogger;
+};
 } // namespace KIRI
 
 #define KIRI_LOG_TRACE(...) ::KIRI::KiriLog::GetLogger()->trace(__VA_ARGS__)

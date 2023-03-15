@@ -1,9 +1,9 @@
-/*** 
+/***
  * @Author: Xu.WANG
  * @Date: 2020-10-18 01:04:15
  * @LastEditTime: 2021-02-20 19:41:33
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \KiriCore\include\kiri_define.h
  */
 

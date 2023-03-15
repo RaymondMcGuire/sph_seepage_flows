@@ -7,18 +7,17 @@
  * @FilePath: \Kiri\KiriCore\src\kiri_log.cpp
  */
 
+// clang-format off
 #include <kiri_log.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+// clang-format on
+namespace KIRI {
+std::shared_ptr<spdlog::logger> KiriLog::mLogger;
 
-namespace KIRI
-{
-    std::shared_ptr<spdlog::logger> KiriLog::mLogger;
+void KiriLog::Init() {
+  spdlog::set_pattern("%^[%T] %n: %v%$");
 
-    void KiriLog::Init()
-    {
-        spdlog::set_pattern("%^[%T] %n: %v%$");
-
-        mLogger = spdlog::stdout_color_mt("KIRI_LOG");
-        mLogger->set_level(spdlog::level::trace);
-    }
+  mLogger = spdlog::stdout_color_mt("KIRI_LOG");
+  mLogger->set_level(spdlog::level::trace);
+}
 } // namespace KIRI

@@ -10,6 +10,8 @@
 
 #pragma once
 
+// clang-format off
+
 // basic library
 #include <iostream>
 
@@ -32,6 +34,8 @@
 // math library
 #include <kiri_pbs_cuda/math/cuda_pbs_math.h>
 
+// clang-format on
+
 // constants
 #define CUDA_BLOCK_SIZE 512
 
@@ -46,109 +50,123 @@
 
 #define LIM_EPS 1e-3
 
-inline float frand()
-{
-    return rand() / (float)RAND_MAX;
-}
+inline float frand() { return rand() / (float)RAND_MAX; }
 
 // physics
 #define CUDA_GRAVITY 9.81f
 
 // helper func
-__host__ __device__ inline uint CeilDiv(uint a, uint b)
-{
-    return (a % b != 0) ? (a / b + 1) : (a / b);
+__host__ __device__ inline uint CeilDiv(uint a, uint b) {
+  return (a % b != 0) ? (a / b + 1) : (a / b);
 }
 
 #define expand(p) p.x, p.y, p.z
 #define expandq(q) q.s, q.v.x, q.v.y, q.v.z
-#define expandt3x3(t3x3) t3x3.e1.x, t3x3.e1.y, t3x3.e1.z, t3x3.e2.x, t3x3.e2.y, t3x3.e2.z, t3x3.e3.x, t3x3.e3.y, t3x3.e3.z
+#define expandt3x3(t3x3)                                                       \
+  t3x3.e1.x, t3x3.e1.y, t3x3.e1.z, t3x3.e2.x, t3x3.e2.y, t3x3.e2.z, t3x3.e3.x, \
+      t3x3.e3.y, t3x3.e3.z
 
-__host__ __device__ inline void printTensor3x3(const char *name, tensor3x3 t3)
-{
-    printf(name);
-    printf("=\n (%.6f,%.6f,%.6f)\n (%.6f,%.6f,%.6f)\n (%.6f,%.6f,%.6f)\n",
-           expandt3x3(t3));
+__host__ __device__ inline void printTensor3x3(const char *name, tensor3x3 t3) {
+  printf(name);
+  printf("=\n (%.6f,%.6f,%.6f)\n (%.6f,%.6f,%.6f)\n (%.6f,%.6f,%.6f)\n",
+         expandt3x3(t3));
 }
 
-__host__ __device__ inline void printFloat3(const char *name, float3 f3)
-{
-    printf(name);
-    printf("=(%.6f,%.6f,%.6f)\n",
-           expand(f3));
+__host__ __device__ inline void printFloat3(const char *name, float3 f3) {
+  printf(name);
+  printf("=(%.6f,%.6f,%.6f)\n", expand(f3));
 }
 
-__host__ __device__ inline void printFloat(const char *name, float f)
-{
-    printf(name);
-    printf("=%.6f\n", f);
+__host__ __device__ inline void printFloat(const char *name, float f) {
+  printf(name);
+  printf("=%.6f\n", f);
 }
 
 // merge array helper func
-__host__ __device__ inline float *mergeFloatArrayInHost(int mergedBeforeNum, int mergeNum, float *mergedBeforeData, float *newData)
-{
-    int mergedNum = mergedBeforeNum + mergeNum;
+__host__ __device__ inline float *mergeFloatArrayInHost(int mergedBeforeNum,
+                                                        int mergeNum,
+                                                        float *mergedBeforeData,
+                                                        float *newData) {
+  int mergedNum = mergedBeforeNum + mergeNum;
 
-    float *mergedArray = (float *)malloc(mergedNum * sizeof(float));
-    float *mergedBeforeHostData = (float *)malloc(mergedBeforeNum * sizeof(float));
+  float *mergedArray = (float *)malloc(mergedNum * sizeof(float));
+  float *mergedBeforeHostData =
+      (float *)malloc(mergedBeforeNum * sizeof(float));
 
-    PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData, mergedBeforeNum * sizeof(float), cudaMemcpyDeviceToHost));
+  PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData,
+                         mergedBeforeNum * sizeof(float),
+                         cudaMemcpyDeviceToHost));
 
-    // mergedArray = mergedBeforeHostData + newData
-    thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum, mergedArray);
-    thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
+  // mergedArray = mergedBeforeHostData + newData
+  thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum,
+               mergedArray);
+  thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
 
-    free(mergedBeforeHostData);
+  free(mergedBeforeHostData);
 
-    return mergedArray;
+  return mergedArray;
 }
 
-__host__ __device__ inline float3 *mergeVector3ArrayInHost(int mergedBeforeNum, int mergeNum, float3 *mergedBeforeData, float3 *newData)
-{
-    int mergedNum = mergedBeforeNum + mergeNum;
+__host__ __device__ inline float3 *
+mergeVector3ArrayInHost(int mergedBeforeNum, int mergeNum,
+                        float3 *mergedBeforeData, float3 *newData) {
+  int mergedNum = mergedBeforeNum + mergeNum;
 
-    float3 *mergedArray = (float3 *)malloc(mergedNum * sizeof(float3));
-    float3 *mergedBeforeHostData = (float3 *)malloc(mergedBeforeNum * sizeof(float3));
+  float3 *mergedArray = (float3 *)malloc(mergedNum * sizeof(float3));
+  float3 *mergedBeforeHostData =
+      (float3 *)malloc(mergedBeforeNum * sizeof(float3));
 
-    PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData, mergedBeforeNum * sizeof(float3), cudaMemcpyDeviceToHost));
+  PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData,
+                         mergedBeforeNum * sizeof(float3),
+                         cudaMemcpyDeviceToHost));
 
-    // mergedArray = mergedBeforeHostData + newData
-    thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum, mergedArray);
-    thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
+  // mergedArray = mergedBeforeHostData + newData
+  thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum,
+               mergedArray);
+  thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
 
-    free(mergedBeforeHostData);
+  free(mergedBeforeHostData);
 
-    return mergedArray;
+  return mergedArray;
 }
 
-__host__ __device__ inline float4 *mergeVector4ArrayInHost(int mergedBeforeNum, int mergeNum, float4 *mergedBeforeData, float4 *newData)
-{
-    int mergedNum = mergedBeforeNum + mergeNum;
+__host__ __device__ inline float4 *
+mergeVector4ArrayInHost(int mergedBeforeNum, int mergeNum,
+                        float4 *mergedBeforeData, float4 *newData) {
+  int mergedNum = mergedBeforeNum + mergeNum;
 
-    float4 *mergedArray = (float4 *)malloc(mergedNum * sizeof(float4));
-    float4 *mergedBeforeHostData = (float4 *)malloc(mergedBeforeNum * sizeof(float4));
+  float4 *mergedArray = (float4 *)malloc(mergedNum * sizeof(float4));
+  float4 *mergedBeforeHostData =
+      (float4 *)malloc(mergedBeforeNum * sizeof(float4));
 
-    PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData, mergedBeforeNum * sizeof(float4), cudaMemcpyDeviceToHost));
+  PBS_CUCHECK(cudaMemcpy(mergedBeforeHostData, mergedBeforeData,
+                         mergedBeforeNum * sizeof(float4),
+                         cudaMemcpyDeviceToHost));
 
-    // mergedArray = mergedBeforeHostData + newData
-    thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum, mergedArray);
-    thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
+  // mergedArray = mergedBeforeHostData + newData
+  thrust::copy(mergedBeforeHostData, mergedBeforeHostData + mergedBeforeNum,
+               mergedArray);
+  thrust::copy(newData, newData + mergeNum, mergedArray + mergedBeforeNum);
 
-    free(mergedBeforeHostData);
+  free(mergedBeforeHostData);
 
-    return mergedArray;
+  return mergedArray;
 }
 
-__host__ __device__ inline void mergeUIntArrayInDevice(int mergedBeforeNum, int mergeNum, uint *mergedBeforeData, uint *newHostData)
-{
-    // alloc device data
-    uint *newDeviceData;
-    cudaMalloc((void **)&newDeviceData, sizeof(uint) * mergeNum);
-    cudaMemcpy(newDeviceData, newHostData, sizeof(uint) * mergeNum, cudaMemcpyHostToDevice);
+__host__ __device__ inline void mergeUIntArrayInDevice(int mergedBeforeNum,
+                                                       int mergeNum,
+                                                       uint *mergedBeforeData,
+                                                       uint *newHostData) {
+  // alloc device data
+  uint *newDeviceData;
+  cudaMalloc((void **)&newDeviceData, sizeof(uint) * mergeNum);
+  cudaMemcpy(newDeviceData, newHostData, sizeof(uint) * mergeNum,
+             cudaMemcpyHostToDevice);
 
-    thrust::device_ptr<uint> newDeviceDataPtr(newDeviceData);
-    thrust::device_ptr<uint> mergedBeforeDataPtr(mergedBeforeData);
+  thrust::device_ptr<uint> newDeviceDataPtr(newDeviceData);
+  thrust::device_ptr<uint> mergedBeforeDataPtr(mergedBeforeData);
 
-    thrust::copy(newDeviceDataPtr, newDeviceDataPtr + mergeNum, mergedBeforeDataPtr + mergedBeforeNum);
+  thrust::copy(newDeviceDataPtr, newDeviceDataPtr + mergeNum,
+               mergedBeforeDataPtr + mergedBeforeNum);
 }
 #endif /* _CUDA_COMMON_CUH_ */
