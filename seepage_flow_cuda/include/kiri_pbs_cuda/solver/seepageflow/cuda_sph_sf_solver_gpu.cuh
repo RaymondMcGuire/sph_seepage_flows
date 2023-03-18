@@ -11,7 +11,7 @@
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_SPH_SF_SOLVER_GPU_CUH_
 
-#pragma once
+#pragma once 
 
 #include <kiri_pbs_cuda/solver/dem/cuda_dem_solver_common_gpu.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sf_utils.cuh>
