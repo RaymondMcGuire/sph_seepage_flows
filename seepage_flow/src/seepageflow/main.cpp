@@ -1,12 +1,12 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2020-10-27 00:49:33
- * @LastEditTime: 2021-08-27 23:50:13
- * @LastEditors: Xu.WANG
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:49:49
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-18 19:49:48
+ * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description:
- * @FilePath: \sph_seepage_flows\seepage_flows\src\seepageflow\main.cpp
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 // clang-format off
 #include <sf_cuda_define.h>
 #include <kiri_utils.h>
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 360;
+auto TotalFrameNumber = 120;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;

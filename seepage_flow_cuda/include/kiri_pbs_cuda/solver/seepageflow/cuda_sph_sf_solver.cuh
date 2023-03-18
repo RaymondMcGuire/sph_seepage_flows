@@ -50,13 +50,13 @@ protected:
                       const float3 highestPoint, const float kernelRadius,
                       const int3 gridSize);
 
-  virtual void ComputeDensity(CudaSFParticlesPtr &particles,
-                              CudaBoundaryParticlesPtr &boundaries,
-                              const float rho0, const float rho1,
-                              const CudaArray<size_t> &cellStart,
-                              const CudaArray<size_t> &boundaryCellStart,
-                              const float3 lowestPoint,
-                              const float kernelRadius, const int3 gridSize);
+  virtual void _ComputeDensity(CudaSFParticlesPtr &particles,
+                               CudaBoundaryParticlesPtr &boundaries,
+                               const float rho0, const float rho1,
+                               const CudaArray<size_t> &cellStart,
+                               const CudaArray<size_t> &boundaryCellStart,
+                               const float3 lowestPoint,
+                               const float kernelRadius, const int3 gridSize);
 
   virtual void ComputePressure(CudaSFParticlesPtr &particles, const float rho0,
                                const float stiff);
@@ -67,11 +67,11 @@ protected:
                                       const float kernelRadius,
                                       const int3 gridSize);
 
-  virtual void ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
-                                    const CudaArray<size_t> &cellStart,
-                                    const float3 lowestPoint,
-                                    const float kernelRadius,
-                                    const int3 gridSize);
+  virtual void _ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
+                                     const CudaArray<size_t> &cellStart,
+                                     const float3 lowestPoint,
+                                     const float kernelRadius,
+                                     const int3 gridSize);
 
   virtual void ComputeSFWaterAdhesion(
       CudaSFParticlesPtr &particles, const CudaArray<size_t> &cellStart,

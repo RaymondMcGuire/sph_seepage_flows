@@ -1,13 +1,13 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-01 14:31:30
- * @LastEditTime: 2021-04-08 00:03:29
- * @LastEditors: Xu.WANG
- * @Description:
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:35:48
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-18 19:19:15
  * @FilePath:
- * \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_wcsph_sf_solver.cuh
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_wcsph_sf_solver.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 #ifndef _CUDA_WCSPH_SF_SOLVER_CUH_
 #define _CUDA_WCSPH_SF_SOLVER_CUH_
 

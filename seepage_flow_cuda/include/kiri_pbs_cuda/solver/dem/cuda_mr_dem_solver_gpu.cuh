@@ -1,17 +1,18 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-02-28 02:50:46
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-15 16:06:50
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_MRDEM_SOLVER_GPU_CUH_
 #define _CUDA_MRDEM_SOLVER_GPU_CUH_
 
 #pragma once
- 
+
 #include <kiri_pbs_cuda/solver/dem/cuda_dem_solver_common_gpu.cuh>
 
 namespace KIRI {

@@ -35,17 +35,17 @@ void CudaWCSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
 
   ExtraForces(particles, params.gravity);
 
-  ComputeDensity(particles, boundaries, params.sph_density, params.dem_density,
-                 cellStart, boundaryCellStart, bparams.lowest_point,
-                 bparams.kernel_radius, bparams.grid_size);
+  _ComputeDensity(particles, boundaries, params.sph_density, params.dem_density,
+                  cellStart, boundaryCellStart, bparams.lowest_point,
+                  bparams.kernel_radius, bparams.grid_size);
 
   ComputePressure(particles, params.sph_density, params.sph_stiff);
 
   ComputeAvgFlowVelocity(particles, cellStart, bparams.lowest_point,
                          bparams.kernel_radius, bparams.grid_size);
 
-  ComputeSFSandVoidage(particles, cellStart, bparams.lowest_point,
-                       bparams.kernel_radius, bparams.grid_size);
+  _ComputeSFSandVoidage(particles, cellStart, bparams.lowest_point,
+                        bparams.kernel_radius, bparams.grid_size);
 
   if (params.sf_type == SF) {
     ComputeSFWaterAdhesion(particles, cellStart, params.sf_a0, params.sf_asat,

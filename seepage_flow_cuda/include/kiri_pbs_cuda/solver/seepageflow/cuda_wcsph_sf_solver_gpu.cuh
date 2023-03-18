@@ -17,9 +17,9 @@
 
 namespace KIRI {
 static __global__ void
-ComputeSFPressureByTait_CUDA(size_t *label, float *density, float *pressure,
-                             const size_t num, const float rho0,
-                             const float stiff, const float negativeScale) {
+_ComputeSFPressureByTait_CUDA(size_t *label, float *density, float *pressure,
+                              const size_t num, const float rho0,
+                              const float stiff, const float negativeScale) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
     return;

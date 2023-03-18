@@ -130,7 +130,7 @@ static __device__ float3 ComputeMRDemCapillaryForces(float3 dij, float3 vij,
   return f;
 }
 
-static __device__ void ComputeDemWorldBoundaryForces(
+static __device__ void _ComputeDEMWorldBoundaryForces(
     float3 *f, float3 posi, float3 veli, const float radiusi,
     const float boundaryRadius, const float young, const float poisson,
     const float tanFrictionAngle, const size_t num, const float3 lowestPoint,

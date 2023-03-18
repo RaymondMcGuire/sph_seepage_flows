@@ -16,7 +16,7 @@ namespace KIRI {
 
 void CudaWCSphSFSolver::ComputePressure(CudaSFParticlesPtr &particles,
                                         const float rho0, const float stiff) {
-  ComputeSFPressureByTait_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
+  _ComputeSFPressureByTait_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
       particles->GetLabelPtr(), particles->GetDensityPtr(),
       particles->GetPressurePtr(), particles->Size(), rho0, stiff,
       mNegativeScale);
