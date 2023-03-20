@@ -1,14 +1,13 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-15 15:35:50
+ * @Date: 2023-03-18 20:06:41
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-18 19:42:27
+ * @LastEditTime: 2023-03-21 00:11:46
  * @FilePath:
  * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cu
  * @Description:
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver.cuh>
 
 #include <kiri_pbs_cuda/solver/cuda_solver_common_gpu.cuh>
@@ -17,7 +16,7 @@
 #include <kiri_pbs_cuda/thrust_helper/helper_thrust.cuh>
 
 namespace KIRI {
-void CudaSphSFSolver::_ComputeDensity(
+void CudaSphSFSolver::ComputeDensity(
     CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,
     const float rho0, const float rho1, const CudaArray<size_t> &cellStart,
     const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
@@ -107,11 +106,11 @@ void CudaSphSFSolver::ComputeSFWetSandColor(CudaSFParticlesPtr &particles,
   KIRI_CUKERNAL();
 }
 
-void CudaSphSFSolver::_ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
-                                            const CudaArray<size_t> &cellStart,
-                                            const float3 lowestPoint,
-                                            const float kernelRadius,
-                                            const int3 gridSize) {
+void CudaSphSFSolver::ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
+                                           const CudaArray<size_t> &cellStart,
+                                           const float3 lowestPoint,
+                                           const float kernelRadius,
+                                           const int3 gridSize) {
 
   _ComputeSFSandVoidage_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
       particles->GetVoidagePtr(), particles->GetLabelPtr(),
@@ -126,8 +125,8 @@ void CudaSphSFSolver::_ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
 void CudaSphSFSolver::ComputeSFSandLinearMomentum(
     CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,
     const CudaArray<size_t> &cellStart,
-    const CudaArray<size_t> &boundaryCellStart, const float sandRadius,
-    const float waterRadius, const float young, const float poisson,
+    const CudaArray<size_t> &boundaryCellStart, const float boundaryRadius,
+    const float maxForceFactor, const float young, const float poisson,
     const float tanFrictionAngle, const float c0, const float csat,
     const float cmc, const float cmcp, const float cd, const float gravity,
     const float rho0, const float3 lowestPoint, const float3 highestPoint,
@@ -138,10 +137,11 @@ void CudaSphSFSolver::ComputeSFSandLinearMomentum(
       particles->GetMassPtr(), particles->GetDensityPtr(),
       particles->GetPressurePtr(), particles->GetVoidagePtr(),
       particles->GetSaturationPtr(), particles->GetAvgFlowVelPtr(),
-      particles->GetAvgAdhesionForcePtr(), sandRadius, waterRadius, young,
-      poisson, tanFrictionAngle, cd, gravity, rho0, particles->Size(),
-      lowestPoint, highestPoint, cellStart.Data(), boundaries->GetPosPtr(),
-      boundaries->GetLabelPtr(), boundaryCellStart.Data(), gridSize,
+      particles->GetAvgAdhesionForcePtr(), particles->GetRadiusPtr(),
+      boundaryRadius, maxForceFactor, young, poisson, tanFrictionAngle, cd,
+      gravity, rho0, particles->Size(), lowestPoint, highestPoint,
+      cellStart.Data(), boundaries->GetPosPtr(), boundaries->GetLabelPtr(),
+      boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize),
       QuadraticBezierCoeff(c0, cmc, cmcp, csat), Poly6Kernel(kernelRadius),
@@ -153,8 +153,8 @@ void CudaSphSFSolver::ComputeSFSandLinearMomentum(
 void CudaSphSFSolver::ComputeMultiSFSandLinearMomentum(
     CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,
     const CudaArray<size_t> &cellStart,
-    const CudaArray<size_t> &boundaryCellStart, const float sandRadius,
-    const float waterRadius, const float young, const float poisson,
+    const CudaArray<size_t> &boundaryCellStart, const float boundaryRadius,
+    const float maxForceFactor, const float young, const float poisson,
     const float tanFrictionAngle, const float c0, const float csat,
     const float cmc, const float cmcp, const float gravity, const float rho0,
     const float3 lowestPoint, const float3 highestPoint,
@@ -165,11 +165,11 @@ void CudaSphSFSolver::ComputeMultiSFSandLinearMomentum(
       particles->GetMassPtr(), particles->GetDensityPtr(),
       particles->GetPressurePtr(), particles->GetVoidagePtr(),
       particles->GetSaturationPtr(), particles->GetAvgFlowVelPtr(),
-      particles->GetAvgAdhesionForcePtr(), sandRadius, waterRadius, young,
-      poisson, tanFrictionAngle, particles->GetCdA0AsatPtr(), gravity, rho0,
-      particles->Size(), lowestPoint, highestPoint, cellStart.Data(),
-      boundaries->GetPosPtr(), boundaries->GetLabelPtr(),
-      boundaryCellStart.Data(), gridSize,
+      particles->GetAvgAdhesionForcePtr(), particles->GetRadiusPtr(),
+      boundaryRadius, maxForceFactor, young, poisson, tanFrictionAngle,
+      particles->GetCdA0AsatPtr(), gravity, rho0, particles->Size(),
+      lowestPoint, highestPoint, cellStart.Data(), boundaries->GetPosPtr(),
+      boundaries->GetLabelPtr(), boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize),
       QuadraticBezierCoeff(c0, cmc, cmcp, csat), Poly6Kernel(kernelRadius),

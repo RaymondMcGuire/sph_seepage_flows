@@ -1,10 +1,10 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-01-12 14:57:38
+ * @Date: 2023-03-18 20:06:39
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-02-28 22:56:45
+ * @LastEditTime: 2023-03-21 00:13:04
  * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
  * @Description:
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
@@ -13,25 +13,30 @@
 
 #pragma once
 
-#include <kiri_pbs_cuda/solver/dem/cuda_dem_solver_common_gpu.cuh>
+#include <kiri_pbs_cuda/solver/dem/cuda_mr_dem_solver_gpu.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sf_utils.cuh>
 #include <kiri_pbs_cuda/solver/sph/cuda_sph_solver_common_gpu.cuh>
 namespace KIRI {
 
 static __device__ void
-_ComputeSFUniRadiusDEMForces(float3 *f, const size_t i, const size_t *label,
-                             const float3 *pos, const float3 *vel,
-                             const float radius, const float young,
-                             const float poisson, const float tanFrictionAngle,
-                             size_t j, const size_t cellEnd) {
+_ComputeSFMSDEMForces(float3 *f, const size_t i, const size_t *label,
+                      const float3 *pos, const float3 *vel, const float *radius,
+                      const float young, const float poisson,
+                      const float tanFrictionAngle, size_t j,
+                      const size_t cellEnd) {
   while (j < cellEnd) {
 
     if (i != j && label[i] == label[j]) {
       float3 dij = pos[j] - pos[i];
-      float rij = 2.f * radius;
+      float rij = radius[i] + radius[j];
       float3 vij = vel[j] - vel[i];
-      float kn = young * radius;
-      float ks = kn * poisson;
+      float kni = young * radius[i];
+      float knj = young * radius[j];
+      float ksi = kni * poisson;
+      float ksj = knj * poisson;
+
+      float kn = 2.f * kni * knj / (kni + knj);
+      float ks = 2.f * ksi * ksj / (ksi + ksj);
 
       *f += ComputeDemForces(dij, vij, rij, kn, ks, tanFrictionAngle);
     }
@@ -40,18 +45,23 @@ _ComputeSFUniRadiusDEMForces(float3 *f, const size_t i, const size_t *label,
   return;
 }
 
-static __device__ void _ComputeSFUniRadiusDEMBoundaryForces(
-    float3 *f, const float3 posi, const float3 veli, const size_t *bLabel,
-    const float3 *bpos, const float radius, const float young,
-    const float poisson, const float tanFrictionAngle, size_t j,
-    const size_t cellEnd) {
+static __device__ void _ComputeSFMSDEMBoundaryForces(
+    float3 *f, const float3 posi, const float3 veli, const float radiusi,
+    const float boundaryRadius, const size_t *bLabel, const float3 *bPos,
+    const float young, const float poisson, const float tanFrictionAngle,
+    size_t j, const size_t cellEnd) {
   while (j < cellEnd) {
     // only collide scene boundary particles
     if (bLabel[j] == 1) {
-      float3 dij = posi - bpos[j];
-      float rij = 2.f * radius;
-      float kn = young * radius;
-      float ks = kn * poisson;
+      float3 dij = posi - bPos[j];
+      float rij = boundaryRadius + radiusi;
+      float kni = young * radiusi;
+      float knj = young * boundaryRadius;
+      float ksi = kni * poisson;
+      float ksj = knj * poisson;
+
+      float kn = 2.f * kni * knj / (kni + knj);
+      float ks = 2.f * ksi * ksj / (ksi + ksj);
 
       float3 vij = make_float3(-veli.x, -veli.y, -veli.z);
       *f += ComputeDemForces(dij, vij, rij, kn, ks, tanFrictionAngle);
@@ -62,17 +72,18 @@ static __device__ void _ComputeSFUniRadiusDEMBoundaryForces(
 }
 
 template <typename AttenuFunc>
-static __device__ void _ComputeSFUniRadiusDEMCapillaryForces(
-    float3 *f, const size_t i, const size_t *label, const float3 *pos,
-    const float3 *vel, const float *sr, const float radius, size_t j,
-    const size_t cellEnd, AttenuFunc G) {
+static __device__ void
+_ComputeSFMSDEMCapillaryForces(float3 *f, const size_t i, const size_t *label,
+                               const float3 *pos, const float *sr,
+                               const float *radius, const float maxForceFactor,
+                               size_t j, const size_t cellEnd, AttenuFunc G) {
   while (j < cellEnd) {
 
     if (i != j && label[i] == label[j]) {
       float3 dij = pos[j] - pos[i];
-      float3 vij = vel[j] - vel[i];
       float avg_srij = (sr[i] + sr[j]) / 2.f;
-      *f += ComputeDemCapillaryForces(dij, vij, radius, avg_srij, G);
+      *f += _ComputeMSDEMCapillaryForce(dij, radius[i], radius[j], avg_srij,
+                                        maxForceFactor, G);
     }
     ++j;
   }
@@ -537,9 +548,9 @@ __global__ void _ComputeSFSandLinearMomentum_CUDA(
     const float3 *vel, const float *mass, const float *density,
     const float *pressure, const float *voidage, const float *saturation,
     const float3 *avgFlowVel, const float3 *avgAdhesionForce,
-    const float sandRadius, const float waterRadius, const float young,
-    const float poisson, const float tanFrictionAngle, const float cd,
-    const float gravity, const float rho0, const size_t num,
+    const float *radius, const float boundaryRadius, const float maxForceFactor,
+    const float young, const float poisson, const float tanFrictionAngle,
+    const float cd, const float gravity, const float rho0, const size_t num,
     const float3 lowestPoint, const float3 highestPoint, size_t *cellStart,
     const float3 *bPos, const size_t *bLabel, size_t *bCellStart,
     const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
@@ -563,12 +574,12 @@ __global__ void _ComputeSFSandLinearMomentum_CUDA(
       continue;
 
     // sand particles
-    _ComputeSFUniRadiusDEMForces(&f, i, label, pos, vel, sandRadius, young,
-                                 poisson, tanFrictionAngle, cellStart[hash_idx],
-                                 cellStart[hash_idx + 1]);
-    _ComputeSFUniRadiusDEMCapillaryForces(&f, i, label, pos, vel, saturation,
-                                          sandRadius, cellStart[hash_idx],
-                                          cellStart[hash_idx + 1], G);
+    _ComputeSFMSDEMForces(&f, i, label, pos, vel, radius, young, poisson,
+                          tanFrictionAngle, cellStart[hash_idx],
+                          cellStart[hash_idx + 1]);
+    _ComputeSFMSDEMCapillaryForces(&f, i, label, pos, saturation, radius,
+                                   maxForceFactor, cellStart[hash_idx],
+                                   cellStart[hash_idx + 1], G);
 
     // sand-water interactive(buoyancy term)
     _ComputeSFSandBuoyancyForces(&f, &v_w, i, label, pos, mass, density,
@@ -581,12 +592,13 @@ __global__ void _ComputeSFSandLinearMomentum_CUDA(
                                cellStart[hash_idx + 1], W);
 
     // scene boundary particles interactive
-    _ComputeSFUniRadiusDEMBoundaryForces(
-        &f, pos[i], vel[i], bLabel, bPos, sandRadius, young, poisson,
-        tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
+    _ComputeSFMSDEMBoundaryForces(&f, pos[i], vel[i], radius[i], boundaryRadius,
+                                  bLabel, bPos, young, poisson,
+                                  tanFrictionAngle, bCellStart[hash_idx],
+                                  bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForces(&f, pos[i], vel[i], sandRadius, waterRadius,
+  _ComputeDEMWorldBoundaryForces(&f, pos[i], vel[i], radius[i], boundaryRadius,
                                  young, poisson, tanFrictionAngle, num,
                                  lowestPoint, highestPoint);
 
@@ -616,13 +628,13 @@ __global__ void _ComputeMultiSFSandLinearMomentum_CUDA(
     const float3 *vel, const float *mass, const float *density,
     const float *pressure, const float *voidage, const float *saturation,
     const float3 *avgFlowVel, const float3 *avgAdhesionForce,
-    const float sandRadius, const float waterRadius, const float young,
-    const float poisson, const float tanFrictionAngle, const float3 *cda0asat,
-    const float gravity, const float rho0, const size_t num,
-    const float3 lowestPoint, const float3 highestPoint, size_t *cellStart,
-    const float3 *bPos, const size_t *bLabel, size_t *bCellStart,
-    const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
-    AttenuFunc G, Func W, GradientFunc nablaW) {
+    const float *radius, const float boundaryRadius, const float maxForceFactor,
+    const float young, const float poisson, const float tanFrictionAngle,
+    const float3 *cda0asat, const float gravity, const float rho0,
+    const size_t num, const float3 lowestPoint, const float3 highestPoint,
+    size_t *cellStart, const float3 *bPos, const size_t *bLabel,
+    size_t *bCellStart, const int3 gridSize, Pos2GridXYZ p2xyz,
+    GridXYZ2GridHash xyz2hash, AttenuFunc G, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num || label[i] != 1)
     return;
@@ -642,12 +654,12 @@ __global__ void _ComputeMultiSFSandLinearMomentum_CUDA(
       continue;
 
     // sand particles
-    _ComputeSFUniRadiusDEMForces(&f, i, label, pos, vel, sandRadius, young,
-                                 poisson, tanFrictionAngle, cellStart[hash_idx],
-                                 cellStart[hash_idx + 1]);
-    _ComputeSFUniRadiusDEMCapillaryForces(&f, i, label, pos, vel, saturation,
-                                          sandRadius, cellStart[hash_idx],
-                                          cellStart[hash_idx + 1], G);
+    _ComputeSFMSDEMForces(&f, i, label, pos, vel, radius, young, poisson,
+                          tanFrictionAngle, cellStart[hash_idx],
+                          cellStart[hash_idx + 1]);
+    _ComputeSFMSDEMCapillaryForces(&f, i, label, pos, saturation, radius,
+                                   maxForceFactor, cellStart[hash_idx],
+                                   cellStart[hash_idx + 1], G);
 
     // sand-water interactive(buoyancy term)
     _ComputeSFSandBuoyancyForces(&f, &v_w, i, label, pos, mass, density,
@@ -660,12 +672,13 @@ __global__ void _ComputeMultiSFSandLinearMomentum_CUDA(
                                cellStart[hash_idx + 1], W);
 
     // scene boundary particles interactive
-    _ComputeSFUniRadiusDEMBoundaryForces(
-        &f, pos[i], vel[i], bLabel, bPos, sandRadius, young, poisson,
-        tanFrictionAngle, bCellStart[hash_idx], bCellStart[hash_idx + 1]);
+    _ComputeSFMSDEMBoundaryForces(&f, pos[i], vel[i], radius[i], boundaryRadius,
+                                  bLabel, bPos, young, poisson,
+                                  tanFrictionAngle, bCellStart[hash_idx],
+                                  bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForces(&f, pos[i], vel[i], sandRadius, waterRadius,
+  _ComputeDEMWorldBoundaryForces(&f, pos[i], vel[i], radius[i], boundaryRadius,
                                  young, poisson, tanFrictionAngle, num,
                                  lowestPoint, highestPoint);
 

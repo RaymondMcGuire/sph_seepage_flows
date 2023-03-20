@@ -1,8 +1,8 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-15 15:49:49
+ * @Date: 2023-03-18 20:06:33
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-18 19:49:48
+ * @LastEditTime: 2023-03-20 23:59:16
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description:
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
@@ -68,12 +68,6 @@ void SetupParams() {
 
   // dem params
   CUDA_SEEPAGEFLOW_PARAMS.dem_density = 2700.f;
-  CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius = 0.005f;
-  CUDA_SEEPAGEFLOW_PARAMS.dem_mass =
-      CUDA_SEEPAGEFLOW_PARAMS.dem_density *
-      ((4.f / 3.f) * 3.1415926f *
-       std::powf(CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius, 3.f));
-
   CUDA_SEEPAGEFLOW_PARAMS.dem_young = 1e5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_poisson = 0.3f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
@@ -94,11 +88,8 @@ void SetupParams() {
       make_float3(0.88f, 0.79552f, 0.5984f);
   CUDA_SEEPAGEFLOW_PARAMS.sf_wet_sand_color = make_float3(0.38f, 0.29f, 0.14f);
 
-  CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f *
-                               CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius /
-                               std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young /
-                                          CUDA_SEEPAGEFLOW_PARAMS.dem_density);
   CUDA_SEEPAGEFLOW_PARAMS.gravity = make_float3(0.0f, -9.8f, 0.0f);
+  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 5.f;
 
   // sph emitter
   CUDA_SPH_EMITTER_PARAMS.enable = true;
@@ -191,9 +182,7 @@ void SetupParams() {
   }
 
   // dt
-  CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius = multiVolumeData.sandMinRadius;
-  CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f *
-                               CUDA_SEEPAGEFLOW_PARAMS.dem_particle_radius /
+  CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /
                                std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young /
                                           CUDA_SEEPAGEFLOW_PARAMS.dem_density);
   KIRI_LOG_INFO("Number of total particles = {0}", multiVolumeData.pos.size());

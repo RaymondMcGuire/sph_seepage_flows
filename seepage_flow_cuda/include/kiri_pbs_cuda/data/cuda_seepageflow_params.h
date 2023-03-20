@@ -1,11 +1,12 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2021-02-10 15:29:35
- * @LastEditTime: 2021-08-21 18:14:53
- * @LastEditors: Xu.WANG
- * @Description:
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:35:45
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-21 00:14:31
  * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #ifndef _CUDA_SEEPAGEFLOW_PARAMS_H_
@@ -31,10 +32,7 @@ struct CudaSeepageflowParams {
   float sph_bnu;
 
   // sand(DEM)
-  float dem_mass;
   float dem_density;
-  float dem_particle_radius;
-  float dem_kernel_radius;
   float dem_young;
   float dem_poisson;
   float dem_tan_friction_angle;
@@ -51,6 +49,8 @@ struct CudaSeepageflowParams {
   float sf_asat;
   float sf_amc;
   float sf_amc_p;
+
+  float max_force_factor;
 
   float3 sf_dry_sand_color;
   float3 sf_wet_sand_color;

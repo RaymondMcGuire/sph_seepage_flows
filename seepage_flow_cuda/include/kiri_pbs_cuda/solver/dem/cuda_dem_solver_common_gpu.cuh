@@ -1,11 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2020-07-04 14:48:23
- * @LastEditTime: 2022-03-19 02:59:49
- * @LastEditors: Xu.WANG
- * @Description:
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 17:21:41
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-20 23:11:53
  * @FilePath:
- * \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\dem\cuda_dem_solver_common_gpu.cuh
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_dem_solver_common_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #ifndef _CUDA_DEM_SOLVER_COMMON_GPU_CUH_
@@ -40,92 +41,6 @@ static __device__ float3 ComputeDemForces(float3 dij, float3 vij, float rij,
     }
 
     f = -normal_force - shear_force;
-  }
-  return f;
-}
-
-template <typename AttenuFunc>
-static __device__ float3 ComputeDemCapillaryForces(float3 dij, float3 vij,
-                                                   const float radiusi,
-                                                   const float sr,
-                                                   AttenuFunc G) {
-  float3 f = make_float3(0.f);
-  // rupture distance
-  float contact_angle = 30.f / 180.f * KIRI_PI;
-  float volume_liquid_bridge =
-      4.f / 3.f * KIRI_PI * powf(radiusi, 3.f) * 0.01f * 0.01f;
-  float s_rupture = (1.f + 0.5f * contact_angle) *
-                    (powf(volume_liquid_bridge, 1.f / 3.f) +
-                     0.1f * powf(volume_liquid_bridge, 2.f / 3.f));
-
-  float dist = length(dij);
-  float H = dist - (radiusi + radiusi);
-  if (H < s_rupture && H > 0.f) {
-    float3 N = dij / dist;
-    float dot_epslion = dot(vij, N);
-
-    float3 vij_normal = dot_epslion * N;
-    float3 vij_tangential = vij - dot_epslion * N;
-
-    // float coeff_c = csat + (1.f - sr) * (c0 - csat);
-    float coeff_c = G(sr);
-
-    // printf("cohesive=%.3f \n", coeff_c);
-
-    float d = -H + sqrtf(H * H + volume_liquid_bridge / (KIRI_PI * radiusi));
-    float phi = sqrtf(2.f * H / radiusi *
-                      (-1.f + sqrtf(1.f + volume_liquid_bridge /
-                                              (KIRI_PI * radiusi * H * H))));
-    float neck_curvature_pressure = -2.f * KIRI_PI * coeff_c * radiusi *
-                                    cosf(contact_angle) / (1.f + H / (2.f * d));
-    float surface_tension_force =
-        -2.f * KIRI_PI * coeff_c * radiusi * phi * sinf(contact_angle);
-
-    f = -N * (neck_curvature_pressure + surface_tension_force);
-  }
-  return f;
-}
-
-template <typename AttenuFunc>
-static __device__ float3 ComputeMRDemCapillaryForces(float3 dij, float3 vij,
-                                                     const float radiusi,
-                                                     const float radiusj,
-                                                     const float sr,
-                                                     AttenuFunc G) {
-  float3 f = make_float3(0.f);
-  // rupture distance
-  float contact_angle = 30.f / 180.f * KIRI_PI;
-  float volume_liquid_bridge = 4.f / 3.f * KIRI_PI *
-                               powf((radiusi + radiusj) / 2.f, 3.f) * 0.01f *
-                               0.01f;
-  float s_rupture = (1.f + 0.5f * contact_angle) *
-                    (powf(volume_liquid_bridge, 1.f / 3.f) +
-                     0.1f * powf(volume_liquid_bridge, 2.f / 3.f));
-
-  float avg_radius = (radiusi + radiusj) / 2.f;
-
-  float dist = length(dij);
-  float H = dist - (radiusi + radiusj);
-  if (H < s_rupture && H > 0.f) {
-    float3 N = dij / dist;
-    float dot_epslion = dot(vij, N);
-
-    float3 vij_normal = dot_epslion * N;
-    float3 vij_tangential = vij - dot_epslion * N;
-
-    // float coeff_c = csat + (1.f - sr) * (c0 - csat);
-    float coeff_c = G(sr);
-
-    float d = -H + sqrtf(H * H + volume_liquid_bridge / (KIRI_PI * avg_radius));
-    float phi = sqrtf(2.f * H / avg_radius *
-                      (-1.f + sqrtf(1.f + volume_liquid_bridge /
-                                              (KIRI_PI * avg_radius * H * H))));
-    float neck_curvature_pressure = -2.f * KIRI_PI * coeff_c * avg_radius *
-                                    cosf(contact_angle) / (1.f + H / (2.f * d));
-    float surface_tension_force =
-        -2.f * KIRI_PI * coeff_c * avg_radius * phi * sinf(contact_angle);
-
-    f = N * (neck_curvature_pressure + surface_tension_force);
   }
   return f;
 }

@@ -1,13 +1,13 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-01 14:31:30
- * @LastEditTime: 2021-08-15 23:13:06
- * @LastEditors: Xu.WANG
- * @Description:
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-18 20:06:39
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-20 23:58:15
  * @FilePath:
- * \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver.cuh
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 #ifndef _CUDA_SPH_SF_SOLVER_CUH_
 #define _CUDA_SPH_SF_SOLVER_CUH_
 
@@ -50,13 +50,13 @@ protected:
                       const float3 highestPoint, const float kernelRadius,
                       const int3 gridSize);
 
-  virtual void _ComputeDensity(CudaSFParticlesPtr &particles,
-                               CudaBoundaryParticlesPtr &boundaries,
-                               const float rho0, const float rho1,
-                               const CudaArray<size_t> &cellStart,
-                               const CudaArray<size_t> &boundaryCellStart,
-                               const float3 lowestPoint,
-                               const float kernelRadius, const int3 gridSize);
+  virtual void ComputeDensity(CudaSFParticlesPtr &particles,
+                              CudaBoundaryParticlesPtr &boundaries,
+                              const float rho0, const float rho1,
+                              const CudaArray<size_t> &cellStart,
+                              const CudaArray<size_t> &boundaryCellStart,
+                              const float3 lowestPoint,
+                              const float kernelRadius, const int3 gridSize);
 
   virtual void ComputePressure(CudaSFParticlesPtr &particles, const float rho0,
                                const float stiff);
@@ -67,11 +67,11 @@ protected:
                                       const float kernelRadius,
                                       const int3 gridSize);
 
-  virtual void _ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
-                                     const CudaArray<size_t> &cellStart,
-                                     const float3 lowestPoint,
-                                     const float kernelRadius,
-                                     const int3 gridSize);
+  virtual void ComputeSFSandVoidage(CudaSFParticlesPtr &particles,
+                                    const CudaArray<size_t> &cellStart,
+                                    const float3 lowestPoint,
+                                    const float kernelRadius,
+                                    const int3 gridSize);
 
   virtual void ComputeSFWaterAdhesion(
       CudaSFParticlesPtr &particles, const CudaArray<size_t> &cellStart,
@@ -91,8 +91,8 @@ protected:
   virtual void ComputeSFSandLinearMomentum(
       CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,
       const CudaArray<size_t> &cellStart,
-      const CudaArray<size_t> &boundaryCellStart, const float waterRadius,
-      const float sandRadius, const float young, const float poisson,
+      const CudaArray<size_t> &boundaryCellStart, const float boundaryRadius,
+      const float maxForceFactor, const float young, const float poisson,
       const float tanFrictionAngle, const float c0, const float csat,
       const float cmc, const float cmcp, const float cd, const float gravity,
       const float rho0, const float3 lowestPoint, const float3 highestPoint,
@@ -101,8 +101,8 @@ protected:
   virtual void ComputeMultiSFSandLinearMomentum(
       CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,
       const CudaArray<size_t> &cellStart,
-      const CudaArray<size_t> &boundaryCellStart, const float waterRadius,
-      const float sandRadius, const float young, const float poisson,
+      const CudaArray<size_t> &boundaryCellStart, const float boundaryRadius,
+      const float maxForceFactor, const float young, const float poisson,
       const float tanFrictionAngle, const float c0, const float csat,
       const float cmc, const float cmcp, const float gravity, const float rho0,
       const float3 lowestPoint, const float3 highestPoint,
