@@ -56,13 +56,13 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
     float surface_tension_force =
         -2.f * KIRI_PI * coeff_c * avg_radius * phi * sinf(contact_angle);
 
-    f = n * (neck_curvature_pressure + surface_tension_force);
+    f = -n * (neck_curvature_pressure + surface_tension_force);
   }
 
-  float force_magnitude = length(f);
-  if (force_magnitude > max_force_allowed) {
-    f = f * (max_force_allowed / force_magnitude);
-  }
+  // float force_magnitude = length(f);
+  // if (force_magnitude > max_force_allowed) {
+  //   f = f * (max_force_allowed / force_magnitude);
+  // }
 
   return f;
 }
