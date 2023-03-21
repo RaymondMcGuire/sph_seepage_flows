@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 17:48:21
+ * @LastEditTime: 2023-03-21 19:20:18
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 360;
+auto TotalFrameNumber = 10;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -197,7 +197,7 @@ void SetupParams() {
   CudaSFParticlesPtr particles;
   particles = std::make_shared<CudaSFParticles>(
       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
-      multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,
+      multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,multiVolumeData.inertia,
       multiVolumeData.radius, multiVolumeData.cda0asat,
       multiVolumeData.amcamcp);
 

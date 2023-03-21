@@ -1,11 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-05 12:33:37
- * @LastEditTime: 2022-03-20 16:56:46
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:35:49
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-21 18:11:10
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher.cuh>
@@ -69,6 +69,7 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
             seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
+            seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
             seepage_flow->GetMaxSaturationPtr())));
   } else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI) {
 
@@ -92,6 +93,7 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
         thrust::make_zip_iterator(thrust::make_tuple(
+            seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
             seepage_flow->GetMaxSaturationPtr(), seepage_flow->GetCdA0AsatPtr(),
             seepage_flow->GetAmcAmcpPtr())));
   }

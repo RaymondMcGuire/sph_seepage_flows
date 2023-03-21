@@ -1,11 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2021-08-18 09:11:50
- * @LastEditors: Xu.WANG
- * @Description: Seepage flow particles
- * @FilePath:
- * \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\particle\cuda_sf_particles.cuh
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:35:47
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-21 18:05:58
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\particle\cuda_sf_particles.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 
 #ifndef _CUDA_SEEPAGEFLOW_PARTICLES_CUH_
@@ -41,6 +41,9 @@ public:
       : CudaParticles(numOfMaxParticles), mLabel(numOfMaxParticles),
         mRadius(numOfMaxParticles), mVel(numOfMaxParticles),
         mAcc(numOfMaxParticles), mCol(numOfMaxParticles),
+        mAngularVel(numOfMaxParticles), 
+        mAngularAcc(numOfMaxParticles),
+        mInertia(numOfMaxParticles),
         mPressure(numOfMaxParticles), mDensity(numOfMaxParticles),
         mMass(numOfMaxParticles), mVoidage(numOfMaxParticles),
         mSaturation(numOfMaxParticles), mMaxSaturation(numOfMaxParticles),
@@ -52,10 +55,12 @@ public:
                                             const Vec_Float3 &col,
                                             const Vec_SizeT &label,
                                             const Vec_Float &mass,
+                                            const Vec_Float &inertia,
                                             const Vec_Float &radius)
       : CudaParticles(p), mLabel(p.size()), mRadius(p.size()), mVel(p.size()),
-        mAcc(p.size()), mCol(p.size()), mPressure(p.size()), mDensity(p.size()),
-        mMass(p.size()), mVoidage(p.size()), mSaturation(p.size()),
+        mAcc(p.size()), mAngularVel(p.size()),
+        mAngularAcc(p.size()), mCol(p.size()), mPressure(p.size()), mDensity(p.size()),
+        mMass(p.size()),mInertia(p.size()), mVoidage(p.size()), mSaturation(p.size()),
         mMaxSaturation(p.size()), mAvgFlowVel(p.size()),
         mAvgDragForce(p.size()), mAdhesionForce(p.size()),
         mAvgAdhesionForce(p.size()), mCdA0Asat(p.size()), mAmcAmcp(p.size()) {
@@ -69,6 +74,9 @@ public:
     KIRI_CUCALL(cudaMemcpy(mLabel.Data(), &label[0],
                            sizeof(size_t) * label.size(),
                            cudaMemcpyHostToDevice));
+                            KIRI_CUCALL(cudaMemcpy(mInertia.Data(), &inertia[0],
+                           sizeof(float) * inertia.size(),
+                           cudaMemcpyHostToDevice));
   }
 
   explicit CudaSFParticles::CudaSFParticles(const size_t numOfMaxParticles,
@@ -76,16 +84,20 @@ public:
                                             const Vec_Float3 &col,
                                             const Vec_SizeT &label,
                                             const Vec_Float &mass,
+                                             const Vec_Float &inertia,
                                             const Vec_Float &radius)
       : CudaParticles(numOfMaxParticles, p), mLabel(numOfMaxParticles),
         mRadius(numOfMaxParticles), mVel(numOfMaxParticles),
         mAcc(numOfMaxParticles), mCol(numOfMaxParticles),
+        mAngularVel(numOfMaxParticles), 
+        mAngularAcc(numOfMaxParticles),
+        mInertia(numOfMaxParticles),
         mPressure(numOfMaxParticles), mDensity(numOfMaxParticles),
         mMass(numOfMaxParticles), mVoidage(numOfMaxParticles),
         mSaturation(numOfMaxParticles), mMaxSaturation(numOfMaxParticles),
         mAvgFlowVel(numOfMaxParticles), mAvgDragForce(numOfMaxParticles),
         mAdhesionForce(numOfMaxParticles), mAvgAdhesionForce(numOfMaxParticles),
-        mCdA0Asat(numOfMaxParticles), mAmcAmcp(numOfMaxParticles) {
+        mCdA0Asat(numOfMaxParticles), mAmcAmcp(numOfMaxParticles){
     KIRI_CUCALL(cudaMemcpy(mCol.Data(), &col[0], sizeof(float3) * col.size(),
                            cudaMemcpyHostToDevice));
     KIRI_CUCALL(cudaMemcpy(mRadius.Data(), &radius[0],
@@ -96,16 +108,22 @@ public:
     KIRI_CUCALL(cudaMemcpy(mLabel.Data(), &label[0],
                            sizeof(size_t) * label.size(),
                            cudaMemcpyHostToDevice));
+                                                KIRI_CUCALL(cudaMemcpy(mInertia.Data(), &inertia[0],
+                           sizeof(float) * inertia.size(),
+                           cudaMemcpyHostToDevice));
   }
 
   explicit CudaSFParticles::CudaSFParticles(
       const size_t numOfMaxParticles, const Vec_Float3 &p,
-      const Vec_Float3 &col, const Vec_SizeT &label, const Vec_Float &mass,
+      const Vec_Float3 &col, const Vec_SizeT &label, const Vec_Float &mass,const Vec_Float &inertia,
       const Vec_Float &radius, const Vec_Float3 &cda0asat,
       const Vec_Float2 &amcamcp)
       : CudaParticles(numOfMaxParticles, p), mLabel(numOfMaxParticles),
         mRadius(numOfMaxParticles), mVel(numOfMaxParticles),
         mAcc(numOfMaxParticles), mCol(numOfMaxParticles),
+                mAngularVel(numOfMaxParticles), 
+        mAngularAcc(numOfMaxParticles),
+        mInertia(numOfMaxParticles),
         mPressure(numOfMaxParticles), mDensity(numOfMaxParticles),
         mMass(numOfMaxParticles), mVoidage(numOfMaxParticles),
         mSaturation(numOfMaxParticles), mMaxSaturation(numOfMaxParticles),
@@ -119,6 +137,11 @@ public:
                            cudaMemcpyHostToDevice));
     KIRI_CUCALL(cudaMemcpy(mMass.Data(), &mass[0], sizeof(float) * mass.size(),
                            cudaMemcpyHostToDevice));
+
+                             KIRI_CUCALL(cudaMemcpy(mInertia.Data(), &inertia[0],
+                           sizeof(float) * inertia.size(),
+                           cudaMemcpyHostToDevice));
+
     KIRI_CUCALL(cudaMemcpy(mLabel.Data(), &label[0],
                            sizeof(size_t) * label.size(),
                            cudaMemcpyHostToDevice));
@@ -138,10 +161,17 @@ public:
 
   float3 *GetVelPtr() const { return mVel.Data(); }
   float3 *GetAccPtr() const { return mAcc.Data(); }
+     float3 *GetAngularVelPtr() const { return mAngularVel.Data(); }
+   float3 *GetAngularAccPtr() const { return mAngularAcc.Data(); }
+
+
+
   float3 *GetColPtr() const { return mCol.Data(); }
   float *GetPressurePtr() const { return mPressure.Data(); }
   float *GetDensityPtr() const { return mDensity.Data(); }
   float *GetMassPtr() const { return mMass.Data(); }
+     float *GetInertiaPtr() const { return mInertia.Data(); }
+
 
   float *GetVoidagePtr() const { return mVoidage.Data(); }
   float *GetSaturationPtr() const { return mSaturation.Data(); }
@@ -165,11 +195,16 @@ public:
 protected:
   CudaArray<size_t> mLabel;
   CudaArray<float> mRadius;
+    CudaArray<float3> mCol;
 
   CudaArray<float3> mVel;
   CudaArray<float3> mAcc;
-  CudaArray<float3> mCol;
+    CudaArray<float3> mAngularVel;
+  CudaArray<float3> mAngularAcc;
+
   CudaArray<float> mMass;
+  CudaArray<float> mInertia;
+
   CudaArray<float> mDensity;
   CudaArray<float> mPressure;
 
