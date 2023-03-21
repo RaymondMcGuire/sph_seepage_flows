@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 00:16:20
+ * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 11:48:36
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-03-21 15:32:23
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _CUDA_MRDEM_SOLVER_GPU_CUH_
 #define _CUDA_MRDEM_SOLVER_GPU_CUH_
@@ -58,10 +57,10 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
     f = -n * (neck_curvature_pressure + surface_tension_force);
   }
 
-  // float force_magnitude = length(f);
-  // if (force_magnitude > max_force_allowed) {
-  //   f = f * (max_force_allowed / force_magnitude);
-  // }
+  float force_magnitude = length(f);
+  if (force_magnitude > max_force_allowed) {
+    f = f * (max_force_allowed / force_magnitude);
+  }
 
   return f;
 }
