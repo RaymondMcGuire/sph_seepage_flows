@@ -85,7 +85,8 @@ public:
                                         Vec_Float4 shape, float3 color,
                                         float sandDensity, float3 cda0asat,
                                         float2 amcamcp, bool offsetY = false,
-                                        float worldLowestY = 0.f, float2 offsetXZ = make_float2(0.f));
+                                        float worldLowestY = 0.f,
+                                        float2 offsetXZ = make_float2(0.f));
 
   inline constexpr bool GetEmitterStatus() const { return bEnable; }
 

@@ -1,11 +1,11 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 00:16:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 12:15:47
+ * @LastEditTime: 2023-03-21 12:31:03
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 // clang-format off
 #include <sf_cuda_define.h>
@@ -37,7 +37,7 @@ void SetupParams() {
 
   // scene config
   auto cuda_lowest_point = make_float3(0.f);
-  auto cuda_highest_point = make_float3(1.5f, 1.5f, 2.5f);
+  auto cuda_highest_point = make_float3(1.5f, 2.f, 2.5f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
   CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 500000;
@@ -118,6 +118,9 @@ void SetupParams() {
       (CUDA_BOUNDARY_PARAMS.highest_point - CUDA_BOUNDARY_PARAMS.lowest_point) /
       CUDA_BOUNDARY_PARAMS.kernel_radius);
 
+  CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius =
+      CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius;
+
   // init emitter
   CudaEmitterPtr emitter = std::make_shared<CudaEmitter>(
       CUDA_SPH_EMITTER_PARAMS.emit_pos, CUDA_SPH_EMITTER_PARAMS.emit_vel,
@@ -130,7 +133,7 @@ void SetupParams() {
   boundaryEmitter->BuildWorldBoundary(
       boundaryData, CUDA_BOUNDARY_PARAMS.lowest_point,
       CUDA_BOUNDARY_PARAMS.highest_point,
-      CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
+      CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius);
 
   // material type (SF: unified material; MULTI_SF: multiple types of materials)
   CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
@@ -174,7 +177,7 @@ void SetupParams() {
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.f,-0.6f));
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.f, -0.6f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
@@ -185,7 +188,10 @@ void SetupParams() {
   CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /
                                std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young /
                                           CUDA_SEEPAGEFLOW_PARAMS.dem_density);
-  KIRI_LOG_INFO("Number of total sand particles = {0}; minimum radius ={1}; dt ={2}", multiVolumeData.pos.size(),multiVolumeData.sandMinRadius,CUDA_SEEPAGEFLOW_PARAMS.dt);
+  KIRI_LOG_INFO(
+      "Number of total sand particles = {0}; minimum radius ={1}; dt ={2}",
+      multiVolumeData.pos.size(), multiVolumeData.sandMinRadius,
+      CUDA_SEEPAGEFLOW_PARAMS.dt);
 
   // spatial searcher & particles
   CudaSFParticlesPtr particles;

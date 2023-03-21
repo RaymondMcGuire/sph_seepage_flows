@@ -1,14 +1,13 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-15 15:35:45
+ * @Date: 2023-03-21 00:16:18
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 00:14:31
+ * @LastEditTime: 2023-03-21 12:31:22
  * @FilePath:
  * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
  * @Description:
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 #ifndef _CUDA_SEEPAGEFLOW_PARAMS_H_
 #define _CUDA_SEEPAGEFLOW_PARAMS_H_
 
@@ -51,6 +50,7 @@ struct CudaSeepageflowParams {
   float sf_amc_p;
 
   float max_force_factor;
+  float boundary_particle_radius;
 
   float3 sf_dry_sand_color;
   float3 sf_wet_sand_color;

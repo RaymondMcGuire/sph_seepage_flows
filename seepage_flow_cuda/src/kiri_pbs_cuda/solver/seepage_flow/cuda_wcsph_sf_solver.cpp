@@ -1,13 +1,13 @@
 /***
- * @Author: Xu.WANG
- * @Date: 2021-02-03 16:35:31
- * @LastEditTime: 2021-08-18 21:31:15
- * @LastEditors: Xu.WANG
- * @Description:
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-21 00:16:22
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-21 12:32:06
  * @FilePath:
- * \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_wcsph_sf_solver.cpp
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_wcsph_sf_solver.cpp
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
-
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_wcsph_sf_solver.cuh>
 
 namespace KIRI {
@@ -54,22 +54,23 @@ void CudaWCSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
 
     ComputeSFSandLinearMomentum(
         particles, boundaries, cellStart, boundaryCellStart,
-        params.sph_particle_radius, params.max_force_factor, params.dem_young,
-        params.dem_poisson, params.dem_tan_friction_angle, params.sf_c0,
-        params.sf_csat, params.sf_cmc, params.sf_cmc_p, params.sf_cd,
-        abs(params.gravity.y), params.sph_density, bparams.lowest_point,
-        bparams.highest_point, bparams.kernel_radius, bparams.grid_size);
+        params.boundary_particle_radius, params.max_force_factor,
+        params.dem_young, params.dem_poisson, params.dem_tan_friction_angle,
+        params.sf_c0, params.sf_csat, params.sf_cmc, params.sf_cmc_p,
+        params.sf_cd, abs(params.gravity.y), params.sph_density,
+        bparams.lowest_point, bparams.highest_point, bparams.kernel_radius,
+        bparams.grid_size);
   } else if (params.sf_type == MULTI_SF) {
     ComputeMultiSFWaterAdhesion(particles, cellStart, bparams.lowest_point,
                                 bparams.kernel_radius, bparams.grid_size);
 
     ComputeMultiSFSandLinearMomentum(
         particles, boundaries, cellStart, boundaryCellStart,
-        params.sph_particle_radius, params.max_force_factor, params.dem_young,
-        params.dem_poisson, params.dem_tan_friction_angle, params.sf_c0,
-        params.sf_csat, params.sf_cmc, params.sf_cmc_p, abs(params.gravity.y),
-        params.sph_density, bparams.lowest_point, bparams.highest_point,
-        bparams.kernel_radius, bparams.grid_size);
+        params.boundary_particle_radius, params.max_force_factor,
+        params.dem_young, params.dem_poisson, params.dem_tan_friction_angle,
+        params.sf_c0, params.sf_csat, params.sf_cmc, params.sf_cmc_p,
+        abs(params.gravity.y), params.sph_density, bparams.lowest_point,
+        bparams.highest_point, bparams.kernel_radius, bparams.grid_size);
   }
 
   ComputeSFWaterLinearMomentum(

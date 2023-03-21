@@ -56,14 +56,13 @@ static __device__ void _ComputeDEMWorldBoundaryForces(
 
   float rij = boundaryRadius + radiusi;
 
-        float kni = young * radiusi;
-      float knj = young * boundaryRadius;
-      float ksi = kni * poisson;
-      float ksj = knj * poisson;
+  float kni = young * radiusi;
+  float knj = young * boundaryRadius;
+  float ksi = kni * poisson;
+  float ksj = knj * poisson;
 
-      float kn = 2.f * kni * knj / (kni + knj);
-      float ks = 2.f * ksi * ksj / (ksi + ksj);
-
+  float kn = 2.f * kni * knj / (kni + knj);
+  float ks = 2.f * ksi * ksj / (ksi + ksj);
 
   float3 N = make_float3(0.f);
   float diff = 0.f;
