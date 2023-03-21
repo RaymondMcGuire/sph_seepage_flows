@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 1;
+auto TotalFrameNumber = 300;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -37,7 +37,7 @@ void SetupParams() {
 
   // scene config
   auto cuda_lowest_point = make_float3(0.f);
-  auto cuda_highest_point = make_float3(1.5f, 2.f, 2.5f);
+  auto cuda_highest_point = make_float3(2.f, 2.f, 3.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
   CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 500000;
@@ -73,10 +73,10 @@ void SetupParams() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 0.7f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 4.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 4.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 0.f;
@@ -177,7 +177,7 @@ void SetupParams() {
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.f, -0.6f));
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
