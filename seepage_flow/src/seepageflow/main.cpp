@@ -1,11 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-18 20:06:33
+ * @Date: 2023-03-21 00:16:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-20 23:59:16
+ * @LastEditTime: 2023-03-21 12:15:47
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 // clang-format off
 #include <sf_cuda_define.h>
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 120;
+auto TotalFrameNumber = 1;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -145,7 +145,7 @@ void SetupParams() {
 
   // object 1: bunny/bunny.bego
   shape_folders.emplace_back("bunny");
-  shape_files.emplace_back("bunny");
+  shape_files.emplace_back("multibunny_0.316");
 
   // object 2: dam/dam2.bego
   // shape_folders.emplace_back("dam");
@@ -174,7 +174,7 @@ void SetupParams() {
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y);
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.f,-0.6f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
@@ -185,7 +185,7 @@ void SetupParams() {
   CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /
                                std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young /
                                           CUDA_SEEPAGEFLOW_PARAMS.dem_density);
-  KIRI_LOG_INFO("Number of total particles = {0}", multiVolumeData.pos.size());
+  KIRI_LOG_INFO("Number of total sand particles = {0}; minimum radius ={1}; dt ={2}", multiVolumeData.pos.size(),multiVolumeData.sandMinRadius,CUDA_SEEPAGEFLOW_PARAMS.dt);
 
   // spatial searcher & particles
   CudaSFParticlesPtr particles;

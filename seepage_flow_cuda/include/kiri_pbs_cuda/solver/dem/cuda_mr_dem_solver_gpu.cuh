@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-18 20:06:39
+ * @Date: 2023-03-21 00:16:20
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 00:11:07
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-03-21 11:48:36
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_mr_dem_solver_gpu.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _CUDA_MRDEM_SOLVER_GPU_CUH_
 #define _CUDA_MRDEM_SOLVER_GPU_CUH_
@@ -45,7 +44,6 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
 
     float3 n = dij / dist;
 
-    // float coeff_c = csat + (1.f - sr) * (c0 - csat);
     float coeff_c = G(sr);
     float d = -H + sqrtf(H * H + volume_liquid_bridge / (KIRI_PI * avg_radius));
     float phi = sqrtf(2.f * H / avg_radius *

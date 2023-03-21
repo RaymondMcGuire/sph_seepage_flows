@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-01-12 14:57:38
+ * @Date: 2023-03-15 15:35:49
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-01-12 14:59:11
- * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG raymondmgwx@gmail.com, All Rights Reserved.
+ * @LastEditTime: 2023-03-21 12:09:47
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\emitter\cuda_volume_emitter.cpp
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #include <kiri_pbs_cuda/emitter/cuda_volume_emitter.cuh>
 #include <random>
@@ -142,7 +141,7 @@ void CudaVolumeEmitter::BuildSeepageflowShapeVolume(
 void CudaVolumeEmitter::BuildSeepageflowShapeMultiVolume(
     SeepageflowMultiVolumeData &data, Vec_Float4 shape, float3 color,
     float sandDensity, float3 cda0asat, float2 amcamcp, bool offsetY,
-    float worldLowestY) {
+    float worldLowestY, float2 offsetXZ) {
   if (!bEnable)
     return;
 
@@ -153,7 +152,7 @@ void CudaVolumeEmitter::BuildSeepageflowShapeMultiVolume(
 
   for (size_t i = 0; i < shape.size(); i++) {
     float radius = shape[i].w;
-    data.pos.emplace_back(make_float3(shape[i].x, shape[i].y, shape[i].z));
+    data.pos.emplace_back(make_float3(shape[i].x + offsetXZ.x, shape[i].y, shape[i].z+ offsetXZ.y));
     data.col.emplace_back(color);
     data.label.emplace_back(1);
     data.radius.emplace_back(radius);
