@@ -382,10 +382,8 @@ __device__ void _ComputeSFFluidDensity(float *density, const size_t i,
                                        const float *mass, size_t j,
                                        const size_t cellEnd, Func W) {
   while (j < cellEnd) {
-    if (label[i] == label[j]) {
+    if (i != j && label[i] == label[j]) 
       *density += mass[j] * W(length(pos[i] - pos[j]));
-    }
-
     ++j;
   }
 

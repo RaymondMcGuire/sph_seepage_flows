@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 19:20:18
+ * @LastEditTime: 2023-03-22 15:44:42
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 10;
+auto TotalFrameNumber = 360;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -73,10 +73,10 @@ void SetupParams() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 4.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 6.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 4.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 6.1f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 0.f;
@@ -89,7 +89,7 @@ void SetupParams() {
   CUDA_SEEPAGEFLOW_PARAMS.sf_wet_sand_color = make_float3(0.38f, 0.29f, 0.14f);
 
   CUDA_SEEPAGEFLOW_PARAMS.gravity = make_float3(0.0f, -9.8f, 0.0f);
-  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 8.f;
+  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 15.f;
 
   // sph emitter
   CUDA_SPH_EMITTER_PARAMS.enable = true;
