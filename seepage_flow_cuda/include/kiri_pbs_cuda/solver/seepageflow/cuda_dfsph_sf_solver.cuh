@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 14:40:51
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-22 16:18:26
+ * @LastEditTime: 2023-03-23 15:59:04
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -37,6 +37,30 @@ protected:
                               const CudaArray<size_t> &boundaryCellStart,
                               const float3 lowestPoint,
                               const float kernelRadius, const int3 gridSize)override;
+                        
+                        void AdvectDFSPHVelocity(CudaDFSFParticles &fluids);
+
+                        void ComputeTimeStepsByCFL(CudaDFSFParticles &fluids,
+                                            const float particleRadius,
+                                            const float timeIntervalInSeconds);
+
+                                        void    ComputeDFSPHAlpha(
+    CudaDFSFParticles &fluids, CudaBoundaryParticlesPtr &boundaries,
+    const float rho0, const CudaArray<size_t> &cellStart,
+    const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
+    const float kernelRadius, const int3 gridSize) ;
+
+    size_t ApplyDivergenceSolver(
+    CudaDFSFParticles &fluids, CudaBoundaryParticlesPtr &boundaries,
+    const float rho0, const CudaArray<size_t> &cellStart,
+    const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
+    const float kernelRadius, const int3 gridSize);
+
+    size_t ApplyPressureSolver(
+    CudaDFSFParticles &fluids, CudaBoundaryParticlesPtr &boundaries,
+    const float rho0, const CudaArray<size_t> &cellStart,
+    const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
+    const float kernelRadius, const int3 gridSize);
 
 };
 

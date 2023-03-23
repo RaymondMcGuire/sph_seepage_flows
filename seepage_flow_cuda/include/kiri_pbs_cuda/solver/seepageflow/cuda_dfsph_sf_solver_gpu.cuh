@@ -15,6 +15,22 @@
 #include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
 namespace KIRI {
 
+static __global__ void _ComputeVelMag_CUDA(float *velMag,const size_t *label, const float3 *vel,
+                                           const float3 *acc, const float dt,
+                                           const size_t num) {
+  const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+  if (i >= num)
+    return;
+  velMag[i] = 0.f;
+
+  if (label[i] == 1) 
+    return;
+
+  velMag[i] = lengthSquared(vel[i] + acc[i] * dt);
+
+  return;
+}
+
 
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>

@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 15:38:55
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-22 16:21:14
+ * @LastEditTime: 2023-03-23 15:58:54
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cu
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -31,9 +31,9 @@ void CudaDFSphSFSolver::ComputeDensity(
   KIRI_CUKERNAL();
 }
 
-void CudaDFSphSFSolver::AdvectSPHVelocity(CudaDFSFParticles &fluids) {
+void CudaDFSphSFSolver::AdvectDFSPHVelocity(CudaDFSFParticles &fluids) {
   
-  data->velAdvect(mDt);
+  fluids->AdvectFluidVel(mDt);
 }
 
 void CudaDFSphSFSolver::ComputeTimeStepsByCFL(CudaDFSFParticles &fluids,
@@ -42,11 +42,11 @@ void CudaDFSphSFSolver::ComputeTimeStepsByCFL(CudaDFSFParticles &fluids,
 
   
   _ComputeVelMag_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->velMagPtr(), data->velPtr(), data->accPtr(), mDt, data->size());
+      fluids->GetVelMagPtr(),fluids->GetLabelPtr(), fluids->GetVelPtr(), fluids->GetAccPtr(), mDt, fluids->Size());
 
-  auto vel_mag_array = thrust::device_pointer_cast(data->velMagPtr());
+  auto vel_mag_array = thrust::device_pointer_cast(fluids->GetVelMagPtr());
   float max_vel_mag =
-      *(thrust::max_element(vel_mag_array, vel_mag_array + data->size()));
+      *(thrust::max_element(vel_mag_array, vel_mag_array + fluids->Size()));
 
   auto diam = 2.f * particleRadius;
   mDt = CFL_FACTOR * 0.4f * (diam / sqrt(max_vel_mag));
@@ -66,9 +66,9 @@ void CudaDFSphSFSolver::ComputeDFSPHAlpha(
     const float kernelRadius, const int3 gridSize) {
   
   _ComputeAlpha_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->alphaPtr(), data->posPtr(), data->massPtr(), data->densityPtr(),
-      rho0, data->size(), cellStart.data(), boundaries->posPtr(),
-      boundaries->volumePtr(), boundaryCellStart.data(), gridSize,
+      fluids->GetAlphaPtr(),fluids->GetLabelPtr(), fluids->GetPosPtr(), fluids->GetMassPtr(), fluids->GetDensityPtr(),
+      rho0, fluids->Size(), cellStart.Data(), boundaries->GetPosPtr(),
+      boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernelGrad(kernelRadius));
 
@@ -82,14 +82,14 @@ size_t CudaDFSphSFSolver::ApplyDivergenceSolver(
     const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
     const float kernelRadius, const int3 gridSize) {
   
-  auto num = data->size();
+  auto num = fluids->Size();
 
   // Compute velocity of density change
   _ComputeDivgenceError_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->stiffPtr(), data->densityErrorPtr(), data->alphaPtr(),
-      data->posPtr(), data->velPtr(), data->massPtr(), data->densityPtr(), rho0,
-      mDt, num, cellStart.data(), boundaries->posPtr(), boundaries->volumePtr(),
-      boundaryCellStart.data(), gridSize,
+      fluids->GetStiffPtr(), fluids->GetDensityErrorPtr(),fluids->GetLabelPtr(),  fluids->GetAlphaPtr(),
+      fluids->GetPosPtr(), fluids->GetVelPtr(), fluids->GetMassPtr(), fluids->GetDensityPtr(), rho0,
+      mDt, num, cellStart.Data(), boundaries->GetPosPtr(), boundaries->GetVolumePtr(),
+      boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernelGrad(kernelRadius));
 
@@ -101,18 +101,18 @@ size_t CudaDFSphSFSolver::ApplyDivergenceSolver(
          (iter < mDivergenceMaxIter)) {
 
     _CorrectDivergenceByJacobi_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-        data->velPtr(), data->stiffPtr(), data->posPtr(), data->massPtr(), rho0,
-        num, cellStart.data(), boundaries->posPtr(), boundaries->volumePtr(),
-        boundaryCellStart.data(), gridSize,
+        fluids->GetVelPtr(), fluids->GetStiffPtr(),fluids->GetLabelPtr(),  fluids->GetPosPtr(), fluids->GetMassPtr(), rho0,
+        num, cellStart.Data(), boundaries->GetPosPtr(), boundaries->GetVolumePtr(),
+        boundaryCellStart.Data(), gridSize,
         ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
         ThrustHelper::GridXYZ2GridHash(gridSize),
         CubicKernelGrad(kernelRadius));
 
     _ComputeDivgenceError_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-        data->stiffPtr(), data->densityErrorPtr(), data->alphaPtr(),
-        data->posPtr(), data->velPtr(), data->massPtr(), data->densityPtr(),
-        rho0, mDt, num, cellStart.data(), boundaries->posPtr(),
-        boundaries->volumePtr(), boundaryCellStart.data(), gridSize,
+        fluids->GetStiffPtr(), fluids->GetDensityErrorPtr(), fluids->GetAlphaPtr(),
+        fluids->GetPosPtr(), fluids->GetVelPtr(), fluids->GetMassPtr(), fluids->GetDensityPtr(),
+        rho0, mDt, num, cellStart.Data(), boundaries->GetPosPtr(),
+        boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
         ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
         ThrustHelper::GridXYZ2GridHash(gridSize),
         CubicKernelGrad(kernelRadius));
@@ -120,8 +120,8 @@ size_t CudaDFSphSFSolver::ApplyDivergenceSolver(
     iter++;
 
     total_error =
-        thrust::reduce(thrust::device_ptr<float>(data->densityErrorPtr()),
-                       thrust::device_ptr<float>(data->densityErrorPtr() + num),
+        thrust::reduce(thrust::device_ptr<float>(fluids->GetDensityErrorPtr()),
+                       thrust::device_ptr<float>(fluids->GetDensityErrorPtr() + num),
                        0.f, ThrustHelper::AbsPlus<float>());
   }
 
@@ -139,26 +139,26 @@ size_t CudaDFSphSFSolver::ApplyPressureSolver(
     const CudaArray<size_t> &boundaryCellStart, const float3 lowestPoint,
     const float kernelRadius, const int3 gridSize) {
   
-  auto num = data->size();
+  auto num = fluids->Size();
 
   // use warm stiff
   _CorrectPressureByJacobi_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->velPtr(), data->warmStiffPtr(), data->posPtr(), data->massPtr(),
-      rho0, mDt, num, cellStart.data(), boundaries->posPtr(),
-      boundaries->volumePtr(), boundaryCellStart.data(), gridSize,
+      fluids->GetVelPtr(), fluids->GetWarmStiffPtr(),fluids->GetLabelPtr(),  fluids->GetPosPtr(), fluids->GetMassPtr(),
+      rho0, mDt, num, cellStart.Data(), boundaries->GetPosPtr(),
+      boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernelGrad(kernelRadius));
 
   _ComputeDensityError_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->densityErrorPtr(), data->stiffPtr(), data->alphaPtr(),
-      data->posPtr(), data->velPtr(), data->massPtr(), data->densityPtr(), rho0,
-      mDt, num, cellStart.data(), boundaries->posPtr(), boundaries->volumePtr(),
-      boundaryCellStart.data(), gridSize,
+      fluids->GetDensityErrorPtr(), fluids->GetStiffPtr(), fluids->GetLabelPtr(), fluids->GetAlphaPtr(),
+      fluids->GetPosPtr(), fluids->GetVelPtr(), fluids->GetMassPtr(), fluids->GetDensityPtr(), rho0,
+      mDt, num, cellStart.Data(), boundaries->GetPosPtr(), boundaries->GetVolumePtr(),
+      boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernelGrad(kernelRadius));
 
   // reset warm stiffness
-  KIRI_CUCALL(cudaMemcpy(data->warmStiffPtr(), data->stiffPtr(),
+  KIRI_CUCALL(cudaMemcpy(fluids->GetWarmStiffPtr(), fluids->GetStiffPtr(),
                          sizeof(float) * num, cudaMemcpyDeviceToDevice));
 
   auto iter = 0;
@@ -169,31 +169,31 @@ size_t CudaDFSphSFSolver::ApplyPressureSolver(
          (iter < mPressureMaxIter)) {
 
     _CorrectPressureByJacobi_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-        data->velPtr(), data->stiffPtr(), data->posPtr(), data->massPtr(), rho0,
-        mDt, num, cellStart.data(), boundaries->posPtr(),
-        boundaries->volumePtr(), boundaryCellStart.data(), gridSize,
+        fluids->GetVelPtr(),fluids->GetLabelPtr(),  fluids->GetStiffPtr(), fluids->GetPosPtr(), fluids->GetMassPtr(), rho0,
+        mDt, num, cellStart.Data(), boundaries->GetPosPtr(),
+        boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
         ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
         ThrustHelper::GridXYZ2GridHash(gridSize),
         CubicKernelGrad(kernelRadius));
 
     _ComputeDensityError_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-        data->densityErrorPtr(), data->stiffPtr(), data->alphaPtr(),
-        data->posPtr(), data->velPtr(), data->massPtr(), data->densityPtr(),
-        rho0, mDt, num, cellStart.data(), boundaries->posPtr(),
-        boundaries->volumePtr(), boundaryCellStart.data(), gridSize,
+        fluids->GetDensityErrorPtr(), fluids->GetStiffPtr(),fluids->GetLabelPtr(),  fluids->GetAlphaPtr(),
+        fluids->GetPosPtr(), fluids->GetVelPtr(), fluids->GetMassPtr(), fluids->GetDensityPtr(),
+        rho0, mDt, num, cellStart.Data(), boundaries->GetPosPtr(),
+        boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
         ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
         ThrustHelper::GridXYZ2GridHash(gridSize),
         CubicKernelGrad(kernelRadius));
 
-    thrust::transform(thrust::device, data->warmStiffPtr(),
-                      data->warmStiffPtr() + num, data->stiffPtr(),
-                      data->warmStiffPtr(), thrust::plus<float>());
+    thrust::transform(thrust::device, fluids->GetWarmStiffPtr(),
+                      fluids->GetWarmStiffPtr() + num, fluids->GetStiffPtr(),
+                      fluids->GetWarmStiffPtr(), thrust::plus<float>());
     iter++;
 
     if (iter >= mPressureMinIter) {
       total_error = thrust::reduce(
-          thrust::device_ptr<float>(data->densityErrorPtr()),
-          thrust::device_ptr<float>(data->densityErrorPtr() + num), 0.f,
+          thrust::device_ptr<float>(fluids->GetDensityErrorPtr()),
+          thrust::device_ptr<float>(fluids->GetDensityErrorPtr() + num), 0.f,
           ThrustHelper::AbsPlus<float>());
     }
   }
