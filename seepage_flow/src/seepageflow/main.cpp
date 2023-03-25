@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-26 00:05:47
+ * @LastEditTime: 2023-03-26 00:35:05
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_dfsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 120;
+auto TotalFrameNumber = 40;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -168,21 +168,22 @@ void SetupParams() {
   // CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
   // amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc,
   // CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
+ 
+    multiVolumeData.sandMinRadius =  CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius;
+//   for (auto i = 0; i < shape_folders.size(); i++) {
+//     auto cda0asat = cd_a0_asat[i];
+//     auto amcamcp = amc_amcp[i];
+//     auto sandShape = ReadBgeoFileForGPU(shape_folders[i], shape_files[i]);
 
-  for (auto i = 0; i < shape_folders.size(); i++) {
-    auto cda0asat = cd_a0_asat[i];
-    auto amcamcp = amc_amcp[i];
-    auto sandShape = ReadBgeoFileForGPU(shape_folders[i], shape_files[i]);
+//     volumeEmitter->BuildSeepageflowShapeMultiVolume(
+//         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
+//         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
+//         CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
 
-    volumeEmitter->BuildSeepageflowShapeMultiVolume(
-        multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
-        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
-
-    KIRI_LOG_DEBUG(
-        "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
-        i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x, amcamcp.y);
-  }
+//     KIRI_LOG_DEBUG(
+//         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
+//         i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x, amcamcp.y);
+//   }
 
   // dt
   CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /

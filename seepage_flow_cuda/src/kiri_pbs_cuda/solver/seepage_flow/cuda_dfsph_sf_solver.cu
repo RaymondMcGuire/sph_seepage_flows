@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 15:38:55
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 23:49:33
+ * @LastEditTime: 2023-03-26 00:42:39
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cu
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -28,6 +28,15 @@ void CudaDFSphSFSolver::ComputeDensity(
       boundaries->GetVolumePtr(), boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernel(kernelRadius));
+  KIRI_CUCALL(cudaDeviceSynchronize());
+  KIRI_CUKERNAL();
+}
+
+void CudaDFSphSFSolver::ComputeDFPressure(CudaDFSFParticlesPtr &particles,
+                                      const float rho0) {
+  _ComputeDFSFPressure_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
+      particles->GetPressurePtr(), particles->GetLabelPtr(),
+      particles->GetDensityPtr(), particles->GetStiffPtr(),particles->Size(), rho0, 1.f);
   KIRI_CUCALL(cudaDeviceSynchronize());
   KIRI_CUKERNAL();
 }
@@ -235,8 +244,8 @@ void CudaDFSphSFSolver::ComputeSFSandLinearMomentum(
       boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize),
-      QuadraticBezierCoeff(c0, cmc, cmcp, csat), Poly6Kernel(kernelRadius),
-      SpikyKernelGrad(kernelRadius));
+      QuadraticBezierCoeff(c0, cmc, cmcp, csat), CubicKernel(kernelRadius),
+      CubicKernelGrad(kernelRadius));
   KIRI_CUCALL(cudaDeviceSynchronize());
   KIRI_CUKERNAL();
 }
@@ -264,8 +273,8 @@ void CudaDFSphSFSolver::ComputeMultiSFSandLinearMomentum(
       boundaries->GetLabelPtr(), boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
       ThrustHelper::GridXYZ2GridHash(gridSize),
-      QuadraticBezierCoeff(c0, cmc, cmcp, csat), Poly6Kernel(kernelRadius),
-      SpikyKernelGrad(kernelRadius));
+      QuadraticBezierCoeff(c0, cmc, cmcp, csat), CubicKernel(kernelRadius),
+      CubicKernelGrad(kernelRadius));
   KIRI_CUCALL(cudaDeviceSynchronize());
   KIRI_CUKERNAL();
 }
@@ -286,8 +295,8 @@ void CudaDFSphSFSolver::ComputeSFWaterLinearMomentum(
       cellStart.Data(), boundaries->GetPosPtr(), boundaries->GetVolumePtr(),
       boundaryCellStart.Data(), gridSize,
       ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
-      ThrustHelper::GridXYZ2GridHash(gridSize), Poly6Kernel(kernelRadius),
-      SpikyKernelGrad(kernelRadius));
+      ThrustHelper::GridXYZ2GridHash(gridSize), CubicKernel(kernelRadius),
+      CubicKernelGrad(kernelRadius));
   KIRI_CUCALL(cudaDeviceSynchronize());
   KIRI_CUKERNAL();
 }

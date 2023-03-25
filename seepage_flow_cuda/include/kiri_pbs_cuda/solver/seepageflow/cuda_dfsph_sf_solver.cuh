@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 14:40:51
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 23:50:32
+ * @LastEditTime: 2023-03-26 00:33:03
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -40,6 +40,9 @@ public:
                             float renderInterval, CudaSeepageflowParams params,
                             CudaBoundaryParams bparams) override;
 protected:
+
+  void ComputeDFPressure(CudaDFSFParticlesPtr &particles,
+                                      const float rho0);
 
   virtual void Advect(CudaSFParticlesPtr &particles,
                       CudaBoundaryParticlesPtr &boundaries,
@@ -90,7 +93,7 @@ protected:
       const float tanFrictionAngle, const float c0, const float csat,
       const float cmc, const float cmcp, const float cd, const float gravity,
       const float rho0, const float3 lowestPoint, const float3 highestPoint,
-      const float kernelRadius, const int3 gridSize);
+      const float kernelRadius, const int3 gridSize)override;
 
   virtual void ComputeMultiSFSandLinearMomentum(
       CudaSFParticlesPtr &particles, CudaBoundaryParticlesPtr &boundaries,

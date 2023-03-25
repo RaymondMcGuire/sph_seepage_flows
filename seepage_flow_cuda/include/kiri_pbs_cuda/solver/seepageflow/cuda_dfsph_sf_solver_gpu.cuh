@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 14:42:08
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 23:37:54
+ * @LastEditTime: 2023-03-26 00:46:46
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -31,6 +31,26 @@ static __global__ void _ComputeVelMag_CUDA(float *velMag,const size_t *label, co
   return;
 }
 
+static __global__ void
+_ComputeDFSFPressure_CUDA(float *pressure, const size_t *label,
+                        const float *density, const float* stiff,
+                        const size_t num, const float rho0, 
+                        const float negativeScale) {
+  const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+  if (i >= num)
+    return;
+
+  if (label[i] == 0) {
+    pressure[i] = stiff[i] * (density[i] - rho0);
+
+    if (pressure[i] < 0.f)
+      pressure[i] *= negativeScale;
+  } else if (label[i] == 1) {
+    pressure[i] = 0.f;
+  }
+
+  return;
+}
 
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
@@ -84,8 +104,16 @@ __global__ void _ComputeDivgenceError_CUDA(
     float3 *bPos, float *bVolume, size_t *bCellStart, const int3 gridSize,
     Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] == 1)
+  if (i >= num)
+     return;
+
+  if(label[i] == 1)
+  {
+    stiff[i] = 0.f;
     return;
+  }
+      
+   
 
   int3 grid_xyz = p2xyz(pos[i]);
   auto error = 0.f;
@@ -319,7 +347,7 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
     const float *bVolume, size_t *bCellStart, const int3 gridSize,
     Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] != 0)
+  if (i >= num || label[i] ==1)
     return;
 
   float3 a = make_float3(0.f);
@@ -334,9 +362,9 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
       continue;
 
-    _ComputeDFSFWaterPressureTerm(&a, i, label, pos, mass, density, stiff,
-                                voidage, cellStart[hash_idx],
-                                cellStart[hash_idx + 1], nablaW);
+    // _ComputeDFSFWaterPressureTerm(&a, i, label, pos, mass, density, stiff,
+    //                             voidage, cellStart[hash_idx],
+    //                             cellStart[hash_idx + 1], nablaW);
     _ComputeSFWaterArtificialViscosity(&a, i, label, pos, vel, mass, density,
                                        voidage, nu, cellStart[hash_idx],
                                        cellStart[hash_idx + 1], nablaW);
@@ -344,9 +372,9 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
                                voidage, avgDragForce, cellStart[hash_idx],
                                cellStart[hash_idx + 1], W, nablaW);
 
-    _ComputeDFSFBoundaryPressure(&a, pos[i], rho0, stiff[i], bPos, bVolume, rho0,
-                             bCellStart[hash_idx], bCellStart[hash_idx + 1],
-                             nablaW);
+    // _ComputeDFSFBoundaryPressure(&a, pos[i], rho0, stiff[i], bPos, bVolume, rho0,
+    //                          bCellStart[hash_idx], bCellStart[hash_idx + 1],
+    //                          nablaW);
     _ComputeBoundaryViscosity(&a, pos[i], bPos, vel[i], rho0, bVolume, bnu,
                               rho0, bCellStart[hash_idx],
                               bCellStart[hash_idx + 1], nablaW);
@@ -371,7 +399,7 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
     const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
     AttenuFunc G, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] != 1)
+  if (i >= num || label[i] ==0)
     return;
 
   float v_w = 0.f;
@@ -454,7 +482,7 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
     size_t *bCellStart, const int3 gridSize, Pos2GridXYZ p2xyz,
     GridXYZ2GridHash xyz2hash, AttenuFunc G, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] != 1)
+  if (i >= num || label[i] ==0)
     return;
 
   float v_w = 0.f;

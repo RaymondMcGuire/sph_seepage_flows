@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 15:40:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 23:29:18
+ * @LastEditTime: 2023-03-26 00:28:44
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -24,6 +24,7 @@ void CudaDFSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
   ComputeDensity(particles, boundaries, params.sph_density, params.dem_density,
                  cellStart, boundaryCellStart, bparams.lowest_point,
                  bparams.kernel_radius, bparams.grid_size);
+  ComputePressure(particles, params.sph_density, params.sph_stiff);
 
     auto data = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
 
@@ -35,6 +36,7 @@ void CudaDFSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
                    boundaryCellStart, bparams.lowest_point,
                    bparams.kernel_radius, bparams.grid_size);
 
+   // ComputeDFPressure(data,params.sph_density);
   ComputeAvgFlowVelocity(particles, cellStart, bparams.lowest_point,
                          bparams.kernel_radius, bparams.grid_size);
 
