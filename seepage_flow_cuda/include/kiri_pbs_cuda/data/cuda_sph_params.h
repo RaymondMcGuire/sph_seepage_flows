@@ -15,7 +15,7 @@
 #include <kiri_pbs_cuda/kiri_pbs_pch.cuh>
 
 namespace KIRI {
-enum CudaSphSolverType { SPH_SOLVER, WCSPH_SOLVER, IISPH_SOLVER };
+enum CudaSphSolverType { SPH_SOLVER, WCSPH_SOLVER, DFSPH_SOLVER };
 
 struct CudaSphParams {
   float rest_mass;

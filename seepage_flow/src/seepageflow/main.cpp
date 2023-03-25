@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-22 15:44:42
+ * @LastEditTime: 2023-03-26 00:05:47
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -16,10 +16,10 @@
 using namespace KIRI;
 
 // global params
-auto ExampleName = "seepageflow_bunny_wcsph";
+auto ExampleName = "seepageflow_bunny_dfsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 360;
+auto TotalFrameNumber = 120;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -195,7 +195,7 @@ void SetupParams() {
 
   // spatial searcher & particles
   CudaSFParticlesPtr particles;
-  particles = std::make_shared<CudaSFParticles>(
+  particles = std::make_shared<CudaDFSFParticles>(
       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
       multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,multiVolumeData.inertia,
       multiVolumeData.radius, multiVolumeData.cda0asat,
@@ -212,12 +212,19 @@ void SetupParams() {
   KIRI_LOG_INFO("Number of Boundary Particles = {0}",
                 boundary_particles->Size());
 
-  // wcsph
+
   bool adaptive_sub_timestep = true;
   CudaSphSFSolverPtr pSolver;
-  pSolver = std::make_shared<CudaWCSphSFSolver>(particles->MaxSize());
-  CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
-  KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
+
+// wcsph
+//   pSolver = std::make_shared<CudaWCSphSFSolver>(particles->MaxSize());
+//   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
+//   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
+
+    //dfsph
+    pSolver = std::make_shared<CudaDFSphSFSolver>(particles->MaxSize(),CUDA_SEEPAGEFLOW_PARAMS.dt);
+  CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
+  KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
 
   // bgeo file export & render FPS
   CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;

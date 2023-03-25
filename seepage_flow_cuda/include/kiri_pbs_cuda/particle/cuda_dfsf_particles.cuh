@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 16:03:20
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-23 15:57:05
+ * @LastEditTime: 2023-03-25 23:15:33
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\particle\cuda_dfsf_particles.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -49,16 +49,16 @@ public:
   virtual ~CudaDFSFParticles() noexcept {}
 
 
-    inline float *GetAlphaPtr() const { return mAlpha.data(); }
-  inline float *GetStiffPtr() const { return mStiff.data(); }
-  inline float *GetWarmStiffPtr() const { return mWarmStiff.data(); }
-  inline float *GetVelMagPtr() const { return mVelMag.data(); }
-  inline float *GetDensityAdvPtr() const { return mDensityAdv.data(); }
-  inline float *GetDensityErrorPtr() const { return mDensityError.data(); }
+    inline float *GetAlphaPtr() const { return mAlpha.Data(); }
+  inline float *GetStiffPtr() const { return mStiff.Data(); }
+  inline float *GetWarmStiffPtr() const { return mWarmStiff.Data(); }
+  inline float *GetVelMagPtr() const { return mVelMag.Data(); }
+  inline float *GetDensityAdvPtr() const { return mDensityAdv.Data(); }
+  inline float *GetDensityErrorPtr() const { return mDensityError.Data(); }
 
 
   void AdvectFluidVel(const float dt);
-  virtual void Advect(const float dt, const float damping);
+  virtual void Advect(const float dt, const float damping)override;
 
 protected:
 

@@ -1,13 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-03 22:59:48
- * @LastEditTime: 2021-08-27 23:45:05
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-25 22:02:18
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-25 23:56:59
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
-
 #include <kiri_pbs_cuda/system/cuda_base_system_gpu.cuh>
 #include <kiri_pbs_cuda/system/cuda_sf_system.cuh>
 #include <kiri_pbs_cuda/system/cuda_sph_system_gpu.cuh>
@@ -59,6 +58,8 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
     solver = std::dynamic_pointer_cast<CudaSphSFSolver>(mSolver);
   else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == WCSPH_SOLVER)
     solver = std::dynamic_pointer_cast<CudaWCSphSFSolver>(mSolver);
+  else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == DFSPH_SOLVER)
+    solver = std::dynamic_pointer_cast<CudaDFSphSFSolver>(mSolver);
 
   solver->UpdateSolver(mParticles, mBoundaries, mSearcher->GetCellStart(),
                        mBoundarySearcher->GetCellStart(), renderInterval,
@@ -82,7 +83,7 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
         // printf("fluid particle number=%zd, max=%zd \n", mParticles->Size(),
         // mParticles->MaxSize());
       }
-    } else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == WCSPH_SOLVER) {
+    } else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == WCSPH_SOLVER || CUDA_SEEPAGEFLOW_PARAMS.solver_type == DFSPH_SOLVER) {
       mEmitterElapsedTime +=
           renderInterval / static_cast<float>(this->GetNumOfSubTimeSteps());
       if ((length(mEmitter->GetEmitterVelocity()) * mEmitterElapsedTime) /
@@ -96,8 +97,7 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
               CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
         else
           mEmitter->SetEmitterStatus(false);
-        // printf("fluid particle number=%zd, max=%zd \n", mParticles->Size(),
-        // mParticles->MaxSize());
+        //printf("fluid particle number=%zd, max=%zd \n", mParticles->Size(),mParticles->MaxSize());
         mEmitterCounter++;
       }
     }

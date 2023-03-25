@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-15 15:35:49
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 18:11:10
+ * @LastEditTime: 2023-03-25 22:56:57
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -12,7 +12,7 @@
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher_gpu.cuh>
 #include <kiri_pbs_cuda/thrust_helper/helper_thrust.cuh>
 
-#include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
+#include <kiri_pbs_cuda/particle/cuda_dfsf_particles.cuh>
 
 namespace KIRI {
 
@@ -56,8 +56,9 @@ CudaGNSearcher::CudaGNSearcher(const float3 lp, const float3 hp,
 
 void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
 
+auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
   if (mSearcherParticleType == SearcherParticleType::SEEPAGE) {
-    auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
+
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
@@ -70,10 +71,11 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
             seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
             seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
-            seepage_flow->GetMaxSaturationPtr())));
+            seepage_flow->GetMaxSaturationPtr(),
+            seepage_flow->GetWarmStiffPtr())));
   } else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI) {
 
-    auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
+    
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
@@ -84,7 +86,8 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
         thrust::make_zip_iterator(thrust::make_tuple(
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
-            seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr())));
+            seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
+            seepage_flow->GetWarmStiffPtr())));
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
