@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-15 15:35:49
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 22:56:57
+ * @LastEditTime: 2023-03-26 01:18:50
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -56,9 +56,10 @@ CudaGNSearcher::CudaGNSearcher(const float3 lp, const float3 hp,
 
 void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
 
-auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
-  if (mSearcherParticleType == SearcherParticleType::SEEPAGE) {
+// auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
+auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
 
+  if (mSearcherParticleType == SearcherParticleType::SEEPAGE) {
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
@@ -66,16 +67,22 @@ auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
     thrust::sort_by_key(
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
-        thrust::make_zip_iterator(thrust::make_tuple(
+        // thrust::make_zip_iterator(thrust::make_tuple(
+        //     seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
+        //     seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
+        //     seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
+        //     seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
+        //     seepage_flow->GetMaxSaturationPtr(),
+        //     seepage_flow->GetWarmStiffPtr())));
+
+
+                thrust::make_zip_iterator(thrust::make_tuple(
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
             seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
             seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
-            seepage_flow->GetMaxSaturationPtr(),
-            seepage_flow->GetWarmStiffPtr())));
+            seepage_flow->GetMaxSaturationPtr())));
   } else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI) {
-
-    
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
@@ -83,11 +90,17 @@ auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
     thrust::sort_by_key(
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
-        thrust::make_zip_iterator(thrust::make_tuple(
+
+         thrust::make_zip_iterator(thrust::make_tuple(
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
-            seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
-            seepage_flow->GetWarmStiffPtr())));
+            seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr())));
+
+        // thrust::make_zip_iterator(thrust::make_tuple(
+        //     seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
+        //     seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
+        //     seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
+        //     seepage_flow->GetWarmStiffPtr())));
 
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),

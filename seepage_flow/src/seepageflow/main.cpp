@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-26 00:35:05
+ * @LastEditTime: 2023-03-26 01:40:42
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -16,10 +16,10 @@
 using namespace KIRI;
 
 // global params
-auto ExampleName = "seepageflow_bunny_dfsph";
+auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 40;
+auto TotalFrameNumber = 240;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -169,21 +169,21 @@ void SetupParams() {
   // amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc,
   // CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
  
-    multiVolumeData.sandMinRadius =  CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius;
-//   for (auto i = 0; i < shape_folders.size(); i++) {
-//     auto cda0asat = cd_a0_asat[i];
-//     auto amcamcp = amc_amcp[i];
-//     auto sandShape = ReadBgeoFileForGPU(shape_folders[i], shape_files[i]);
+  multiVolumeData.sandMinRadius =  CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius;
+  for (auto i = 0; i < shape_folders.size(); i++) {
+    auto cda0asat = cd_a0_asat[i];
+    auto amcamcp = amc_amcp[i];
+    auto sandShape = ReadBgeoFileForGPU(shape_folders[i], shape_files[i]);
 
-//     volumeEmitter->BuildSeepageflowShapeMultiVolume(
-//         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
-//         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-//         CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
+    volumeEmitter->BuildSeepageflowShapeMultiVolume(
+        multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
+        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
 
-//     KIRI_LOG_DEBUG(
-//         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
-//         i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x, amcamcp.y);
-//   }
+    KIRI_LOG_DEBUG(
+        "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
+        i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x, amcamcp.y);
+  }
 
   // dt
   CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /
@@ -196,7 +196,16 @@ void SetupParams() {
 
   // spatial searcher & particles
   CudaSFParticlesPtr particles;
-  particles = std::make_shared<CudaDFSFParticles>(
+
+  //dfsf
+//   particles = std::make_shared<CudaDFSFParticles>(
+//       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
+//       multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,multiVolumeData.inertia,
+//       multiVolumeData.radius, multiVolumeData.cda0asat,
+//       multiVolumeData.amcamcp);
+
+    // wcsph
+  particles = std::make_shared<CudaSFParticles>(
       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
       multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,multiVolumeData.inertia,
       multiVolumeData.radius, multiVolumeData.cda0asat,
@@ -218,14 +227,14 @@ void SetupParams() {
   CudaSphSFSolverPtr pSolver;
 
 // wcsph
-//   pSolver = std::make_shared<CudaWCSphSFSolver>(particles->MaxSize());
-//   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
-//   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
+  pSolver = std::make_shared<CudaWCSphSFSolver>(particles->MaxSize());
+  CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
+  KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
 
     //dfsph
-    pSolver = std::make_shared<CudaDFSphSFSolver>(particles->MaxSize(),CUDA_SEEPAGEFLOW_PARAMS.dt);
-  CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
-  KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
+//     pSolver = std::make_shared<CudaDFSphSFSolver>(particles->MaxSize(),CUDA_SEEPAGEFLOW_PARAMS.dt);
+//   CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
+//   KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
 
   // bgeo file export & render FPS
   CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
