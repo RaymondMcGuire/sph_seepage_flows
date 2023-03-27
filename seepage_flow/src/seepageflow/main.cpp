@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-26 18:56:54
+ * @LastEditTime: 2023-03-27 14:25:57
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 360;
+auto TotalFrameNumber = 10;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -30,7 +30,7 @@ CudaSFSystemPtr SFSystem;
 void SetupExample1() {
 
   KIRI_LOG_DEBUG("Seepageflow: Example1 SetupParams");
-
+     ExampleName = "seepageflow_bunny_wcsph";
   // export path
   strcpy(CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
          (String(EXPORT_PATH) + "bgeo/" + ExampleName).c_str());
@@ -252,17 +252,17 @@ void SetupExample1() {
 void SetupExample2() {
 
   KIRI_LOG_DEBUG("Seepageflow: Example2 SetupParams");
-
+     ExampleName = "seepageflow_dam_wcsph";
   // export path
   strcpy(CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
          (String(EXPORT_PATH) + "bgeo/" + ExampleName).c_str());
 
   // scene config
   auto cuda_lowest_point = make_float3(0.f);
-  auto cuda_highest_point = make_float3(2.f, 2.f, 3.f);
+  auto cuda_highest_point = make_float3(1.43f, 2.f, 3.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
-  CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 550000;
+  CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 900000;
 
   // sph params
   CUDA_SEEPAGEFLOW_PARAMS.sph_density = 1000.f;
@@ -295,16 +295,16 @@ void SetupExample2() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 6.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 0.7f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.15f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 6.1f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_asat = 0.8f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_amc = 1.5f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p = 0.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 2.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_asat = 1.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_amc = 2.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p = 0.8f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color =
       make_float3(0.88f, 0.79552f, 0.5984f);
@@ -317,13 +317,13 @@ void SetupExample2() {
   CUDA_SPH_EMITTER_PARAMS.enable = true;
   CUDA_SPH_EMITTER_PARAMS.run = false;
   CUDA_SPH_EMITTER_PARAMS.emit_pos =
-      make_float3(cuda_world_center.x + cuda_world_size.x / 10.f,
-                  cuda_world_center.y + cuda_world_size.y / 5.f,
-                  cuda_world_center.z + cuda_world_size.z / 2.3f);
-  CUDA_SPH_EMITTER_PARAMS.emit_vel = make_float3(0.f, 0.f, -5.f);
+      make_float3(cuda_world_center.x,
+                  cuda_world_center.y,
+                  cuda_world_center.z + cuda_world_size.z / 2.f);
+  CUDA_SPH_EMITTER_PARAMS.emit_vel = make_float3(0.f, -3.f, 0.f);
   CUDA_SPH_EMITTER_PARAMS.emit_col = make_float3(127.f, 205.f, 255.f) / 255.f;
 
-  CUDA_SPH_EMITTER_PARAMS.emit_radius = 0.17f;
+  CUDA_SPH_EMITTER_PARAMS.emit_radius = 0.25f;
   CUDA_SPH_EMITTER_PARAMS.emit_width = 0.22f;
   CUDA_SPH_EMITTER_PARAMS.emit_height = 0.18f;
   CUDA_SPH_EMITTER_PARAMS.emit_type = CudaSphEmitterType::CIRCLE;
@@ -389,7 +389,7 @@ void SetupExample2() {
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
         multiVolumeData, sandShape, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(0.75f, 2.f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
@@ -451,7 +451,7 @@ void SetupExample2() {
 void main() {
   KiriLog::Init();
 
-  SetupExample1();
+  SetupExample2();
 
   // abc exporter params
   auto AbcDtScale = 120.f * RenderInterval;
