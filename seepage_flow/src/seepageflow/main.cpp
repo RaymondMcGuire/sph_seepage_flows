@@ -73,10 +73,10 @@ void SetupExample1() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 4.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 2.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 4.1f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 2.1f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 0.f;
@@ -101,7 +101,7 @@ void SetupExample1() {
   CUDA_SPH_EMITTER_PARAMS.emit_vel = make_float3(0.f, 0.f, -5.f);
   CUDA_SPH_EMITTER_PARAMS.emit_col = make_float3(127.f, 205.f, 255.f) / 255.f;
 
-  CUDA_SPH_EMITTER_PARAMS.emit_radius = 0.17f;
+  CUDA_SPH_EMITTER_PARAMS.emit_radius = 0.2f;
   CUDA_SPH_EMITTER_PARAMS.emit_width = 0.22f;
   CUDA_SPH_EMITTER_PARAMS.emit_height = 0.18f;
   CUDA_SPH_EMITTER_PARAMS.emit_type = CudaSphEmitterType::CIRCLE;
@@ -158,7 +158,7 @@ void SetupExample1() {
   std::vector<float2> amc_amcp;
 
   // params(cd, a0, asat, amc, amcp) for object1
-  cd_a0_asat.emplace_back(make_float3(0.5f, CUDA_SEEPAGEFLOW_PARAMS.sf_a0,
+  cd_a0_asat.emplace_back(make_float3(CUDA_SEEPAGEFLOW_PARAMS.sf_cd, CUDA_SEEPAGEFLOW_PARAMS.sf_a0,
                                       CUDA_SEEPAGEFLOW_PARAMS.sf_asat));
   amc_amcp.emplace_back(make_float2(CUDA_SEEPAGEFLOW_PARAMS.sf_amc,
                                     CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p));
