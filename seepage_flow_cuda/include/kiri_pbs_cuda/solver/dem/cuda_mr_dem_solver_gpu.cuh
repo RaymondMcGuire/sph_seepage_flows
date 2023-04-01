@@ -39,8 +39,8 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
   float max_force_allowed = maxForceFactor * min(weighti, weightj);
 
   float dist = length(dij);
-  float H = abs(dist - (radiusi + radiusj));
-  if (H < s_rupture) {
+  float H = dist - (radiusi + radiusj);
+  if (H < s_rupture && H>0.f) {
 
     float3 n = dij / dist;
 
