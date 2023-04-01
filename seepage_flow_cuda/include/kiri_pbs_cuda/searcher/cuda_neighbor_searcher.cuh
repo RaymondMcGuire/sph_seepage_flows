@@ -1,11 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2020-07-26 17:30:04
- * @LastEditTime: 2022-03-20 11:26:59
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-25 22:02:18
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-04-02 00:27:44
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 
 #ifndef _CUDA_NEIGHBOR_SEARCHER_CUH_
@@ -16,7 +16,7 @@
 #include <kiri_pbs_cuda/particle/cuda_boundary_particles.cuh>
 namespace KIRI {
 
-enum SearcherParticleType { SEEPAGE = 0, SEEPAGE_MULTI = 1 };
+enum SearcherParticleType { SEEPAGE = 0, SEEPAGE_MULTI = 1, DFSF_MULTI = 2 };
 
 class CudaGNBaseSearcher {
 public:

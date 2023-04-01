@@ -1,12 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-07 17:48:08
- * @LastEditTime: 2021-03-02 18:24:27
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\kernel\cuda_sph_kernel.cuh
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-25 22:02:18
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-04-02 00:58:49
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\kernel\cuda_sph_kernel.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
-
 #ifndef _CUDA_SPH_KERNEL_CUH_
 #define _CUDA_SPH_KERNEL_CUH_
 
@@ -19,16 +19,16 @@ struct CubicKernel {
   float h, coef;
   __host__ __device__ CubicKernel(const float radius) : h(radius) {
     const float h3 = h * h * h;
-    coef = 1.f / (h3 * KIRI_PI);
+    coef = 8.f / (h3 * KIRI_PI);
   }
 
   __device__ float operator()(const float r) {
-    float res = 0.f;
-    const float q = fabsf(r) / h;
-    if (q <= 1.f && q > KIRI_EPSILON) {
-      if (q <= 0.5f) {
-        const float q2 = q * q;
-        const float q3 = q2 * q;
+    auto res = 0.f;
+    auto q = r / h;
+    if (q <= 1.0) {
+      if (q <= 0.5) {
+        auto q2 = q * q;
+        auto q3 = q2 * q;
         res = coef * (6.f * q3 - 6.f * q2 + 1.f);
       } else {
         res = coef * (2.f * powf(1.f - q, 3.f));
@@ -42,7 +42,7 @@ struct CubicKernelGrad {
   float h, coef;
   __host__ __device__ CubicKernelGrad(const float radius) : h(radius) {
     const float h3 = h * h * h;
-    coef = 6.f / (h3 * KIRI_PI);
+    coef = 48.f / (h3 * KIRI_PI);
   }
 
   __device__ float3 operator()(const float3 r) {
@@ -54,7 +54,8 @@ struct CubicKernelGrad {
       if (q <= 0.5f) {
         res = coef * q * (3.f * q - 2.f) * gradq;
       } else {
-        res = coef * (2.f * q - q * q - 1.f) * gradq;
+        auto factor = 1.f - q;
+        res = coef * (-factor * factor) * gradq;
       }
     }
     return res;

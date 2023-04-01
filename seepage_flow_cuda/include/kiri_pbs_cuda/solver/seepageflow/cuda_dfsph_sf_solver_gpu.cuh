@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 14:42:08
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-26 00:46:46
+ * @LastEditTime: 2023-04-02 01:18:14
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -91,6 +91,9 @@ _ComputeAlpha_CUDA(float *alpha, const size_t *label,const float3 *pos, const fl
   }
 
   alpha[i] = -1.f / fmaxf(KIRI_EPSILON, alpha[i] + lengthSquared(grad_pi));
+
+  if(alpha[i]!=alpha[i])
+    printf("alpha NaN! \n");
 
   return;
 }
@@ -402,6 +405,8 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
   if (i >= num || label[i] ==0)
     return;
 
+    //printf("_ComputeDFSFSandLinearMomentum_CUDA \n");
+
   float v_w = 0.f;
   float3 f = make_float3(0.f);
   float3 torque = make_float3(0.f);
@@ -484,6 +489,9 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num || label[i] ==0)
     return;
+
+      // printf("_ComputeMultiDFSFSandLinearMomentum_CUDA \n");
+
 
   float v_w = 0.f;
   float3 f = make_float3(0.f);

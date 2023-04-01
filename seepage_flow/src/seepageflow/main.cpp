@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:33:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-01 21:17:46
+ * @LastEditTime: 2023-04-02 01:20:15
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -73,16 +73,16 @@ void Seepage_UniBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 1.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 1.7f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.8f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.9f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_asat = 0.8f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_amc = 1.5f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p = 0.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 2.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_asat = 1.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_amc = 2.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p = 0.8f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color =
       make_float3(0.88f, 0.79552f, 0.5984f);
@@ -197,13 +197,6 @@ void Seepage_UniBunny_WCSPH() {
   // spatial searcher & particles
   CudaSFParticlesPtr particles;
 
-  //dfsf
-//   particles = std::make_shared<CudaDFSFParticles>(
-//       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
-//       multiVolumeData.col, multiVolumeData.label, multiVolumeData.mass,multiVolumeData.inertia,
-//       multiVolumeData.radius, multiVolumeData.cda0asat,
-//       multiVolumeData.amcamcp);
-
     // wcsph
   particles = std::make_shared<CudaSFParticles>(
       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multiVolumeData.pos,
@@ -231,11 +224,6 @@ void Seepage_UniBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
 
-    //dfsph
-//     pSolver = std::make_shared<CudaDFSphSFSolver>(particles->MaxSize(),CUDA_SEEPAGEFLOW_PARAMS.dt);
-//   CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
-//   KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
-
   // bgeo file export & render FPS
   CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
 
@@ -248,6 +236,7 @@ void Seepage_UniBunny_WCSPH() {
       particles, boundary_particles, pSolver, searcher, boundary_searcher,
       emitter, adaptive_sub_timestep);
 }
+
 
 
 void Seepage_UniBunny_DFSPH() {
@@ -412,6 +401,7 @@ void Seepage_UniBunny_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.dt = 0.5f * multiVolumeData.sandMinRadius /
                                std::sqrtf(CUDA_SEEPAGEFLOW_PARAMS.dem_young /
                                           CUDA_SEEPAGEFLOW_PARAMS.dem_density);
+
   KIRI_LOG_INFO(
       "Number of total sand particles = {0}; minimum radius ={1}; dt ={2}",
       multiVolumeData.pos.size(), multiVolumeData.sandMinRadius,
@@ -431,7 +421,7 @@ void Seepage_UniBunny_DFSPH() {
   searcher = std::make_shared<CudaGNSearcher>(
       CUDA_BOUNDARY_PARAMS.lowest_point, CUDA_BOUNDARY_PARAMS.highest_point,
       particles->MaxSize(), CUDA_BOUNDARY_PARAMS.kernel_radius,
-      SearcherParticleType::SEEPAGE_MULTI);
+      SearcherParticleType::DFSF_MULTI);
 
   auto boundary_particles = std::make_shared<CudaBoundaryParticles>(
       boundaryData.pos, boundaryData.label);
@@ -664,7 +654,7 @@ void SetupExample2() {
 void main() {
   KiriLog::Init();
 
-  Seepage_UniBunny_WCSPH();
+  Seepage_UniBunny_DFSPH();
 
   // abc exporter params
   auto AbcDtScale = 120.f * RenderInterval;

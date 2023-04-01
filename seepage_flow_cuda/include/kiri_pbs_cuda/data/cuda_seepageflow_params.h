@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 00:16:18
+ * @Date: 2023-04-01 12:11:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 12:31:22
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-04-02 00:25:27
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\data\cuda_seepageflow_params.h
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _CUDA_SEEPAGEFLOW_PARAMS_H_
 #define _CUDA_SEEPAGEFLOW_PARAMS_H_

@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:32:22
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 18:49:18
+ * @LastEditTime: 2023-04-02 00:55:02
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -390,11 +390,6 @@ __device__ void _ComputeSFFluidDensity(float *density, const size_t i,
   return;
 }
 
-/**
- * @description:
- * @param {rho0: water; rho1: sand; label: 0=water 1=sand}
- * @return {*}
- */
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash, typename Func>
 __global__ void _ComputeSFDensity_CUDA(
     float *density, const size_t *label, const float3 *pos, const float *mass,
@@ -426,6 +421,9 @@ __global__ void _ComputeSFDensity_CUDA(
     _ComputeBoundaryDensity(&density[i], pos[i], bPos, bVolume, rho0,
                             bCellStart[hash_idx], bCellStart[hash_idx + 1], W);
   }
+
+  if(density[i]!=density[i])
+      printf("density NaN! \n");
 
   return;
 }
