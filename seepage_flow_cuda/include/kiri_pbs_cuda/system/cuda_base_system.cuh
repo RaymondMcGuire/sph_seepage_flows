@@ -1,11 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-03 22:52:09
- * @LastEditTime: 2021-08-21 17:24:38
- * @LastEditors: Xu.WANG
- * @Description:
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-25 22:02:18
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-04-08 11:59:15
  * @FilePath:
- * \sph_seepage_flows\seepage_flows_cuda\include\kiri_pbs_cuda\system\cuda_base_system.cuh
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\system\cuda_base_system.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_BASE_SYSTEM_CUH_
 #define _CUDA_BASE_SYSTEM_CUH_
@@ -31,8 +32,8 @@ public:
   float UpdateSystem(float timeIntervalInSeconds);
 
   inline bool GetAdaptiveSubTimeStep() const { return bAdaptiveSubTimeStep; }
-  inline size_t GetNumOfSubTimeSteps() const {
-    return mSolver->GetNumOfSubTimeSteps();
+  inline float GetCurrentTimeStep() const {
+    return mSolver->GetCurrentTimeSteps();
   }
 
 protected:

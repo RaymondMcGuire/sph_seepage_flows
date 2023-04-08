@@ -1,8 +1,8 @@
 /*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-22 14:42:08
+ * @Date: 2023-04-08 12:28:00
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-02 01:18:14
+ * @LastEditTime: 2023-04-08 12:33:07
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -13,17 +13,18 @@
 #pragma once
 
 #include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
+#include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver_gpu.cuh>
 namespace KIRI {
 
-static __global__ void _ComputeVelMag_CUDA(float *velMag,const size_t *label, const float3 *vel,
-                                           const float3 *acc, const float dt,
-                                           const size_t num) {
+static __global__ void _ComputeVelMag_CUDA(float *velMag, const size_t *label,
+                                           const float3 *vel, const float3 *acc,
+                                           const float dt, const size_t num) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
     return;
   velMag[i] = 0.f;
 
-  if (label[i] == 1) 
+  if (label[i] == 1)
     return;
 
   velMag[i] = lengthSquared(vel[i] + acc[i] * dt);
@@ -33,9 +34,9 @@ static __global__ void _ComputeVelMag_CUDA(float *velMag,const size_t *label, co
 
 static __global__ void
 _ComputeDFSFPressure_CUDA(float *pressure, const size_t *label,
-                        const float *density, const float* stiff,
-                        const size_t num, const float rho0, 
-                        const float negativeScale) {
+                          const float *density, const float *stiff,
+                          const size_t num, const float rho0,
+                          const float negativeScale) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
     return;
@@ -55,20 +56,20 @@ _ComputeDFSFPressure_CUDA(float *pressure, const size_t *label,
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
 __global__ void
-_ComputeAlpha_CUDA(float *alpha, const size_t *label,const float3 *pos, const float *mass,
-                   const float *density, const float rho0, const size_t num,
-                   size_t *cellStart, const float3 *bPos, const float *bVolume,
-                   size_t *bCellStart, const int3 gridSize, Pos2GridXYZ p2xyz,
+_ComputeAlpha_CUDA(float *alpha, const size_t *label, const float3 *pos,
+                   const float *mass, const float *density, const float rho0,
+                   const size_t num, size_t *cellStart, const float3 *bPos,
+                   const float *bVolume, size_t *bCellStart,
+                   const int3 gridSize, Pos2GridXYZ p2xyz,
                    GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
     return;
-  
+
   alpha[i] = 0.f;
 
-  if (label[i] == 1) 
+  if (label[i] == 1)
     return;
-  
 
   int3 grid_xyz = p2xyz(pos[i]);
   float3 grad_pi = make_float3(0.f);
@@ -92,7 +93,7 @@ _ComputeAlpha_CUDA(float *alpha, const size_t *label,const float3 *pos, const fl
 
   alpha[i] = -1.f / fmaxf(KIRI_EPSILON, alpha[i] + lengthSquared(grad_pi));
 
-  if(alpha[i]!=alpha[i])
+  if (alpha[i] != alpha[i])
     printf("alpha NaN! \n");
 
   return;
@@ -101,22 +102,20 @@ _ComputeAlpha_CUDA(float *alpha, const size_t *label,const float3 *pos, const fl
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
 __global__ void _ComputeDivgenceError_CUDA(
-    float *stiff, float *densityError,const size_t *label, const float *alpha, const float3 *pos,
-    const float3 *vel, const float *mass, const float *density,
-    const float rho0, const float dt, const size_t num, size_t *cellStart,
-    float3 *bPos, float *bVolume, size_t *bCellStart, const int3 gridSize,
-    Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
+    float *stiff, float *densityError, const size_t *label, const float *alpha,
+    const float3 *pos, const float3 *vel, const float *mass,
+    const float *density, const float rho0, const float dt, const size_t num,
+    size_t *cellStart, float3 *bPos, float *bVolume, size_t *bCellStart,
+    const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
+    GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
-     return;
+    return;
 
-  if(label[i] == 1)
-  {
+  if (label[i] == 1) {
     stiff[i] = 0.f;
     return;
   }
-      
-   
 
   int3 grid_xyz = p2xyz(pos[i]);
   auto error = 0.f;
@@ -130,8 +129,9 @@ __global__ void _ComputeDivgenceError_CUDA(
     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
       continue;
 
-    _ComputeDivergenceError(&error, i,label, pos, mass, vel, cellStart[hash_idx],
-                            cellStart[hash_idx + 1], nablaW);
+    _ComputeDivergenceError(&error, i, label, pos, mass, vel,
+                            cellStart[hash_idx], cellStart[hash_idx + 1],
+                            nablaW);
     _ComputeDivergenceErrorBoundary(&error, pos[i], vel[i], bPos, bVolume, rho0,
                                     bCellStart[hash_idx],
                                     bCellStart[hash_idx + 1], nablaW);
@@ -150,10 +150,11 @@ __global__ void _ComputeDivgenceError_CUDA(
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
 __global__ void _CorrectDivergenceByJacobi_CUDA(
-    float3 *vel,const size_t *label,  const float *stiff, const float3 *pos, const float *mass,
-    const float rho0, const size_t num, size_t *cellStart, const float3 *bPos,
-    const float *bVolume, size_t *bCellStart, const int3 gridSize,
-    Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
+    float3 *vel, const size_t *label, const float *stiff, const float3 *pos,
+    const float *mass, const float rho0, const size_t num, size_t *cellStart,
+    const float3 *bPos, const float *bVolume, size_t *bCellStart,
+    const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
+    GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num || label[i] == 1)
     return;
@@ -185,11 +186,12 @@ __global__ void _CorrectDivergenceByJacobi_CUDA(
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
 __global__ void _ComputeDensityError_CUDA(
-    float *densityError, float *stiff,const size_t *label, const float *alpha, const float3 *pos,
-    const float3 *vel, const float *mass, const float *density,
-    const float rho0, const float dt, const size_t num, size_t *cellStart,
-    float3 *bPos, float *bVolume, size_t *bCellStart, const int3 gridSize,
-    Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
+    float *densityError, float *stiff, const size_t *label, const float *alpha,
+    const float3 *pos, const float3 *vel, const float *mass,
+    const float *density, const float rho0, const float dt, const size_t num,
+    size_t *cellStart, float3 *bPos, float *bVolume, size_t *bCellStart,
+    const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
+    GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num || label[i] == 1)
     return;
@@ -206,8 +208,9 @@ __global__ void _ComputeDensityError_CUDA(
     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
       continue;
 
-    _ComputeDivergenceError(&error, i, label, pos, mass, vel, cellStart[hash_idx],
-                            cellStart[hash_idx + 1], nablaW);
+    _ComputeDivergenceError(&error, i, label, pos, mass, vel,
+                            cellStart[hash_idx], cellStart[hash_idx + 1],
+                            nablaW);
     _ComputeDivergenceErrorBoundary(&error, pos[i], vel[i], bPos, bVolume, rho0,
                                     bCellStart[hash_idx],
                                     bCellStart[hash_idx + 1], nablaW);
@@ -222,11 +225,11 @@ __global__ void _ComputeDensityError_CUDA(
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash,
           typename GradientFunc>
 __global__ void _CorrectPressureByJacobi_CUDA(
-    float3 *vel, const size_t *label, const float *stiff, const float3 *pos, const float *mass,
-    const float rho0, const float dt, const size_t num, size_t *cellStart,
-    const float3 *bPos, const float *bVolume, size_t *bCellStart,
-    const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
-    GradientFunc nablaW) {
+    float3 *vel, const size_t *label, const float *stiff, const float3 *pos,
+    const float *mass, const float rho0, const float dt, const size_t num,
+    size_t *cellStart, const float3 *bPos, const float *bVolume,
+    size_t *bCellStart, const int3 gridSize, Pos2GridXYZ p2xyz,
+    GridXYZ2GridHash xyz2hash, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num || label[i] == 1)
     return;
@@ -313,9 +316,7 @@ __device__ void _ComputeDFSFWaterPressureTerm(
     if (i != j && label[i] == label[j]) {
       float densityi = density[i] / fmaxf(KIRI_EPSILON, voidage[i]);
       float densityj = density[j] / fmaxf(KIRI_EPSILON, voidage[j]);
-      *a += -mass[j] *
-            (stiff[i]+ stiff[j]) *
-            nablaW(pos[i] - pos[j]);
+      *a += -mass[j] * (stiff[i] + stiff[j]) * nablaW(pos[i] - pos[j]);
     }
     ++j;
   }
@@ -326,18 +327,15 @@ __device__ void _ComputeDFSFWaterPressureTerm(
 template <typename GradientFunc>
 __device__ void
 _ComputeDFSFBoundaryPressure(float3 *a, const float3 posi, const float densityi,
-                         const float stiffi, const float3 *bpos,
-                         const float *volume, const float rho0, size_t j,
-                         const size_t cellEnd, GradientFunc nablaW) {
+                             const float stiffi, const float3 *bpos,
+                             const float *volume, const float rho0, size_t j,
+                             const size_t cellEnd, GradientFunc nablaW) {
   while (j < cellEnd) {
-    *a += -rho0 * volume[j] *
-          stiffi *
-          nablaW(posi - bpos[j]);
+    *a += -rho0 * volume[j] * stiffi * nablaW(posi - bpos[j]);
     ++j;
   }
   return;
 }
-
 
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash, typename Func,
           typename GradientFunc>
@@ -350,7 +348,7 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
     const float *bVolume, size_t *bCellStart, const int3 gridSize,
     Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] ==1)
+  if (i >= num || label[i] == 1)
     return;
 
   float3 a = make_float3(0.f);
@@ -372,10 +370,11 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
                                        voidage, nu, cellStart[hash_idx],
                                        cellStart[hash_idx + 1], nablaW);
     _ComputeDFSFWaterSeepageTerm(&a, i, label, pos, mass, density, stiff,
-                               voidage, avgDragForce, cellStart[hash_idx],
-                               cellStart[hash_idx + 1], W, nablaW);
+                                 voidage, avgDragForce, cellStart[hash_idx],
+                                 cellStart[hash_idx + 1], W, nablaW);
 
-    // _ComputeDFSFBoundaryPressure(&a, pos[i], rho0, stiff[i], bPos, bVolume, rho0,
+    // _ComputeDFSFBoundaryPressure(&a, pos[i], rho0, stiff[i], bPos, bVolume,
+    // rho0,
     //                          bCellStart[hash_idx], bCellStart[hash_idx + 1],
     //                          nablaW);
     _ComputeBoundaryViscosity(&a, pos[i], bPos, vel[i], rho0, bVolume, bnu,
@@ -390,8 +389,9 @@ __global__ void _ComputeDFSFWaterLinearMomentum_CUDA(
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash, typename AttenuFunc,
           typename Func, typename GradientFunc>
 __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
-    float3 *avgDragForce, float3 *acc,float3 *angularAcc, const size_t *label, const float3 *pos,
-    const float3 *vel, const float3 *angularVel, const float *mass, const float *inertia, const float *density,
+    float3 *avgDragForce, float3 *acc, float3 *angularAcc, const size_t *label,
+    const float3 *pos, const float3 *vel, const float3 *angularVel,
+    const float *mass, const float *inertia, const float *density,
     const float *stiff, const float *voidage, const float *saturation,
     const float3 *avgFlowVel, const float3 *avgAdhesionForce,
     const float *radius, const float boundaryRadius, const float maxForceFactor,
@@ -402,10 +402,10 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
     const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash,
     AttenuFunc G, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] ==0)
+  if (i >= num || label[i] == 0)
     return;
 
-    //printf("_ComputeDFSFSandLinearMomentum_CUDA \n");
+  // printf("_ComputeDFSFSandLinearMomentum_CUDA \n");
 
   float v_w = 0.f;
   float3 f = make_float3(0.f);
@@ -423,9 +423,9 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
       continue;
 
     // sand particles
-    _ComputeSFMSDEMForcesTorque(&f,&torque, i, label, pos, vel, radius, angularVel,young, poisson,
-                          tanFrictionAngle, cellStart[hash_idx],
-                          cellStart[hash_idx + 1]);
+    _ComputeSFMSDEMForcesTorque(&f, &torque, i, label, pos, vel, radius,
+                                angularVel, young, poisson, tanFrictionAngle,
+                                cellStart[hash_idx], cellStart[hash_idx + 1]);
 
     _ComputeSFMSDEMCapillaryForces(&f, i, label, pos, saturation, radius,
                                    maxForceFactor, cellStart[hash_idx],
@@ -433,8 +433,8 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
 
     // sand-water interactive(buoyancy term)
     _ComputeDFSFSandBuoyancyForces(&f, &v_w, i, label, pos, mass, density,
-                                 stiff, voidage, cellStart[hash_idx],
-                                 cellStart[hash_idx + 1], W, nablaW);
+                                   stiff, voidage, cellStart[hash_idx],
+                                   cellStart[hash_idx + 1], W, nablaW);
 
     // adhesion
     _ComputeSFSandAdhesionTerm(&f, i, label, pos, mass, density,
@@ -442,15 +442,15 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
                                cellStart[hash_idx + 1], W);
 
     // scene boundary particles interactive
-  _ComputeSFMSDEMBoundaryForcesTorque(&f,&torque, pos[i], vel[i], angularVel[i],radius[i], boundaryRadius,
-                                  bLabel, bPos, young, poisson,
-                                  tanFrictionAngle, bCellStart[hash_idx],
-                                  bCellStart[hash_idx + 1]);
+    _ComputeSFMSDEMBoundaryForcesTorque(
+        &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
+        bLabel, bPos, young, poisson, tanFrictionAngle, bCellStart[hash_idx],
+        bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForcesTorque(&f,&torque, pos[i], vel[i],angularVel[i], radius[i], boundaryRadius,
-                                 young, poisson, tanFrictionAngle, num,
-                                 lowestPoint, highestPoint);
+  _ComputeDEMWorldBoundaryForcesTorque(
+      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
+      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {
@@ -468,15 +468,16 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
 
   // sand linear momentum
   acc[i] += 2.f * (f + df) / mass[i];
-   angularAcc[i] = 2.f * torque / inertia[i];
+  angularAcc[i] = 2.f * torque / inertia[i];
   return;
 }
 
 template <typename Pos2GridXYZ, typename GridXYZ2GridHash, typename AttenuFunc,
           typename Func, typename GradientFunc>
 __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
-    float3 *avgDragForce, float3 *acc,float3 *angularAcc, const size_t *label, const float3 *pos,
-    const float3 *vel, const float3 *angularVel, const float *mass, const float *inertia, const float *density,
+    float3 *avgDragForce, float3 *acc, float3 *angularAcc, const size_t *label,
+    const float3 *pos, const float3 *vel, const float3 *angularVel,
+    const float *mass, const float *inertia, const float *density,
     const float *stiff, const float *voidage, const float *saturation,
     const float3 *avgFlowVel, const float3 *avgAdhesionForce,
     const float *radius, const float boundaryRadius, const float maxForceFactor,
@@ -487,11 +488,10 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
     size_t *bCellStart, const int3 gridSize, Pos2GridXYZ p2xyz,
     GridXYZ2GridHash xyz2hash, AttenuFunc G, Func W, GradientFunc nablaW) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] ==0)
+  if (i >= num || label[i] == 0)
     return;
 
-      // printf("_ComputeMultiDFSFSandLinearMomentum_CUDA \n");
-
+  // printf("_ComputeMultiDFSFSandLinearMomentum_CUDA \n");
 
   float v_w = 0.f;
   float3 f = make_float3(0.f);
@@ -509,17 +509,17 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
       continue;
 
     // sand particles
-    _ComputeSFMSDEMForcesTorque(&f,&torque, i, label, pos, vel, radius,angularVel, young, poisson,
-                          tanFrictionAngle, cellStart[hash_idx],
-                          cellStart[hash_idx + 1]);
+    _ComputeSFMSDEMForcesTorque(&f, &torque, i, label, pos, vel, radius,
+                                angularVel, young, poisson, tanFrictionAngle,
+                                cellStart[hash_idx], cellStart[hash_idx + 1]);
     _ComputeSFMSDEMCapillaryForces(&f, i, label, pos, saturation, radius,
                                    maxForceFactor, cellStart[hash_idx],
                                    cellStart[hash_idx + 1], G);
 
     // sand-water interactive(buoyancy term)
     _ComputeDFSFSandBuoyancyForces(&f, &v_w, i, label, pos, mass, density,
-                                 stiff, voidage, cellStart[hash_idx],
-                                 cellStart[hash_idx + 1], W, nablaW);
+                                   stiff, voidage, cellStart[hash_idx],
+                                   cellStart[hash_idx + 1], W, nablaW);
 
     // adhesion
     _ComputeSFSandAdhesionTerm(&f, i, label, pos, mass, density,
@@ -527,15 +527,15 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
                                cellStart[hash_idx + 1], W);
 
     // scene boundary particles interactive
-    _ComputeSFMSDEMBoundaryForcesTorque(&f,&torque, pos[i], vel[i], angularVel[i],radius[i], boundaryRadius,
-                                  bLabel, bPos, young, poisson,
-                                  tanFrictionAngle, bCellStart[hash_idx],
-                                  bCellStart[hash_idx + 1]);
+    _ComputeSFMSDEMBoundaryForcesTorque(
+        &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
+        bLabel, bPos, young, poisson, tanFrictionAngle, bCellStart[hash_idx],
+        bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForcesTorque(&f,&torque, pos[i], vel[i],angularVel[i], radius[i], boundaryRadius,
-                                 young, poisson, tanFrictionAngle, num,
-                                 lowestPoint, highestPoint);
+  _ComputeDEMWorldBoundaryForcesTorque(
+      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
+      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {

@@ -1,8 +1,8 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 00:16:22
+ * @Date: 2023-04-01 12:11:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 12:31:50
+ * @LastEditTime: 2023-04-08 11:53:07
  * @FilePath:
  * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cpp
  * @Description:
@@ -19,7 +19,7 @@ void CudaSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
                                    float renderInterval,
                                    CudaSeepageflowParams params,
                                    CudaBoundaryParams bparams) {
-  mNumOfSubTimeSteps = static_cast<size_t>(renderInterval / params.dt);
+  mDt = params.dt;
   ExtraForces(particles, params.gravity);
 
   ComputeDensity(particles, boundaries, params.sph_density, params.dem_density,
@@ -69,8 +69,8 @@ void CudaSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
                         params.sf_wet_sand_color);
 
   Advect(particles, boundaries, boundaryCellStart, params.sph_particle_radius,
-         params.dt, params.dem_damping, bparams.lowest_point,
-         bparams.highest_point, bparams.kernel_radius, bparams.grid_size);
+         mDt, params.dem_damping, bparams.lowest_point, bparams.highest_point,
+         bparams.kernel_radius, bparams.grid_size);
 }
 
 } // namespace KIRI

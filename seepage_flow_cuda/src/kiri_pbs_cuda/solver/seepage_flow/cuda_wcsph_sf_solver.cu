@@ -42,12 +42,9 @@ void CudaWCSphSFSolver::ComputeSubTimeStepsByCFL(CudaSFParticlesPtr &particles,
   float timeStepLimitByForce =
       mTimeStepLimitByForceFactor *
       std::sqrt(kernelRadius * sphMass / maxForceMagnitude);
-  float desiredTimeStep =
-      std::min(mTimeStepLimitScale *
-                   std::min(timeStepLimitBySpeed, timeStepLimitByForce),
-               dt);
-
-  mNumOfSubTimeSteps = static_cast<size_t>(renderInterval / desiredTimeStep);
+  mDt = std::min(mTimeStepLimitScale *
+                     std::min(timeStepLimitBySpeed, timeStepLimitByForce),
+                 dt);
 
   KIRI_CUCALL(cudaDeviceSynchronize());
   KIRI_CUKERNAL();

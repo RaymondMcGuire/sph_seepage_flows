@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 14:45:47
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-22 15:48:41
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\sph\cuda_dfsph_solver_common_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\sph\cuda_dfsph_solver_common_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_DFSPH_SOLVER_COMMON_GPU_CUH_
 #define _CUDA_DFSPH_SOLVER_COMMON_GPU_CUH_
@@ -18,8 +19,9 @@ namespace KIRI {
 
 template <typename GradientFunc>
 __device__ void _ComputeAlpha(float *alpha, float3 *grad_pi, const size_t i,
-                              const size_t *label,const float3 *pos, const float *mass, size_t j,
-                              const size_t cellEnd, GradientFunc nablaW) {
+                              const size_t *label, const float3 *pos,
+                              const float *mass, size_t j, const size_t cellEnd,
+                              GradientFunc nablaW) {
   while (j < cellEnd) {
     if (i != j && label[i] == label[j]) {
       float3 grad_pj = mass[j] * nablaW(pos[i] - pos[j]);
@@ -46,9 +48,9 @@ _ComputeBoundaryAlpha(float3 *grad_pi, const float3 posi, const float3 *bpos,
 
 template <typename GradientFunc>
 __device__ void
-_ComputeDivergenceError(float *error, const size_t i, const size_t *label,const float3 *pos,
-                        const float *mass, const float3 *vel, size_t j,
-                        const size_t cellEnd, GradientFunc nablaW) {
+_ComputeDivergenceError(float *error, const size_t i, const size_t *label,
+                        const float3 *pos, const float *mass, const float3 *vel,
+                        size_t j, const size_t cellEnd, GradientFunc nablaW) {
   while (j < cellEnd) {
     if (i != j && label[i] == label[j])
       *error += mass[j] * dot((vel[i] - vel[j]), nablaW(pos[i] - pos[j]));
@@ -73,9 +75,10 @@ _ComputeDivergenceErrorBoundary(float *error, const float3 posi,
 
 template <typename GradientFunc>
 __device__ void
-_AdaptVelocitiesByDivergence(float3 *v, const size_t i, const size_t *label,const float *stiff,
-                             const float3 *pos, const float *mass, size_t j,
-                             const size_t cellEnd, GradientFunc nablaW) {
+_AdaptVelocitiesByDivergence(float3 *v, const size_t i, const size_t *label,
+                             const float *stiff, const float3 *pos,
+                             const float *mass, size_t j, const size_t cellEnd,
+                             GradientFunc nablaW) {
 
   while (j < cellEnd) {
     if (i != j && label[i] == label[j])
@@ -100,10 +103,10 @@ __device__ void _AdaptVelocitiesBoundaryByDivergence(
 
 template <typename GradientFunc>
 __device__ void
-_AdaptVelocitiesByPressure(float3 *v, const size_t i, const size_t *label,const float *stiff,
-                           const float3 *pos, const float *mass, const float dt,
-                           size_t j, const size_t cellEnd,
-                           GradientFunc nablaW) {
+_AdaptVelocitiesByPressure(float3 *v, const size_t i, const size_t *label,
+                           const float *stiff, const float3 *pos,
+                           const float *mass, const float dt, size_t j,
+                           const size_t cellEnd, GradientFunc nablaW) {
   float inv_h = 1.f / dt;
   while (j < cellEnd) {
     if (i != j && label[i] == label[j])

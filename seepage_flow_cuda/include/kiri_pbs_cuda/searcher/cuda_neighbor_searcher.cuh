@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-25 22:02:18
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-04-02 00:27:44
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #ifndef _CUDA_NEIGHBOR_SEARCHER_CUH_

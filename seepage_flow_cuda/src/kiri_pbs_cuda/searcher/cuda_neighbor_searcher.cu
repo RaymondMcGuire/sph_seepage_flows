@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-15 15:35:49
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-04-02 00:30:05
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\searcher\cuda_neighbor_searcher.cu
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher.cuh>
@@ -56,7 +57,8 @@ CudaGNSearcher::CudaGNSearcher(const float3 lp, const float3 hp,
 
 void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
 
-// auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
+  // auto seepage_flow =
+  // std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
 
   if (mSearcherParticleType == SearcherParticleType::SEEPAGE) {
     auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
@@ -66,12 +68,12 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
     thrust::sort_by_key(
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
- 
-    thrust::make_zip_iterator(thrust::make_tuple(
+
+        thrust::make_zip_iterator(thrust::make_tuple(
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
             seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr(),
-            seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
+            seepage_flow->GetAngularVelPtr(), seepage_flow->GetInertiaPtr(),
             seepage_flow->GetMaxSaturationPtr())));
   } else if (mSearcherParticleType == SearcherParticleType::SEEPAGE_MULTI) {
     auto seepage_flow = std::dynamic_pointer_cast<CudaSFParticles>(particles);
@@ -82,7 +84,7 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
 
-         thrust::make_zip_iterator(thrust::make_tuple(
+        thrust::make_zip_iterator(thrust::make_tuple(
             seepage_flow->GetLabelPtr(), seepage_flow->GetPosPtr(),
             seepage_flow->GetVelPtr(), seepage_flow->GetColPtr(),
             seepage_flow->GetRadiusPtr(), seepage_flow->GetMassPtr())));
@@ -94,10 +96,10 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
         thrust::make_zip_iterator(thrust::make_tuple(
-            seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
+            seepage_flow->GetAngularVelPtr(), seepage_flow->GetInertiaPtr(),
             seepage_flow->GetMaxSaturationPtr(), seepage_flow->GetCdA0AsatPtr(),
             seepage_flow->GetAmcAmcpPtr())));
-  }else if (mSearcherParticleType == SearcherParticleType::DFSF_MULTI) {
+  } else if (mSearcherParticleType == SearcherParticleType::DFSF_MULTI) {
     auto seepage_flow = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
     KIRI_CUCALL(cudaMemcpy(
         mGridIdxArray.Data(), seepage_flow->GetParticle2CellPtr(),
@@ -119,7 +121,7 @@ void CudaGNSearcher::SortData(const CudaParticlesPtr &particles) {
         thrust::device, mGridIdxArray.Data(),
         mGridIdxArray.Data() + particles->Size(),
         thrust::make_zip_iterator(thrust::make_tuple(
-            seepage_flow->GetAngularVelPtr(),seepage_flow->GetInertiaPtr(),
+            seepage_flow->GetAngularVelPtr(), seepage_flow->GetInertiaPtr(),
             seepage_flow->GetMaxSaturationPtr(), seepage_flow->GetCdA0AsatPtr(),
             seepage_flow->GetAmcAmcpPtr())));
   }

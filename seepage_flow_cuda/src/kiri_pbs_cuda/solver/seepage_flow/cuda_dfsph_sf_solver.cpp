@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-22 15:40:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-26 00:28:44
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cpp
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @LastEditTime: 2023-04-08 11:54:36
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cpp
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_dfsph_sf_solver.cuh>
 
@@ -26,24 +27,24 @@ void CudaDFSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
                  bparams.kernel_radius, bparams.grid_size);
   ComputePressure(particles, params.sph_density, params.sph_stiff);
 
-    auto data = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
+  auto data = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
 
-    ComputeDFSPHAlpha(data, boundaries, params.sph_density, cellStart,
-               boundaryCellStart, bparams.lowest_point, bparams.kernel_radius,
-               bparams.grid_size);
+  ComputeDFSPHAlpha(data, boundaries, params.sph_density, cellStart,
+                    boundaryCellStart, bparams.lowest_point,
+                    bparams.kernel_radius, bparams.grid_size);
 
   ApplyDivergenceSolver(data, boundaries, params.sph_density, cellStart,
-                   boundaryCellStart, bparams.lowest_point,
-                   bparams.kernel_radius, bparams.grid_size);
+                        boundaryCellStart, bparams.lowest_point,
+                        bparams.kernel_radius, bparams.grid_size);
 
-   // ComputeDFPressure(data,params.sph_density);
+  // ComputeDFPressure(data,params.sph_density);
   ComputeAvgFlowVelocity(particles, cellStart, bparams.lowest_point,
                          bparams.kernel_radius, bparams.grid_size);
 
   ComputeSFSandVoidage(particles, cellStart, bparams.lowest_point,
                        bparams.kernel_radius, bparams.grid_size);
 
-    if (params.sf_type == SF) {
+  if (params.sf_type == SF) {
     ComputeSFWaterAdhesion(particles, cellStart, params.sf_a0, params.sf_asat,
                            params.sf_amc, params.sf_amc_p, bparams.lowest_point,
                            bparams.kernel_radius, bparams.grid_size);
@@ -74,22 +75,20 @@ void CudaDFSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
       params.sph_nu, params.sph_bnu, bparams.lowest_point,
       bparams.kernel_radius, bparams.grid_size);
 
-                  
-
- AdvectDFSPHVelocity(data);
+  AdvectDFSPHVelocity(data);
 
   ApplyPressureSolver(data, boundaries, params.sph_density, cellStart,
-                 boundaryCellStart, bparams.lowest_point, bparams.kernel_radius,
-                 bparams.grid_size);
+                      boundaryCellStart, bparams.lowest_point,
+                      bparams.kernel_radius, bparams.grid_size);
 
   ComputeSFWetSandColor(particles, params.sf_dry_sand_color,
                         params.sf_wet_sand_color);
 
-  ComputeTimeStepsByCFL(data, params.sph_particle_radius,params.dt, renderInterval);
+  ComputeTimeStepsByCFL(data, params.sph_particle_radius, params.dt,
+                        renderInterval);
 
   Advect(particles, boundaries, boundaryCellStart, params.sph_particle_radius,
-         renderInterval / static_cast<float>(mNumOfSubTimeSteps),
-         params.dem_damping, bparams.lowest_point, bparams.highest_point,
+         mDt, params.dem_damping, bparams.lowest_point, bparams.highest_point,
          bparams.kernel_radius, bparams.grid_size);
 }
 

@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-25 22:02:18
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-25 23:56:59
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @LastEditTime: 2023-04-08 12:05:09
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\system\cuda_sf_system.cu
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #include <kiri_pbs_cuda/system/cuda_base_system_gpu.cuh>
 #include <kiri_pbs_cuda/system/cuda_sf_system.cuh>
@@ -67,39 +68,22 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
 
   // emitter
   if (mEmitter->GetEmitterStatus() && CUDA_SPH_EMITTER_PARAMS.run) {
-    if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == SPH_SOLVER) {
-      size_t step_num =
-          2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius /
-          (length(mEmitter->GetEmitterVelocity()) * CUDA_SEEPAGEFLOW_PARAMS.dt);
-      if (mEmitterCounter++ % step_num == 0) {
-        auto p = mEmitter->Emit();
-        if (mParticles->Size() + p.size() < mParticles->MaxSize())
-          mParticles->AddSphParticles(
-              p, CUDA_SPH_EMITTER_PARAMS.emit_col,
-              mEmitter->GetEmitterVelocity(), CUDA_SEEPAGEFLOW_PARAMS.sph_mass,
-              CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
-        else
-          mEmitter->SetEmitterStatus(false);
-        // printf("fluid particle number=%zd, max=%zd \n", mParticles->Size(),
-        // mParticles->MaxSize());
-      }
-    } else if (CUDA_SEEPAGEFLOW_PARAMS.solver_type == WCSPH_SOLVER || CUDA_SEEPAGEFLOW_PARAMS.solver_type == DFSPH_SOLVER) {
-      mEmitterElapsedTime +=
-          renderInterval / static_cast<float>(this->GetNumOfSubTimeSteps());
-      if ((length(mEmitter->GetEmitterVelocity()) * mEmitterElapsedTime) /
-              (2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius) >=
-          static_cast<float>(mEmitterCounter)) {
-        auto p = mEmitter->Emit();
-        if (mParticles->Size() + p.size() < mParticles->MaxSize())
-          mParticles->AddSphParticles(
-              p, CUDA_SPH_EMITTER_PARAMS.emit_col,
-              mEmitter->GetEmitterVelocity(), CUDA_SEEPAGEFLOW_PARAMS.sph_mass,
-              CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
-        else
-          mEmitter->SetEmitterStatus(false);
-        //printf("fluid particle number=%zd, max=%zd \n", mParticles->Size(),mParticles->MaxSize());
-        mEmitterCounter++;
-      }
+
+    mEmitterElapsedTime += this->GetCurrentTimeStep();
+    if ((length(mEmitter->GetEmitterVelocity()) * mEmitterElapsedTime) /
+            (2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius) >=
+        static_cast<float>(mEmitterCounter)) {
+      auto p = mEmitter->Emit();
+      if (mParticles->Size() + p.size() < mParticles->MaxSize())
+        mParticles->AddSphParticles(
+            p, CUDA_SPH_EMITTER_PARAMS.emit_col, mEmitter->GetEmitterVelocity(),
+            CUDA_SEEPAGEFLOW_PARAMS.sph_mass,
+            CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius);
+      else
+        mEmitter->SetEmitterStatus(false);
+      // printf("fluid particle number=%zd, max=%zd \n",
+      // mParticles->Size(),mParticles->MaxSize());
+      mEmitterCounter++;
     }
   }
 

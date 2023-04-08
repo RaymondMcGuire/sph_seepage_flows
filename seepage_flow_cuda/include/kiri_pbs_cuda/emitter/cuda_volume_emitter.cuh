@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:32:20
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-21 18:53:26
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\emitter\cuda_volume_emitter.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\emitter\cuda_volume_emitter.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #ifndef _CUDA_VOLUME_EMITTER_CUH_

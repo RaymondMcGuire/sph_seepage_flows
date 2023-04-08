@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-25 22:02:18
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-25 22:59:23
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\system\cuda_sf_system.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\system\cuda_sf_system.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_SF_SYSTEM_CUH_
 #define _CUDA_SF_SYSTEM_CUH_
@@ -18,8 +19,8 @@
 
 #include <kiri_pbs_cuda/particle/cuda_boundary_particles.cuh>
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
-#include <kiri_pbs_cuda/solver/seepageflow/cuda_wcsph_sf_solver.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_dfsph_sf_solver.cuh>
+#include <kiri_pbs_cuda/solver/seepageflow/cuda_wcsph_sf_solver.cuh>
 
 #include <kiri_pbs_cuda/searcher/cuda_neighbor_searcher.cuh>
 

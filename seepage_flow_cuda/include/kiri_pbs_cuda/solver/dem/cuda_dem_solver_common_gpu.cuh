@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 12:32:22
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-21 19:16:03
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_dem_solver_common_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\dem\cuda_dem_solver_common_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_DEM_SOLVER_COMMON_GPU_CUH_
 #define _CUDA_DEM_SOLVER_COMMON_GPU_CUH_
@@ -17,8 +18,8 @@
 namespace KIRI {
 
 static __device__ float3 _ComputeDEMForces(float3 dij, float3 vij, float rij,
-                                          float kn, float ks,
-                                          float tanFrictionAngle) {
+                                           float kn, float ks,
+                                           float tanFrictionAngle) {
   float3 f = make_float3(0.f);
   float dist = length(dij);
   float penetration_depth = rij - dist;
@@ -157,7 +158,6 @@ static __device__ void _ComputeDEMWorldBoundaryForcesTorque(
   if (posi.x > highestPoint.x - rij) {
     N = make_float3(1.f, 0.f, 0.f);
     dij = abs(posi.x - highestPoint.x);
-
 
     float penetration_depth = rij - dij;
 

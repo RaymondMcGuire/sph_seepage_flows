@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-15 15:35:49
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-21 19:18:53
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\particle\cuda_sf_particles.cu
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\particle\cuda_sf_particles.cu
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
@@ -20,16 +21,18 @@ void CudaSFParticles::Advect(const float dt, const float damping) {
       thrust::make_tuple(mLabel.Data(), mAcc.Data(), mVel.Data());
   auto sandAccDataIterator = thrust::make_zip_iterator(sandAccDataTuple);
 
-  thrust::transform(thrust::device, sandAccDataIterator, sandAccDataIterator + Size(),
-                    mAcc.Data(), AccDampingForSand(dt, damping));
-  
+  thrust::transform(thrust::device, sandAccDataIterator,
+                    sandAccDataIterator + Size(), mAcc.Data(),
+                    AccDampingForSand(dt, damping));
 
-    auto sandAngularAccDataTuple =
+  auto sandAngularAccDataTuple =
       thrust::make_tuple(mLabel.Data(), mAngularAcc.Data(), mAngularVel.Data());
-  auto sandAngularAccDataIterator = thrust::make_zip_iterator(sandAngularAccDataTuple);
+  auto sandAngularAccDataIterator =
+      thrust::make_zip_iterator(sandAngularAccDataTuple);
 
-  thrust::transform(thrust::device, sandAngularAccDataIterator, sandAngularAccDataIterator + Size(),
-                    mAngularAcc.Data(), AccDampingForSand(dt, damping));
+  thrust::transform(thrust::device, sandAngularAccDataIterator,
+                    sandAngularAccDataIterator + Size(), mAngularAcc.Data(),
+                    AccDampingForSand(dt, damping));
 
   thrust::transform(
       thrust::device, mVel.Data(), mVel.Data() + Size(), mAcc.Data(),
@@ -37,13 +40,12 @@ void CudaSFParticles::Advect(const float dt, const float damping) {
         return lv + dt * a;
       });
 
-        thrust::transform(
+  thrust::transform(
       thrust::device, mAngularVel.Data(), mAngularVel.Data() + Size(),
       mAngularAcc.Data(), mAngularVel.Data(),
       [dt] __host__ __device__(const float3 &lv, const float3 &a) {
         return lv + dt * a;
       });
-      
 
   thrust::transform(
       thrust::device, mPos.Data(), mPos.Data() + Size(), mVel.Data(),
@@ -77,7 +79,8 @@ void CudaSFParticles::AddSphParticles(Vec_Float3 pos, float3 col, float3 vel,
   thrust::fill(thrust::device, this->GetRadiusPtr() + this->Size(),
                this->GetRadiusPtr() + this->Size() + num, radius);
   thrust::fill(thrust::device, this->GetInertiaPtr() + this->Size(),
-               this->GetInertiaPtr() + this->Size() + num, 2.f / 5.f * mass * radius * radius);
+               this->GetInertiaPtr() + this->Size() + num,
+               2.f / 5.f * mass * radius * radius);
   mNumOfParticles += num;
 }
 

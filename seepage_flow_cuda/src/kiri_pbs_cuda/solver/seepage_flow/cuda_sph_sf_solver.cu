@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-03-21 00:16:22
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-03-21 19:10:03
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cu
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_sph_sf_solver.cu
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver.cuh>
 
@@ -131,9 +132,11 @@ void CudaSphSFSolver::ComputeSFSandLinearMomentum(
     const float rho0, const float3 lowestPoint, const float3 highestPoint,
     const float kernelRadius, const int3 gridSize) {
   _ComputeSFSandLinearMomentum_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      particles->GetAvgDragForcePtr(), particles->GetAccPtr(),particles->GetAngularAccPtr(),
-      particles->GetLabelPtr(), particles->GetPosPtr(), particles->GetVelPtr(),particles->GetAngularVelPtr(),
-      particles->GetMassPtr(),particles->GetInertiaPtr(), particles->GetDensityPtr(),
+      particles->GetAvgDragForcePtr(), particles->GetAccPtr(),
+      particles->GetAngularAccPtr(), particles->GetLabelPtr(),
+      particles->GetPosPtr(), particles->GetVelPtr(),
+      particles->GetAngularVelPtr(), particles->GetMassPtr(),
+      particles->GetInertiaPtr(), particles->GetDensityPtr(),
       particles->GetPressurePtr(), particles->GetVoidagePtr(),
       particles->GetSaturationPtr(), particles->GetAvgFlowVelPtr(),
       particles->GetAvgAdhesionForcePtr(), particles->GetRadiusPtr(),
@@ -159,9 +162,11 @@ void CudaSphSFSolver::ComputeMultiSFSandLinearMomentum(
     const float3 lowestPoint, const float3 highestPoint,
     const float kernelRadius, const int3 gridSize) {
   _ComputeMultiSFSandLinearMomentum_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      particles->GetAvgDragForcePtr(), particles->GetAccPtr(),particles->GetAngularAccPtr(),
-      particles->GetLabelPtr(), particles->GetPosPtr(), particles->GetVelPtr(),particles->GetAngularVelPtr(),
-      particles->GetMassPtr(),particles->GetInertiaPtr(), particles->GetDensityPtr(),
+      particles->GetAvgDragForcePtr(), particles->GetAccPtr(),
+      particles->GetAngularAccPtr(), particles->GetLabelPtr(),
+      particles->GetPosPtr(), particles->GetVelPtr(),
+      particles->GetAngularVelPtr(), particles->GetMassPtr(),
+      particles->GetInertiaPtr(), particles->GetDensityPtr(),
       particles->GetPressurePtr(), particles->GetVoidagePtr(),
       particles->GetSaturationPtr(), particles->GetAvgFlowVelPtr(),
       particles->GetAvgAdhesionForcePtr(), particles->GetRadiusPtr(),

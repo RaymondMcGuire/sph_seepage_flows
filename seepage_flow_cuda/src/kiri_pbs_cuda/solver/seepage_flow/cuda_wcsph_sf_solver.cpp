@@ -1,8 +1,8 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 00:16:22
+ * @Date: 2023-04-01 12:11:13
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 12:32:06
+ * @LastEditTime: 2023-04-08 11:54:16
  * @FilePath:
  * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_wcsph_sf_solver.cpp
  * @Description:
@@ -85,8 +85,7 @@ void CudaWCSphSFSolver::UpdateSolver(CudaSFParticlesPtr &particles,
                            bparams.kernel_radius, renderInterval);
 
   Advect(particles, boundaries, boundaryCellStart, params.sph_particle_radius,
-         renderInterval / static_cast<float>(mNumOfSubTimeSteps),
-         params.dem_damping, bparams.lowest_point, bparams.highest_point,
+         mDt, params.dem_damping, bparams.lowest_point, bparams.highest_point,
          bparams.kernel_radius, bparams.grid_size);
 }
 
