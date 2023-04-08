@@ -40,7 +40,7 @@ void Seepage_UniBunny_WCSPH() {
   auto cuda_highest_point = make_float3(2.f, 2.f, 3.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
-  CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 450000;
+  CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 350000;
 
   // sph params
   CUDA_SEEPAGEFLOW_PARAMS.sph_density = 1000.f;
@@ -73,10 +73,10 @@ void Seepage_UniBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 2.f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 1.7f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 2.1f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.9f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
   CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 2.f;
@@ -89,7 +89,7 @@ void Seepage_UniBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.sf_wet_sand_color = make_float3(0.38f, 0.29f, 0.14f);
 
   CUDA_SEEPAGEFLOW_PARAMS.gravity = make_float3(0.0f, -9.8f, 0.0f);
-  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 20.f;
+  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 8.f;
 
   // sph emitter
   CUDA_SPH_EMITTER_PARAMS.enable = true;
@@ -283,13 +283,13 @@ void Seepage_UniBunny_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.4f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 1.75f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_c0 = 1.7f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cd = 0.5f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_csat = 0.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.81f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_cmc = 1.9f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_cmc_p = 0.01f;
 
-  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 1.5f;
+  CUDA_SEEPAGEFLOW_PARAMS.sf_a0 = 2.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_asat = 1.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_amc = 2.f;
   CUDA_SEEPAGEFLOW_PARAMS.sf_amc_p = 0.8f;
@@ -299,7 +299,7 @@ void Seepage_UniBunny_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.sf_wet_sand_color = make_float3(0.38f, 0.29f, 0.14f);
 
   CUDA_SEEPAGEFLOW_PARAMS.gravity = make_float3(0.0f, -9.8f, 0.0f);
-  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 3.f;
+  CUDA_SEEPAGEFLOW_PARAMS.max_force_factor = 8.f;
 
   // sph emitter
   CUDA_SPH_EMITTER_PARAMS.enable = true;
@@ -866,6 +866,8 @@ void main() {
   KiriLog::Init();
 
   Seepage_UniBunny_WCSPH();
+
+ // Seepage_UniBunny_DFSPH();
 
   // abc exporter params
   auto AbcDtScale = 120.f * RenderInterval;
