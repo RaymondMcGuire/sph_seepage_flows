@@ -63,9 +63,11 @@ static __device__ void _ComputeSFMSDEMForcesTorque(
 
         float3 n = dij / dist;
         float alpha = rij / (rij - penetration_depth);
-        float3 vij = (vel[j] - vel[i]) * alpha +
-                     cross(angularVel[j], -radius[j] * n) -
-                     cross(angularVel[i], radius[i] * n);
+        // float3 vij = (vel[j] - vel[i]) * alpha +
+        //              cross(angularVel[j], -radius[j] * n) -
+        //              cross(angularVel[i], radius[i] * n);
+
+        float3 vij = vel[j] - vel[i];
 
         float kni = young * radius[i];
         float knj = young * radius[j];
@@ -78,7 +80,7 @@ static __device__ void _ComputeSFMSDEMForcesTorque(
         float3 force = _ComputeDEMForces(dij, vij, rij, kn, ks,
                                          tanFrictionAngle, penetration_depth);
         *f += force;
-        *torque += (radius[i] - 0.5f * penetration_depth) * cross(n, force);
+        //*torque += (radius[i] - 0.5f * penetration_depth) * cross(n, force);
       }
     }
     ++j;
@@ -145,7 +147,7 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
         float3 force = _ComputeDEMForces(dij, vik, rij, kn, ks,
                                          tanFrictionAngle, penetration_depth);
         *f += force;
-        *torque += (radiusi - 0.5f * penetration_depth) * cross(n, force);
+        //*torque += (radiusi - 0.5f * penetration_depth) * cross(n, force);
       }
     }
     ++j;
@@ -699,7 +701,7 @@ __global__ void _ComputeSFSandLinearMomentum_CUDA(
 
   // sand linear momentum
   acc[i] += 2.f * (f + df) / mass[i];
-  angularAcc[i] = 2.f * torque / inertia[i];
+  //angularAcc[i] = 2.f * torque / inertia[i];
   return;
 }
 
@@ -783,7 +785,7 @@ __global__ void _ComputeMultiSFSandLinearMomentum_CUDA(
 
   // sand linear momentum
   acc[i] += 2.f * (f + df) / mass[i];
-  angularAcc[i] = 2.f * torque / inertia[i];
+  //angularAcc[i] = 2.f * torque / inertia[i];
   return;
 }
 

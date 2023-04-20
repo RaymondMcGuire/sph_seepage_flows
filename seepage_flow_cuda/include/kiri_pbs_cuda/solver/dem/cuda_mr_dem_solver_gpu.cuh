@@ -31,13 +31,13 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
                     (powf(volume_liquid_bridge, 1.f / 3.f) +
                      0.1f * powf(volume_liquid_bridge, 2.f / 3.f));
 
-  float particle_density = 2700.f;
-  float gravity = 9.81f;
-  float massi = 4.f / 3.f * KIRI_PI * powf(radiusi, 3.f) * particle_density;
-  float massj = 4.f / 3.f * KIRI_PI * powf(radiusj, 3.f) * particle_density;
-  float weighti = massi * gravity;
-  float weightj = massj * gravity;
-  float max_force_allowed = maxForceFactor * min(weighti, weightj);
+  // float particle_density = 2700.f;
+  // float gravity = 9.81f;
+  // float massi = 4.f / 3.f * KIRI_PI * powf(radiusi, 3.f) * particle_density;
+  // float massj = 4.f / 3.f * KIRI_PI * powf(radiusj, 3.f) * particle_density;
+  // float weighti = massi * gravity;
+  // float weightj = massj * gravity;
+  // float max_force_allowed = maxForceFactor * min(weighti, weightj);
 
   float dist = length(dij);
   float H = dist - (radiusi + radiusj);
@@ -58,10 +58,10 @@ static __device__ float3 _ComputeMSDEMCapillaryForce(
     f = -n * (neck_curvature_pressure + surface_tension_force);
   }
 
-  float force_magnitude = length(f);
-  if (force_magnitude > max_force_allowed) {
-    f = f * (max_force_allowed / force_magnitude);
-  }
+  // float force_magnitude = length(f);
+  // if (force_magnitude > max_force_allowed) {
+  //   f = f * (max_force_allowed / force_magnitude);
+  // }
 
   return f;
 }

@@ -19,7 +19,7 @@
 namespace KIRI {
 
 struct SeepageflowVolumeData {
-  float sandMinRadius;
+  float min_radius;
   Vec_Float3 pos;
   Vec_Float3 col;
   Vec_Float mass;
@@ -29,7 +29,7 @@ struct SeepageflowVolumeData {
 };
 
 struct SeepageflowMultiVolumeData {
-  float sandMinRadius;
+  float min_radius;
   Vec_Float3 pos;
   Vec_Float3 col;
   Vec_Float mass;

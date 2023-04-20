@@ -18,7 +18,7 @@ void CudaVolumeEmitter::BuildSeepageflowShapeVolume(
   if (!bEnable)
     return;
 
-  data.sandMinRadius = Huge<size_t>();
+  data.min_radius = Huge<size_t>();
   float minY = Huge<size_t>();
 
   for (size_t i = 0; i < shape.size(); i++) {
@@ -32,12 +32,12 @@ void CudaVolumeEmitter::BuildSeepageflowShapeVolume(
     data.radius.emplace_back(radius);
     data.mass.emplace_back(mass);
     data.inertia.emplace_back(2.f / 5.f * mass * radius * radius);
-    data.sandMinRadius = std::min(radius, data.sandMinRadius);
+    data.min_radius = std::min(radius, data.min_radius);
     minY = std::min(minY, shape[i].y);
   }
 
   if (offsetY) {
-    float offsetYVal = minY - (worldLowestY + data.sandMinRadius * 5.f);
+    float offsetYVal = minY - (worldLowestY + data.min_radius * 5.f);
     for (size_t i = 0; i < data.pos.size(); i++)
       data.pos[i] -= make_float3(0.f, offsetYVal, 0.f);
   }
@@ -51,7 +51,7 @@ void CudaVolumeEmitter::BuildSeepageflowShapeMultiVolume(
     return;
 
   if (data.pos.size() == 0)
-    data.sandMinRadius = Huge<size_t>();
+    data.min_radius = Huge<size_t>();
 
   float minY = Huge<size_t>();
 
@@ -65,14 +65,14 @@ void CudaVolumeEmitter::BuildSeepageflowShapeMultiVolume(
     data.radius.emplace_back(radius);
     data.mass.emplace_back(mass);
     data.inertia.emplace_back(2.f / 5.f * mass * radius * radius);
-    data.sandMinRadius = std::min(radius, data.sandMinRadius);
+    data.min_radius = std::min(radius, data.min_radius);
     data.cda0asat.emplace_back(make_float3(cda0asat));
     data.amcamcp.emplace_back(make_float2(amcamcp));
     minY = std::min(minY, shape[i].y);
   }
 
   if (offsetY) {
-    float offsetYVal = minY - (worldLowestY + data.sandMinRadius * 5.f);
+    float offsetYVal = minY - (worldLowestY + data.min_radius * 5.f);
     for (size_t i = 0; i < data.pos.size(); i++)
       data.pos[i] -= make_float3(0.f, offsetYVal, 0.f);
   }
