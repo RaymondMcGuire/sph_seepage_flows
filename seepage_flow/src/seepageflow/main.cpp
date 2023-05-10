@@ -1,11 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 12:33:24
+ * @Date: 2023-05-08 19:27:15
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-08 12:27:36
+ * @LastEditTime: 2023-05-10 10:42:20
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 // clang-format off
 #include <sf_cuda_define.h>
@@ -1076,13 +1076,13 @@ void main() {
 
  //Seepage_UniBunny_WCSPH();
 
- Seepage_MSBunny_WCSPH();
+ //Seepage_MSBunny_WCSPH();
 
  // Seepage_UniBunny_DFSPH();
 
  //Seepage_MSBunny_DFSPH();
 
- //Seepage_MSDam_WCSPH();
+ Seepage_MSDam_WCSPH();
 
   // abc exporter params
   auto AbcDtScale = 120.f * RenderInterval;
