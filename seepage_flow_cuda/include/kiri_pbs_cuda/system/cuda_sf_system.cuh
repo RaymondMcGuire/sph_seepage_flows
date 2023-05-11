@@ -52,11 +52,13 @@ protected:
 
 private:
   const size_t mCudaGridSize;
-  size_t mEmitterCounter;
-  float mEmitterElapsedTime;
+
   CudaSFParticlesPtr mParticles;
   CudaGNSearcherPtr mSearcher;
+
   CudaEmitterPtr mEmitter;
+  float mNextEmitTime;
+  float mEmitterElapsedTime;
 
   void ComputeBoundaryVolume();
 };
