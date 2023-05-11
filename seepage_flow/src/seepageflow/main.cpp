@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-08 19:27:15
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-10 10:42:20
+ * @LastEditTime: 2023-05-11 21:05:40
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -1177,6 +1177,10 @@ void Seepage_MSDam_OverTop_DFSPH() {
       boundaryData, CUDA_BOUNDARY_PARAMS.lowest_point,
       CUDA_BOUNDARY_PARAMS.highest_point,
       CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius);
+
+  // read boundary data
+//   auto boudnary_shapes_data = ReadBgeoFileForGPU("xxxxx","xxxxx");
+//   boundaryEmitter->BuildBoundaryShapeVolume(boundaryData,boudnary_shapes_data);
 
   // material type (SF: unified material; MULTI_SF: multiple types of materials)
   CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
