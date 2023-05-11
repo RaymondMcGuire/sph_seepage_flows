@@ -32,6 +32,7 @@ namespace KIRI
           mSearcher(std::move(searcher)),
           mEmitter(std::move(emitter)),
           mEmitterCounter(0),
+          mEmitterElapsedTime(0.f),
           mCudaGridSize(CuCeilDiv(particles->MaxSize(), KIRI_CUBLOCKSIZE))
     {
 
