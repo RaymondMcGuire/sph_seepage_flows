@@ -4,6 +4,7 @@ build
 !/cmake/checkCUDA/compile/.gitkeep
 /export/bgeo/**/*.bgeo
 /export/bgeo/**/*.vtk
+/export/vtk/**/*.vtk
 /export/obj/**/*.obj
 /export/abc/**/*.abc
 /**/*.dat

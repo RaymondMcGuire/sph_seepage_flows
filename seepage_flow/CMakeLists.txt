@@ -15,6 +15,12 @@ set(EXTLIBS_SRC ${CMAKE_SOURCE_DIR}/extlib/src)
 set(EXTLIBS_LIB ${CMAKE_SOURCE_DIR}/extlib/lib)
 link_directories(${EXTLIBS_LIB})
 
+set(VTK_DIR D:/build_library/vtk/lib/cmake/vtk-9.2)
+find_package(VTK REQUIRED)
+# set(VTK_INCLUDE D:/build_library/vtk/include/vtk-9.2)
+# set(VTK_LIB D:/build_library/vtk/lib)
+
+
 # Kiri PBS CUDA Library
 set(KIRI_PBS_CUDA_LIB_INLCUDE ${CMAKE_BINARY_DIR}/seepage_flow_cuda/include)
 
@@ -50,12 +56,13 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC
     include
     ${EXTLIBS_INCLUDE}
+    ${VTK_USE_FILE}
     ${CONFIGURATION_INCLUDE}
     ${KIRI_PBS_CUDA_LIB_INLCUDE}
     ${KIRI_MATH_LIB_INLCUDE}
 )
 
-target_link_libraries(${PROJECT_NAME} ${EXTLIBS_LINK_LIBS_DEBUG} debug partiod optimized partio Alembic)
+target_link_libraries(${PROJECT_NAME} ${EXTLIBS_LINK_LIBS_DEBUG} debug partiod optimized partio Alembic ${VTK_LIBRARIES})
 
 set(WD_DEBUG_FILE_PATH ${CMAKE_BINARY_DIR}/bin/Debug/)
 set(WD_RELEASE_FILE_PATH ${CMAKE_BINARY_DIR}/bin/Release/)

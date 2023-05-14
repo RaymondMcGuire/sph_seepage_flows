@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-08 19:27:15
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-11 21:05:40
+ * @LastEditTime: 2023-05-14 23:14:47
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -1286,9 +1286,98 @@ void Seepage_MSDam_OverTop_DFSPH() {
       emitter, adaptive_sub_timestep);
 }
 
-
+struct Point
+{
+    double x, y, z;
+};
+#include <vtkGenericDataObjectReader.h>
+#include <vtkNew.h>
+#include <vtkPolyData.h>
+#include <vtkStructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
 void main() {
   KiriLog::Init();
+
+    auto path = String(DB_PBR_PATH) + "vtk/slide.vtk";
+
+
+          vtkNew<vtkGenericDataObjectReader> reader;
+  reader->SetFileName(path.c_str());
+  reader->Update();
+
+  // All of the standard data types can be checked and obtained like this:
+  if (reader->IsFilePolyData())
+  {
+    std::cout << "output is polydata," << std::endl;
+    auto output = reader->GetPolyDataOutput();
+    std::cout << "   output has " << output->GetNumberOfPoints() << " points."
+              << std::endl;
+    
+    auto points = output->GetPoints();
+    
+    if (points)
+    {
+        // 获取粒子数量
+        int numParticles = points->GetNumberOfPoints();
+            std::cout << "Total numbers " << numParticles << std::endl;
+        // 遍历粒子点坐标
+        for (int i = 0; i < numParticles; ++i)
+        {
+            double point[3];
+            points->GetPoint(i, point);
+            
+            std::cout << "Particle " << i << " coordinates: "
+                      << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Point data not found." << std::endl;
+    }
+  }
+
+  if (reader->IsFileUnstructuredGrid())
+  {
+    std::cout << "output is unstructured grid," << std::endl;
+    auto output = reader->GetUnstructuredGridOutput();
+    std::cout << "   output has " << output->GetNumberOfPoints() << " points."
+              << std::endl;
+  }
+
+    
+    // // 设置要读取的 VTK 粒子数据文件名
+    // reader->SetFileName(path.c_str());
+    
+    // // 执行读取操作
+    // reader->Update();
+    
+    // // 获取读取的数据
+    // vtkSmartPointer<vtkPolyData> polyData = reader->GetOutput();
+    
+    // // 获取点坐标数据
+    // vtkSmartPointer<vtkPoints> points = polyData->GetPoints();
+    
+    // if (points)
+    // {
+    //     // 获取粒子数量
+    //     int numParticles = points->GetNumberOfPoints();
+    //         std::cout << "Total numbers " << numParticles << std::endl;
+    //     // 遍历粒子点坐标
+    //     for (int i = 0; i < numParticles; ++i)
+    //     {
+    //         double point[3];
+    //         points->GetPoint(i, point);
+            
+    //         // std::cout << "Particle " << i << " coordinates: "
+    //         //           << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
+    //     }
+    // }
+    // else
+    // {
+    //     std::cout << "Point data not found." << std::endl;
+    // }
+
+
 
  //Seepage_UniBunny_WCSPH();
 
@@ -1300,81 +1389,81 @@ void main() {
 
  //Seepage_MSDam_WCSPH();
 
- Seepage_MSDam_OverTop_DFSPH();
+//  Seepage_MSDam_OverTop_DFSPH();
 
-  // abc exporter params
-  auto AbcDtScale = 120.f * RenderInterval;
-  auto AbcExportorPath = String(EXPORT_PATH) + "abc/" + ExampleName;
-  auto AbcExportorPos = AbcExportorPath + "/" + "pos" + ".abc";
-  auto AbcExportorScale = AbcExportorPath + "/" + "scale" + ".abc";
-  auto AbcExportorColor = AbcExportorPath + "/" + "color" + ".abc";
+//   // abc exporter params
+//   auto AbcDtScale = 120.f * RenderInterval;
+//   auto AbcExportorPath = String(EXPORT_PATH) + "abc/" + ExampleName;
+//   auto AbcExportorPos = AbcExportorPath + "/" + "pos" + ".abc";
+//   auto AbcExportorScale = AbcExportorPath + "/" + "scale" + ".abc";
+//   auto AbcExportorColor = AbcExportorPath + "/" + "color" + ".abc";
 
-  std::error_code ErrorCode;
-  std::filesystem::create_directories(AbcExportorPath, ErrorCode);
+//   std::error_code ErrorCode;
+//   std::filesystem::create_directories(AbcExportorPath, ErrorCode);
 
-  auto AbcPosData = std::make_shared<ParticlesAlembicManager>(
-      AbcExportorPos, RenderInterval * AbcDtScale, "particle_pos");
-  auto AbcScaleData = std::make_shared<ParticlesAlembicManager>(
-      AbcExportorScale, RenderInterval * AbcDtScale, "particle_scale");
-  auto AbcColorData = std::make_shared<ParticlesAlembicManager>(
-      AbcExportorColor, RenderInterval * AbcDtScale, "particle_cd");
+//   auto AbcPosData = std::make_shared<ParticlesAlembicManager>(
+//       AbcExportorPos, RenderInterval * AbcDtScale, "particle_pos");
+//   auto AbcScaleData = std::make_shared<ParticlesAlembicManager>(
+//       AbcExportorScale, RenderInterval * AbcDtScale, "particle_scale");
+//   auto AbcColorData = std::make_shared<ParticlesAlembicManager>(
+//       AbcExportorColor, RenderInterval * AbcDtScale, "particle_cd");
 
-  CUDA_SEEPAGEFLOW_APP_PARAMS.run = true;
+//   CUDA_SEEPAGEFLOW_APP_PARAMS.run = true;
 
-  while (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
-    if (CUDA_SEEPAGEFLOW_APP_PARAMS.run &&
-        SimCount < TotalFrameNumber + RunLiquidNumber) {
-      if (SimCount == RunLiquidNumber) {
-        // export bgeo file
-        CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export =
-            CUDA_SEEPAGEFLOW_APP_PARAMS.run;
-        if (CUDA_SPH_EMITTER_PARAMS.enable)
-          CUDA_SPH_EMITTER_PARAMS.run = CUDA_SEEPAGEFLOW_APP_PARAMS.run;
-      }
+//   while (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
+//     if (CUDA_SEEPAGEFLOW_APP_PARAMS.run &&
+//         SimCount < TotalFrameNumber + RunLiquidNumber) {
+//       if (SimCount == RunLiquidNumber) {
+//         // export bgeo file
+//         CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export =
+//             CUDA_SEEPAGEFLOW_APP_PARAMS.run;
+//         if (CUDA_SPH_EMITTER_PARAMS.enable)
+//           CUDA_SPH_EMITTER_PARAMS.run = CUDA_SEEPAGEFLOW_APP_PARAMS.run;
+//       }
 
-      auto remaining_time = RenderInterval;
-      KIRI_LOG_INFO("Simulation Frame={0}, Adaptive Sub-Simulation",
-                    ++SimCount);
-      PerFrameTimer.Restart();
-      auto sub_timestep = 0;
-      while (remaining_time > KIRI_EPSILON) {
-        KIRI_LOG_INFO(
-            "Current Sub-Simulation RemainTime={0},Sub-Simulation Step={1}",
-            remaining_time, ++sub_timestep);
-        SFSystem->UpdateSystem(remaining_time);
-        remaining_time -= SFSystem->GetCurrentTimeStep();
-      }
+//       auto remaining_time = RenderInterval;
+//       KIRI_LOG_INFO("Simulation Frame={0}, Adaptive Sub-Simulation",
+//                     ++SimCount);
+//       PerFrameTimer.Restart();
+//       auto sub_timestep = 0;
+//       while (remaining_time > KIRI_EPSILON) {
+//         KIRI_LOG_INFO(
+//             "Current Sub-Simulation RemainTime={0},Sub-Simulation Step={1}",
+//             remaining_time, ++sub_timestep);
+//         SFSystem->UpdateSystem(remaining_time);
+//         remaining_time -= SFSystem->GetCurrentTimeStep();
+//       }
 
-      KIRI_LOG_INFO("Time Per Frame={0}", PerFrameTimer.Elapsed());
-      TotalFrameTime += PerFrameTimer.Elapsed();
+//       KIRI_LOG_INFO("Time Per Frame={0}", PerFrameTimer.Elapsed());
+//       TotalFrameTime += PerFrameTimer.Elapsed();
 
-      if (CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export) {
-        auto particles = SFSystem->GetSFParticles();
-        // ExportBgeoFileCUDA(
-        //     CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
-        //     UInt2Str4Digit(SimCount - RunLiquidNumber),
-        //     particles->GetPosPtr(),
-        //     particles->GetColPtr(),
-        //     particles->GetRadiusPtr(),
-        //     particles->GetLabelPtr(),
-        //     particles->Size());
+//       if (CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export) {
+//         auto particles = SFSystem->GetSFParticles();
+//         // ExportBgeoFileCUDA(
+//         //     CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
+//         //     UInt2Str4Digit(SimCount - RunLiquidNumber),
+//         //     particles->GetPosPtr(),
+//         //     particles->GetColPtr(),
+//         //     particles->GetRadiusPtr(),
+//         //     particles->GetLabelPtr(),
+//         //     particles->Size());
 
-        AbcPosData->SubmitCurrentStatusFloat3(particles->GetPosPtr(),
-                                              particles->Size());
+//         AbcPosData->SubmitCurrentStatusFloat3(particles->GetPosPtr(),
+//                                               particles->Size());
 
-        AbcScaleData->SubmitCurrentStatusFloat(particles->GetRadiusPtr(),
-                                               particles->Size());
+//         AbcScaleData->SubmitCurrentStatusFloat(particles->GetRadiusPtr(),
+//                                                particles->Size());
 
-        AbcColorData->SubmitCurrentStatusFloat3(particles->GetColPtr(),
-                                                particles->Size());
-      }
-    } else if (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
-      CUDA_SEEPAGEFLOW_APP_PARAMS.run = false;
+//         AbcColorData->SubmitCurrentStatusFloat3(particles->GetColPtr(),
+//                                                 particles->Size());
+//       }
+//     } else if (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
+//       CUDA_SEEPAGEFLOW_APP_PARAMS.run = false;
 
-      KIRI_LOG_INFO("Average Per Frame={0}",
-                    TotalFrameTime / (TotalFrameNumber + RunLiquidNumber));
-    }
-  }
+//       KIRI_LOG_INFO("Average Per Frame={0}",
+//                     TotalFrameTime / (TotalFrameNumber + RunLiquidNumber));
+//     }
+//   }
 
   return;
 }
