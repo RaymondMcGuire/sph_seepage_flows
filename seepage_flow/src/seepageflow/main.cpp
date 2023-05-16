@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-08 19:27:15
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-14 23:14:47
+ * @LastEditTime: 2023-05-14 23:57:16
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -1290,93 +1290,153 @@ struct Point
 {
     double x, y, z;
 };
-#include <vtkGenericDataObjectReader.h>
+// #include <vtkGenericDataObjectReader.h>
+// #include <vtkNew.h>
+// #include <vtkPolyData.h>
+// #include <vtkStructuredGrid.h>
+// #include <vtkUnstructuredGrid.h>
+
+#include <vtkCellArray.h>
 #include <vtkNew.h>
-#include <vtkPolyData.h>
+#include <vtkPoints.h>
 #include <vtkStructuredGrid.h>
-#include <vtkUnstructuredGrid.h>
+#include <vtkXMLStructuredGridWriter.h>
+#include <vtkCellIterator.h>
+#include <vtkDoubleArray.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 void main() {
   KiriLog::Init();
 
-    auto path = String(DB_PBR_PATH) + "vtk/slide.vtk";
+//     auto path = String(DB_PBR_PATH) + "vtk/slide.vtk";
 
 
-          vtkNew<vtkGenericDataObjectReader> reader;
-  reader->SetFileName(path.c_str());
-  reader->Update();
+//           vtkNew<vtkGenericDataObjectReader> reader;
+//   reader->SetFileName(path.c_str());
+//   reader->Update();
 
-  // All of the standard data types can be checked and obtained like this:
-  if (reader->IsFilePolyData())
-  {
-    std::cout << "output is polydata," << std::endl;
-    auto output = reader->GetPolyDataOutput();
-    std::cout << "   output has " << output->GetNumberOfPoints() << " points."
-              << std::endl;
+//   // All of the standard data types can be checked and obtained like this:
+//   if (reader->IsFilePolyData())
+//   {
+//     std::cout << "output is polydata," << std::endl;
+//     auto output = reader->GetPolyDataOutput();
+//     std::cout << "   output has " << output->GetNumberOfPoints() << " points."
+//               << std::endl;
     
-    auto points = output->GetPoints();
+//     auto points = output->GetPoints();
     
-    if (points)
-    {
-        // 获取粒子数量
-        int numParticles = points->GetNumberOfPoints();
-            std::cout << "Total numbers " << numParticles << std::endl;
-        // 遍历粒子点坐标
-        for (int i = 0; i < numParticles; ++i)
-        {
-            double point[3];
-            points->GetPoint(i, point);
+//     if (points)
+//     {
+//         // 获取粒子数量
+//         int numParticles = points->GetNumberOfPoints();
+//             std::cout << "Total numbers " << numParticles << std::endl;
+//         // 遍历粒子点坐标
+//         for (int i = 0; i < numParticles; ++i)
+//         {
+//             double point[3];
+//             points->GetPoint(i, point);
             
-            std::cout << "Particle " << i << " coordinates: "
-                      << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
-        }
-    }
-    else
+//             std::cout << "Particle " << i << " coordinates: "
+//                       << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
+//         }
+//     }
+//     else
+//     {
+//         std::cout << "Point data not found." << std::endl;
+//     }
+//   }
+
+//   if (reader->IsFileUnstructuredGrid())
+//   {
+//     std::cout << "output is unstructured grid," << std::endl;
+//     auto output = reader->GetUnstructuredGridOutput();
+//     std::cout << "   output has " << output->GetNumberOfPoints() << " points."
+//               << std::endl;
+//   }
+
+    
+size_t nx = 2, ny = 3, nz = 2;
+  auto dataSize = nx * ny * nz;
+
+  vtkNew<vtkDoubleArray> pointValues;
+  pointValues->SetName("123");
+  pointValues->SetNumberOfComponents(1);
+  pointValues->SetNumberOfTuples(dataSize);
+  for (size_t i = 0; i < dataSize; ++i)
+  {
+    pointValues->SetValue(i, i);
+  }
+
+  auto numberOfCells = (nx - 1) * (ny - 1) * (nz - 1);
+  vtkNew<vtkDoubleArray> cellValues;
+  cellValues->SetNumberOfTuples(numberOfCells);
+  for (size_t i = 0; i < numberOfCells; ++i)
+  {
+    cellValues->SetValue(i, i);
+  }
+
+  vtkNew<vtkPoints> points;
+  auto x = 0.0;
+  auto y = 0.0;
+  auto z = 0.0;
+  for (unsigned int k = 0; k < nz; k++)
+  {
+    z += 2.0;
+    for (unsigned int j = 0; j < ny; j++)
     {
-        std::cout << "Point data not found." << std::endl;
+      y += 1.0;
+      for (unsigned int i = 0; i < nx; i++)
+      {
+        x += .5;
+        points->InsertNextPoint(x, y, z);
+      }
     }
   }
 
-  if (reader->IsFileUnstructuredGrid())
+  // Create a grid
+  vtkNew<vtkStructuredGrid> structuredGrid;
+  // Specify the dimensions of the grid
+  structuredGrid->SetDimensions(static_cast<int>(nx), static_cast<int>(ny),
+                                static_cast<int>(nz));
+  structuredGrid->SetPoints(points);
+  structuredGrid->GetCellData()->SetScalars(cellValues);
+  structuredGrid->GetPointData()->SetScalars(pointValues);
+
+  // The key is the cell Id and the value is a set of corresponding point Ids.
+  std::map<vtkIdType, std::set<vtkIdType>> cellPointIds;
+  vtkCellIterator* it = structuredGrid->NewCellIterator();
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextCell())
   {
-    std::cout << "output is unstructured grid," << std::endl;
-    auto output = reader->GetUnstructuredGridOutput();
-    std::cout << "   output has " << output->GetNumberOfPoints() << " points."
-              << std::endl;
+    vtkIdList* pointIds = it->GetPointIds();
+    std::set<vtkIdType> ptIds;
+    for (vtkIdType* id = pointIds->begin(); id != pointIds->end(); ++id)
+    {
+      ptIds.insert(*id);
+    }
+    cellPointIds[it->GetCellId()] = ptIds;
+  }
+  it->Delete();
+
+  std::cout << "Cells and their points" << std::endl;
+  for (auto const& cell : cellPointIds)
+  {
+    std::cout << "Cell Id: " << cell.first << " Point Ids: ";
+    for (auto id = cell.second.begin(); id != cell.second.end(); ++id)
+      if (id != std::prev(cell.second.end()))
+      {
+        std::cout << *id << ", ";
+      }
+      else
+      {
+        std::cout << *id << std::endl;
+      }
   }
 
-    
-    // // 设置要读取的 VTK 粒子数据文件名
-    // reader->SetFileName(path.c_str());
-    
-    // // 执行读取操作
-    // reader->Update();
-    
-    // // 获取读取的数据
-    // vtkSmartPointer<vtkPolyData> polyData = reader->GetOutput();
-    
-    // // 获取点坐标数据
-    // vtkSmartPointer<vtkPoints> points = polyData->GetPoints();
-    
-    // if (points)
-    // {
-    //     // 获取粒子数量
-    //     int numParticles = points->GetNumberOfPoints();
-    //         std::cout << "Total numbers " << numParticles << std::endl;
-    //     // 遍历粒子点坐标
-    //     for (int i = 0; i < numParticles; ++i)
-    //     {
-    //         double point[3];
-    //         points->GetPoint(i, point);
-            
-    //         // std::cout << "Particle " << i << " coordinates: "
-    //         //           << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
-    //     }
-    // }
-    // else
-    // {
-    //     std::cout << "Point data not found." << std::endl;
-    // }
-
+  // Write file
+  vtkNew<vtkXMLStructuredGridWriter> writer;
+  writer->SetFileName("output.vts");
+  writer->SetInputData(structuredGrid);
+  writer->Write();
 
 
  //Seepage_UniBunny_WCSPH();
