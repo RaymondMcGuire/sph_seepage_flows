@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-17 17:36:03
+ * @LastEditTime: 2023-05-17 21:04:09
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -18,7 +18,7 @@
 using namespace KIRI;
 
 // global params
-auto ExampleName = "seepageflow_bunny_wcsph";
+auto ExampleName = "seepageflow_uni_slide_dfsph";
 
 auto RunLiquidNumber = 0;
 auto TotalFrameNumber = 180;
@@ -32,18 +32,20 @@ CudaSFSystemPtr SFSystem;
 void Seepage_Uni_Slide_DFSPH() {
 
   KIRI_LOG_DEBUG("Example:  Seepage_Uni_Slide_DFSPH");
-  ExampleName = "seepageflow_uni_slide_dfsph";
+   auto vtk_export_path = String(EXPORT_PATH) + "vtk/" + ExampleName + "/";
+
+
 
   // scene config
   auto cuda_lowest_point = make_float3(-2.f, -2.f, -2.f);//左下角与右上角 坐标顺序 x y z
-  auto cuda_highest_point = make_float3(15.f, 25.f, 10.f);//-0.63
+  auto cuda_highest_point = make_float3(15.f, 10.f, 25.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
   CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 8000000;
 
   // sph params
   CUDA_SEEPAGEFLOW_PARAMS.sph_density = 1000.f;
-  CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius = 0.01f;
+  CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius = 0.1f;
   CUDA_SEEPAGEFLOW_PARAMS.sph_kernel_radius =
       4.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius;
 
@@ -67,7 +69,7 @@ void Seepage_Uni_Slide_DFSPH() {
 
   // dem params
   CUDA_SEEPAGEFLOW_PARAMS.dem_density = 2700.f;
-  CUDA_SEEPAGEFLOW_PARAMS.dem_young = 1e4f;
+  CUDA_SEEPAGEFLOW_PARAMS.dem_young = 1e5f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_poisson = 0.3f;
   CUDA_SEEPAGEFLOW_PARAMS.dem_tan_friction_angle = std::tanf(0.5f);
   CUDA_SEEPAGEFLOW_PARAMS.dem_damping = 0.6f;
@@ -97,7 +99,7 @@ void Seepage_Uni_Slide_DFSPH() {
   CUDA_SPH_EMITTER_PARAMS.emit_vel = make_float3(0.f, -1.2f, 0.f);
   CUDA_SPH_EMITTER_PARAMS.emit_col = make_float3(127.f, 205.f, 255.f) / 255.f;
 
-  // **发射器形状参数 圆形 矩形.
+  // 发射器形状参数 圆形 矩形.
   CUDA_SPH_EMITTER_PARAMS.emit_radius = 0.6f;
   CUDA_SPH_EMITTER_PARAMS.emit_width = 0.6f;
   CUDA_SPH_EMITTER_PARAMS.emit_height = 0.6f;
@@ -126,22 +128,32 @@ void Seepage_Uni_Slide_DFSPH() {
   // boundary sampling
   BoundaryData boundary_data;
   auto boundary_emitter = std::make_shared<CudaBoundaryEmitter>();
-
+  
+  // build world boundary data
   boundary_emitter->BuildWorldBoundary(
       boundary_data, CUDA_BOUNDARY_PARAMS.lowest_point,
       CUDA_BOUNDARY_PARAMS.highest_point,
       CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius);
 
-  // read boundary data
+  // build custom boundary data
    auto boundary_vtk_file_path = String(DB_PBR_PATH) + "vtk/boundary.vtk";
    auto boundary_particles_data = VTKReader::ReadPoints(boundary_vtk_file_path);
-  boundary_emitter->BuildBoundaryShapeVolume(boundary_data,boundary_particles_data);
+  boundary_emitter->BuildBoundaryShapeVolume(boundary_data,boundary_particles_data,true);
+
+    auto vtk_world_boundary = vtk_export_path +"world_boundary.vtk";
+     auto vtk_custom_boundary = vtk_export_path +"custom_boundary.vtk";
+
+    auto vtk_world_boundary_writer = std::make_shared<VTKPolygonalWriter>(vtk_world_boundary,boundary_data.pos,boundary_data.label,0);
+    vtk_world_boundary_writer->WriteToFile();
+
+    auto vtk_custom_boundary_writer = std::make_shared<VTKPolygonalWriter>(vtk_custom_boundary,boundary_data.pos,boundary_data.label,1);
+    vtk_custom_boundary_writer->WriteToFile();
 
   // material type (SF: unified material; MULTI_SF: multiple types of materials)
   CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
 
   // shape sampling
-  auto offset2Ground = true;
+  auto offset2Ground = false;
   SeepageflowMultiVolumeData multi_volume_data;
   auto volumeEmitter = std::make_shared<CudaVolumeEmitter>();
 
@@ -180,8 +192,8 @@ void Seepage_Uni_Slide_DFSPH() {
 
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
         multi_volume_data, sand_shape,0.1f, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
-        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(1.2f, 0.6f));
+        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp,true, offset2Ground,
+        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(0.f, 0.f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
@@ -245,12 +257,15 @@ void main() {
   KiriLog::Init();
 
 
-  Seepage_Uni_Slide_DFSPH();
-
-  // vtk exporter params
+          // vtk exporter params
   auto vtk_export_path = String(EXPORT_PATH) + "vtk/" + ExampleName + "/";
+
   std::error_code error_code;
   std::filesystem::create_directories(vtk_export_path, error_code);
+
+
+  Seepage_Uni_Slide_DFSPH();
+
 
 
   CUDA_SEEPAGEFLOW_APP_PARAMS.run = true;

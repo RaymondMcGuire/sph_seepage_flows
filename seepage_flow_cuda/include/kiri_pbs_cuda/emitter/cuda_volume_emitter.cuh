@@ -64,7 +64,7 @@ public:
    void BuildSeepageflowShapeMultiVolume(SeepageflowMultiVolumeData &data,
                                         Vec_Float3 shape, float radius, float3 color,
                                         float sandDensity, float3 cda0asat,
-                                        float2 amcamcp, bool offsetY = false,
+                                        float2 amcamcp,bool axisChange=false, bool offsetY = false,
                                         float worldLowestY = 0.f,
                                         float2 offsetXZ = make_float2(0.f));
 

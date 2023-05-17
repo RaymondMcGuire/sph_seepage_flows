@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-22 15:38:55
+ * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-08 11:55:32
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cu
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-05-17 20:34:28
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\solver\seepage_flow\cuda_dfsph_sf_solver.cu
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_dfsph_sf_solver.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_dfsph_sf_solver_gpu.cuh>
@@ -316,12 +315,12 @@ void CudaDFSphSFSolver::Advect(CudaSFParticlesPtr &particles,
   auto data = std::dynamic_pointer_cast<CudaDFSFParticles>(particles);
   size_t num = data->Size();
   data->Advect(dt, damping);
-  _SFWaterBoundaryConstrain_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
-      data->GetPosPtr(), data->GetVelPtr(), data->GetLabelPtr(), num,
-      lowestPoint, highestPoint, waterRadius, boundaries->GetPosPtr(),
-      boundaries->GetLabelPtr(), boundaryCellStart.Data(), gridSize,
-      ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
-      ThrustHelper::GridXYZ2GridHash(gridSize));
+  // _SFWaterBoundaryConstrain_CUDA<<<mCudaGridSize, KIRI_CUBLOCKSIZE>>>(
+  //     data->GetPosPtr(), data->GetVelPtr(), data->GetLabelPtr(), num,
+  //     lowestPoint, highestPoint, waterRadius, boundaries->GetPosPtr(),
+  //     boundaries->GetLabelPtr(), boundaryCellStart.Data(), gridSize,
+  //     ThrustHelper::Pos2GridXYZ<float3>(lowestPoint, kernelRadius, gridSize),
+  //     ThrustHelper::GridXYZ2GridHash(gridSize));
 
   thrust::fill(thrust::device, data->GetAdhesionForcePtr(),
                data->GetAdhesionForcePtr() + num, make_float3(0.f));

@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-17 16:56:49
+ * @LastEditTime: 2023-05-17 18:49:19
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -76,12 +76,17 @@ void CudaBoundaryEmitter::BuildWorldBoundary(BoundaryData &data,
 }
 
 void CudaBoundaryEmitter::BuildBoundaryShapeVolume(BoundaryData &data,
-                                                   const  std::vector<float3>& shape) {
+                                                   const  std::vector<float3>& shape,
+                                                   const bool axis_change) {
   if (!bEnable)
     return;
 
   for (size_t i = 0; i < shape.size(); i++) {
-    data.pos.emplace_back(make_float3(shape[i].x, shape[i].y, shape[i].z));
+    if(axis_change)
+      data.pos.emplace_back(make_float3(shape[i].x, shape[i].z, shape[i].y));
+    else
+      data.pos.emplace_back(make_float3(shape[i].x, shape[i].y, shape[i].z));
+
     data.label.emplace_back(1);
   }
 }

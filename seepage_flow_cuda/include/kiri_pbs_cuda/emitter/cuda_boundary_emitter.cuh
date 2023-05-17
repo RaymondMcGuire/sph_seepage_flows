@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-17 16:57:37
+ * @LastEditTime: 2023-05-17 18:49:28
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -32,7 +32,7 @@ public:
                           const float3 &highest, const float particleRadius);
 
 
-  void BuildBoundaryShapeVolume(BoundaryData &data, const std::vector<float3>& shape);
+  void BuildBoundaryShapeVolume(BoundaryData &data, const std::vector<float3>& shape,const bool axis_change=false);
 
 
 private:

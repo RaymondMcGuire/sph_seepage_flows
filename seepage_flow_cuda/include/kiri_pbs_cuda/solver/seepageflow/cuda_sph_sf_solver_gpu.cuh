@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-21 12:32:22
+ * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-02 00:55:02
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-05-17 21:00:17
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_SPH_SF_SOLVER_GPU_CUH_
@@ -122,18 +121,13 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
     const float poisson, const float tanFrictionAngle, size_t j,
     const size_t cellEnd) {
   while (j < cellEnd) {
-    // only collide scene boundary particles
-    if (bLabel[j] == 1) {
-      //printf("collide boundary particles");
+
       float3 dij = posi - bPos[j];
       float rij = boundaryRadius + radiusi;
       float kni = young * radiusi;
       float knj = young * boundaryRadius;
-      float ksi = kni * poisson;
-      float ksj = knj * poisson;
 
       float kn = 2.f * kni * knj / (kni + knj);
-      float ks = 2.f * ksi * ksj / (ksi + ksj);
 
       float dist = length(dij);
       float penetration_depth = rij - dist;
@@ -144,12 +138,21 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
         float3 vik = make_float3(-veli.x, -veli.y, -veli.z) * alpha -
                      cross(angulari, radiusi * n);
 
-        float3 force = _ComputeDEMForces(dij, vik, rij, kn, ks,
-                                         tanFrictionAngle, penetration_depth);
-        *f += force;
+           float3 normal_forces =  kn * penetration_depth * n;
+
+      float3 tangential_forces = make_float3(0.f);
+
+      if (length(vik) != 0.f) 
+          tangential_forces = normalize(vik) * length(normal_forces) * 3.f;
+      
+
+      float3 restitute_forces = dot(vik, n) * n * 5.f;
+      float3 force = normal_forces + tangential_forces + restitute_forces;
+      *f += force;
+
         *torque += (radiusi - 0.5f * penetration_depth) * cross(n, force);
       }
-    }
+    
     ++j;
   }
   return;
@@ -681,10 +684,6 @@ __global__ void _ComputeSFSandLinearMomentum_CUDA(
         bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForcesTorque(
-      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
-      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
-
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {
     float dragCoeff = cd * powf(voidage[i], 3.f) / powf(1.f - voidage[i], 2.f);
@@ -763,10 +762,6 @@ __global__ void _ComputeMultiSFSandLinearMomentum_CUDA(
         bLabel, bPos, young, poisson, tanFrictionAngle, bCellStart[hash_idx],
         bCellStart[hash_idx + 1]);
   }
-
-  _ComputeDEMWorldBoundaryForcesTorque(
-      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
-      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {
@@ -873,64 +868,64 @@ __global__ void _SFWaterBoundaryConstrain_CUDA(
   float3 tmp_vel = vel[i];
 
   // world boundary
-  if (tmp_pos.x > highestPoint.x - 2 * radius) {
-    tmp_pos.x = highestPoint.x - 2 * radius;
-    tmp_vel.x = fminf(tmp_vel.x, 0.f);
-  }
+  // if (tmp_pos.x > highestPoint.x - 2 * radius) {
+  //   tmp_pos.x = highestPoint.x - 2 * radius;
+  //   tmp_vel.x = fminf(tmp_vel.x, 0.f);
+  // }
 
-  if (tmp_pos.x < lowestPoint.x + 2 * radius) {
-    tmp_pos.x = lowestPoint.x + 2 * radius;
-    tmp_vel.x = fmaxf(tmp_vel.x, 0.f);
-  }
+  // if (tmp_pos.x < lowestPoint.x + 2 * radius) {
+  //   tmp_pos.x = lowestPoint.x + 2 * radius;
+  //   tmp_vel.x = fmaxf(tmp_vel.x, 0.f);
+  // }
 
-  if (tmp_pos.y > highestPoint.y - 2 * radius) {
-    tmp_pos.y = highestPoint.y - 2 * radius;
-    tmp_vel.y = fminf(tmp_vel.y, 0.f);
-  }
+  // if (tmp_pos.y > highestPoint.y - 2 * radius) {
+  //   tmp_pos.y = highestPoint.y - 2 * radius;
+  //   tmp_vel.y = fminf(tmp_vel.y, 0.f);
+  // }
 
-  if (tmp_pos.y < lowestPoint.y + 2 * radius) {
-    tmp_pos.y = lowestPoint.y + 2 * radius;
-    tmp_vel.y = fmaxf(tmp_vel.y, 0.f);
-  }
+  // if (tmp_pos.y < lowestPoint.y + 2 * radius) {
+  //   tmp_pos.y = lowestPoint.y + 2 * radius;
+  //   tmp_vel.y = fmaxf(tmp_vel.y, 0.f);
+  // }
 
-  if (tmp_pos.z > highestPoint.z - 2 * radius) {
-    tmp_pos.z = highestPoint.z - 2 * radius;
-    tmp_vel.z = fminf(tmp_vel.z, 0.f);
-  }
+  // if (tmp_pos.z > highestPoint.z - 2 * radius) {
+  //   tmp_pos.z = highestPoint.z - 2 * radius;
+  //   tmp_vel.z = fminf(tmp_vel.z, 0.f);
+  // }
 
-  if (tmp_pos.z < lowestPoint.z + 2 * radius) {
-    tmp_pos.z = lowestPoint.z + 2 * radius;
-    tmp_vel.z = fmaxf(tmp_vel.z, 0.f);
-  }
+  // if (tmp_pos.z < lowestPoint.z + 2 * radius) {
+  //   tmp_pos.z = lowestPoint.z + 2 * radius;
+  //   tmp_vel.z = fmaxf(tmp_vel.z, 0.f);
+  // }
 
   // boundary particles
-  int3 grid_xyz = p2xyz(pos[i]);
-#pragma unroll
-  for (size_t m = 0; m < 27; ++m) {
-    int3 cur_grid_xyz =
-        grid_xyz + make_int3(m / 9 - 1, (m % 9) / 3 - 1, m % 3 - 1);
-    const size_t hash_idx =
-        xyz2hash(cur_grid_xyz.x, cur_grid_xyz.y, cur_grid_xyz.z);
-    if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
-      continue;
+//   int3 grid_xyz = p2xyz(pos[i]);
+// #pragma unroll
+//   for (size_t m = 0; m < 27; ++m) {
+//     int3 cur_grid_xyz =
+//         grid_xyz + make_int3(m / 9 - 1, (m % 9) / 3 - 1, m % 3 - 1);
+//     const size_t hash_idx =
+//         xyz2hash(cur_grid_xyz.x, cur_grid_xyz.y, cur_grid_xyz.z);
+//     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
+//       continue;
 
-    size_t j = bCellStart[hash_idx];
-    const size_t cellEnd = bCellStart[hash_idx + 1];
-    while (j < cellEnd) {
+//     size_t j = bCellStart[hash_idx];
+//     const size_t cellEnd = bCellStart[hash_idx + 1];
+//     while (j < cellEnd) {
 
-      if (bLabel[j] == 1) {
-        float dpij = length(pos[i] - bPos[j]);
-        float overlap = dpij - 2.f * radius;
-        if (overlap < 0.f) {
-          float3 n = (pos[i] - bPos[j]) / dpij;
-          tmp_vel *= 0.f;
-          tmp_pos += n * -overlap;
-        }
-      }
+//       if (bLabel[j] == 1) {
+//         float dpij = length(pos[i] - bPos[j]);
+//         float overlap = dpij - 2.f * radius;
+//         if (overlap < 0.f) {
+//           float3 n = (pos[i] - bPos[j]) / dpij;
+//           tmp_vel *= 0.f;
+//           tmp_pos += n * -overlap;
+//         }
+//       }
 
-      ++j;
-    }
-  }
+//       ++j;
+//     }
+//   }
 
   pos[i] = tmp_pos;
   vel[i] = tmp_vel;
