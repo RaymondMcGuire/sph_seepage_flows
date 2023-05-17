@@ -1,11 +1,11 @@
-/***
- * @Author: Xu.WANG
- * @Date: 2021-03-19 22:04:26
- * @LastEditTime: 2021-04-04 02:20:24
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath:
- * \Kiri\KiriPBSCuda\src\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cpp
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-05-14 20:01:11
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-05-17 16:56:49
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cpp
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #include <kiri_pbs_cuda/emitter/cuda_boundary_emitter.cuh>
 namespace KIRI {
@@ -76,7 +76,7 @@ void CudaBoundaryEmitter::BuildWorldBoundary(BoundaryData &data,
 }
 
 void CudaBoundaryEmitter::BuildBoundaryShapeVolume(BoundaryData &data,
-                                                   Vec_Float4 shape) {
+                                                   const  std::vector<float3>& shape) {
   if (!bEnable)
     return;
 

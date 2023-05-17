@@ -71,7 +71,7 @@ struct CudaSeepageflowAppParams {
 
   int scene_data_idx = 0;
   char bgeo_export_folder[320] = "default";
-  bool bgeo_export = false;
+  bool enable_write2file = false;
 };
 
 extern CudaSeepageflowParams CUDA_SEEPAGEFLOW_PARAMS;

@@ -1,12 +1,6 @@
 # Project Name
 set(PROJECT_NAME seepage_flow_cuda)
 
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
-else()
-    set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
-endif()
-
 # CUDA PBS Library
 file(GLOB_RECURSE SOURCES "src/*.cu" "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HEADERS "include/*.cuh" "include/*.hpp" "include/*.h")

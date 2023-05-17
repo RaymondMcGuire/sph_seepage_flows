@@ -1,24 +1,15 @@
 # Project Name
 set(PROJECT_NAME seepage_flow)
 
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
-    set(DLL_STRING "${CMAKE_SOURCE_DIR}/extlib/debug_dlls/")
-else()
-    set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
-    set(DLL_STRING "${CMAKE_SOURCE_DIR}/extlib/release_dlls/")
-endif()
-
 # Find Extra Library Package
 set(EXTLIBS_INCLUDE ${CMAKE_SOURCE_DIR}/extlib/include)
 set(EXTLIBS_SRC ${CMAKE_SOURCE_DIR}/extlib/src)
 set(EXTLIBS_LIB ${CMAKE_SOURCE_DIR}/extlib/lib)
 link_directories(${EXTLIBS_LIB})
 
-set(VTK_DIR D:/build_library/vtk/lib/cmake/vtk-9.2)
+set(VTK_DIR ${CMAKE_SOURCE_DIR}/extlib/vtk/lib/cmake/vtk-9.2)
 find_package(VTK REQUIRED)
-# set(VTK_INCLUDE D:/build_library/vtk/include/vtk-9.2)
-# set(VTK_LIB D:/build_library/vtk/lib)
+set(DLL_STRING "${CMAKE_SOURCE_DIR}/extlib/vtk/bin")
 
 
 # Kiri PBS CUDA Library
@@ -62,7 +53,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${KIRI_MATH_LIB_INLCUDE}
 )
 
-target_link_libraries(${PROJECT_NAME} ${EXTLIBS_LINK_LIBS_DEBUG} debug partiod optimized partio Alembic ${VTK_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${EXTLIBS_LINK_LIBS_DEBUG} ${VTK_LIBRARIES})
 
 set(WD_DEBUG_FILE_PATH ${CMAKE_BINARY_DIR}/bin/Debug/)
 set(WD_RELEASE_FILE_PATH ${CMAKE_BINARY_DIR}/bin/Release/)

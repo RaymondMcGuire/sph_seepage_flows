@@ -1,13 +1,12 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2021-04-04 02:19:32
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath:
- * \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cuh
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-05-14 20:01:11
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-05-17 16:57:37
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\emitter\cuda_boundary_emitter.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
-
 #ifndef _CUDA_BOUNDARY_EMITTER_CUH_
 #define _CUDA_BOUNDARY_EMITTER_CUH_
 
@@ -31,7 +30,10 @@ public:
 
   void BuildWorldBoundary(BoundaryData &data, const float3 &lowest,
                           const float3 &highest, const float particleRadius);
-  void BuildBoundaryShapeVolume(BoundaryData &data, Vec_Float4 shape);
+
+
+  void BuildBoundaryShapeVolume(BoundaryData &data, const std::vector<float3>& shape);
+
 
 private:
   bool bEnable;

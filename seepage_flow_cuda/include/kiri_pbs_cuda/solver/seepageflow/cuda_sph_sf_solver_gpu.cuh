@@ -96,7 +96,7 @@ static __device__ void _ComputeSFMSDEMBoundaryForces(
   while (j < cellEnd) {
     // only collide scene boundary particles
     if (bLabel[j] == 1) {
-      printf("collide boundary particles");
+      //printf("collide boundary particles");
       float3 dij = posi - bPos[j];
       float rij = boundaryRadius + radiusi;
       float kni = young * radiusi;
@@ -124,7 +124,7 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
   while (j < cellEnd) {
     // only collide scene boundary particles
     if (bLabel[j] == 1) {
-      printf("collide boundary particles");
+      //printf("collide boundary particles");
       float3 dij = posi - bPos[j];
       float rij = boundaryRadius + radiusi;
       float kni = young * radiusi;
