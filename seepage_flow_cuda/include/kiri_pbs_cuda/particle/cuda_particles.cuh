@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-05-17 15:32:20
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\particle\cuda_particles.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\particle\cuda_particles.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 
 #ifndef _CUDA_PARTICLES_CUH_
@@ -19,8 +20,8 @@ namespace KIRI {
 class CudaParticles {
 public:
   explicit CudaParticles(const size_t numOfMaxParticles)
-      : mPos(numOfMaxParticles),mId(numOfMaxParticles), mParticle2Cell(numOfMaxParticles),
-        mNumOfParticles(numOfMaxParticles),
+      : mPos(numOfMaxParticles), mId(numOfMaxParticles),
+        mParticle2Cell(numOfMaxParticles), mNumOfParticles(numOfMaxParticles),
         mNumOfMaxParticles(numOfMaxParticles) {}
 
   explicit CudaParticles(const Vec_Float3 &p);

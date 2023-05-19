@@ -1,19 +1,20 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-04-08 12:28:00
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-05-17 20:40:34
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_DFSPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_DFSPH_SF_SOLVER_GPU_CUH_
 
 #pragma once
 
-#include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver_gpu.cuh>
+#include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
 namespace KIRI {
 
 static __global__ void _ComputeVelMag_CUDA(float *velMag, const size_t *label,

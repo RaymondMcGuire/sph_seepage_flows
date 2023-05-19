@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-05-14 20:01:11
+ * @Date: 2023-05-19 20:19:31
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-17 21:00:17
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @LastEditTime: 2023-05-19 20:31:32
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_SPH_SF_SOLVER_GPU_CUH_
@@ -66,7 +67,7 @@ static __device__ void _ComputeSFMSDEMForcesTorque(
                      cross(angularVel[j], -radius[j] * n) -
                      cross(angularVel[i], radius[i] * n);
 
-        //float3 vij = vel[j] - vel[i];
+        // float3 vij = vel[j] - vel[i];
 
         float kni = young * radius[i];
         float knj = young * radius[j];
@@ -95,7 +96,7 @@ static __device__ void _ComputeSFMSDEMBoundaryForces(
   while (j < cellEnd) {
     // only collide scene boundary particles
     if (bLabel[j] == 1) {
-      //printf("collide boundary particles");
+      // printf("collide boundary particles");
       float3 dij = posi - bPos[j];
       float rij = boundaryRadius + radiusi;
       float kni = young * radiusi;
@@ -122,37 +123,36 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
     const size_t cellEnd) {
   while (j < cellEnd) {
 
-      float3 dij = posi - bPos[j];
-      float rij = boundaryRadius + radiusi;
-      float kni = young * radiusi;
-      float knj = young * boundaryRadius;
+    float3 dij = posi - bPos[j];
+    float rij = boundaryRadius + radiusi;
+    float kni = young * radiusi;
+    float knj = young * boundaryRadius;
 
-      float kn = 2.f * kni * knj / (kni + knj);
+    float kn = 2.f * kni * knj / (kni + knj);
 
-      float dist = length(dij);
-      float penetration_depth = rij - dist;
-      if (penetration_depth > 0.f) {
+    float dist = length(dij);
+    float penetration_depth = rij - dist;
+    if (penetration_depth > 0.f) {
 
-        float3 n = dij / dist;
-        float alpha = rij / (rij - penetration_depth);
-        float3 vik = make_float3(-veli.x, -veli.y, -veli.z) * alpha -
-                     cross(angulari, radiusi * n);
+      float3 n = dij / dist;
+      float alpha = rij / (rij - penetration_depth);
+      float3 vik = make_float3(-veli.x, -veli.y, -veli.z) * alpha -
+                   cross(angulari, radiusi * n);
 
-           float3 normal_forces =  kn * penetration_depth * n;
+      float3 normal_forces = kn * penetration_depth * n;
 
       float3 tangential_forces = make_float3(0.f);
 
-      if (length(vik) != 0.f) 
-          tangential_forces = normalize(vik) * length(normal_forces) * 3.f;
-      
+      if (length(vik) != 0.f)
+        tangential_forces = normalize(vik) * length(normal_forces) * poisson;
 
       float3 restitute_forces = dot(vik, n) * n * 5.f;
       float3 force = normal_forces + tangential_forces + restitute_forces;
       *f += force;
 
-        *torque += (radiusi - 0.5f * penetration_depth) * cross(n, force);
-      }
-    
+      *torque += (radiusi - 0.5f * penetration_depth) * cross(n, force);
+    }
+
     ++j;
   }
   return;
@@ -899,33 +899,33 @@ __global__ void _SFWaterBoundaryConstrain_CUDA(
   // }
 
   // boundary particles
-//   int3 grid_xyz = p2xyz(pos[i]);
-// #pragma unroll
-//   for (size_t m = 0; m < 27; ++m) {
-//     int3 cur_grid_xyz =
-//         grid_xyz + make_int3(m / 9 - 1, (m % 9) / 3 - 1, m % 3 - 1);
-//     const size_t hash_idx =
-//         xyz2hash(cur_grid_xyz.x, cur_grid_xyz.y, cur_grid_xyz.z);
-//     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
-//       continue;
+  //   int3 grid_xyz = p2xyz(pos[i]);
+  // #pragma unroll
+  //   for (size_t m = 0; m < 27; ++m) {
+  //     int3 cur_grid_xyz =
+  //         grid_xyz + make_int3(m / 9 - 1, (m % 9) / 3 - 1, m % 3 - 1);
+  //     const size_t hash_idx =
+  //         xyz2hash(cur_grid_xyz.x, cur_grid_xyz.y, cur_grid_xyz.z);
+  //     if (hash_idx == (gridSize.x * gridSize.y * gridSize.z))
+  //       continue;
 
-//     size_t j = bCellStart[hash_idx];
-//     const size_t cellEnd = bCellStart[hash_idx + 1];
-//     while (j < cellEnd) {
+  //     size_t j = bCellStart[hash_idx];
+  //     const size_t cellEnd = bCellStart[hash_idx + 1];
+  //     while (j < cellEnd) {
 
-//       if (bLabel[j] == 1) {
-//         float dpij = length(pos[i] - bPos[j]);
-//         float overlap = dpij - 2.f * radius;
-//         if (overlap < 0.f) {
-//           float3 n = (pos[i] - bPos[j]) / dpij;
-//           tmp_vel *= 0.f;
-//           tmp_pos += n * -overlap;
-//         }
-//       }
+  //       if (bLabel[j] == 1) {
+  //         float dpij = length(pos[i] - bPos[j]);
+  //         float overlap = dpij - 2.f * radius;
+  //         if (overlap < 0.f) {
+  //           float3 n = (pos[i] - bPos[j]) / dpij;
+  //           tmp_vel *= 0.f;
+  //           tmp_pos += n * -overlap;
+  //         }
+  //       }
 
-//       ++j;
-//     }
-//   }
+  //       ++j;
+  //     }
+  //   }
 
   pos[i] = tmp_pos;
   vel[i] = tmp_vel;

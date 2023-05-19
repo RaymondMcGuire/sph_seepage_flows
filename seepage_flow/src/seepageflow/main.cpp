@@ -1,11 +1,11 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-14 20:01:11
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-05-17 21:04:09
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 // clang-format off
 #include <sf_cuda_define.h>
@@ -32,12 +32,11 @@ CudaSFSystemPtr SFSystem;
 void Seepage_Uni_Slide_DFSPH() {
 
   KIRI_LOG_DEBUG("Example:  Seepage_Uni_Slide_DFSPH");
-   auto vtk_export_path = String(EXPORT_PATH) + "vtk/" + ExampleName + "/";
-
-
+  auto vtk_export_path = String(EXPORT_PATH) + "vtk/" + ExampleName + "/";
 
   // scene config
-  auto cuda_lowest_point = make_float3(-2.f, -2.f, -2.f);//左下角与右上角 坐标顺序 x y z
+  auto cuda_lowest_point =
+      make_float3(-2.f, -2.f, -2.f); //左下角与右上角 坐标顺序 x y z
   auto cuda_highest_point = make_float3(15.f, 10.f, 25.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
@@ -117,8 +116,8 @@ void Seepage_Uni_Slide_DFSPH() {
       (CUDA_BOUNDARY_PARAMS.highest_point - CUDA_BOUNDARY_PARAMS.lowest_point) /
       CUDA_BOUNDARY_PARAMS.kernel_radius);
 
-    // boudnary particle radius
-  CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius =0.1f;
+  // boudnary particle radius
+  CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius = 0.1f;
 
   // init emitter
   CudaEmitterPtr emitter = std::make_shared<CudaEmitter>(
@@ -128,7 +127,7 @@ void Seepage_Uni_Slide_DFSPH() {
   // boundary sampling
   BoundaryData boundary_data;
   auto boundary_emitter = std::make_shared<CudaBoundaryEmitter>();
-  
+
   // build world boundary data
   boundary_emitter->BuildWorldBoundary(
       boundary_data, CUDA_BOUNDARY_PARAMS.lowest_point,
@@ -136,18 +135,21 @@ void Seepage_Uni_Slide_DFSPH() {
       CUDA_SEEPAGEFLOW_PARAMS.boundary_particle_radius);
 
   // build custom boundary data
-   auto boundary_vtk_file_path = String(DB_PBR_PATH) + "vtk/boundary.vtk";
-   auto boundary_particles_data = VTKReader::ReadPoints(boundary_vtk_file_path);
-  boundary_emitter->BuildBoundaryShapeVolume(boundary_data,boundary_particles_data,true);
+  auto boundary_vtk_file_path = String(DB_PBR_PATH) + "vtk/boundary.vtk";
+  auto boundary_particles_data = VTKReader::ReadPoints(boundary_vtk_file_path);
+  boundary_emitter->BuildBoundaryShapeVolume(boundary_data,
+                                             boundary_particles_data, true);
 
-    auto vtk_world_boundary = vtk_export_path +"world_boundary.vtk";
-     auto vtk_custom_boundary = vtk_export_path +"custom_boundary.vtk";
+  auto vtk_world_boundary = vtk_export_path + "world_boundary.vtk";
+  auto vtk_custom_boundary = vtk_export_path + "custom_boundary.vtk";
 
-    auto vtk_world_boundary_writer = std::make_shared<VTKPolygonalWriter>(vtk_world_boundary,boundary_data.pos,boundary_data.label,0);
-    vtk_world_boundary_writer->WriteToFile();
+  auto vtk_world_boundary_writer = std::make_shared<VTKPolygonalWriter>(
+      vtk_world_boundary, boundary_data.pos, boundary_data.label, 0);
+  vtk_world_boundary_writer->WriteToFile();
 
-    auto vtk_custom_boundary_writer = std::make_shared<VTKPolygonalWriter>(vtk_custom_boundary,boundary_data.pos,boundary_data.label,1);
-    vtk_custom_boundary_writer->WriteToFile();
+  auto vtk_custom_boundary_writer = std::make_shared<VTKPolygonalWriter>(
+      vtk_custom_boundary, boundary_data.pos, boundary_data.label, 1);
+  vtk_custom_boundary_writer->WriteToFile();
 
   // material type (SF: unified material; MULTI_SF: multiple types of materials)
   CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
@@ -191,9 +193,11 @@ void Seepage_Uni_Slide_DFSPH() {
     auto sand_shape = VTKReader::ReadPoints(sand_shape_files[i]);
 
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
-        multi_volume_data, sand_shape,0.1f, CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
-        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp,true, offset2Ground,
-        CUDA_BOUNDARY_PARAMS.lowest_point.y, make_float2(0.f, 0.f));
+        multi_volume_data, sand_shape, 0.1f,
+        CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
+        CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, true,
+        offset2Ground, CUDA_BOUNDARY_PARAMS.lowest_point.y,
+        make_float2(0.f, 0.f));
 
     KIRI_LOG_DEBUG(
         "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}",
@@ -217,8 +221,8 @@ void Seepage_Uni_Slide_DFSPH() {
   particles = std::make_shared<CudaDFSFParticles>(
       CUDA_SEEPAGEFLOW_APP_PARAMS.max_num, multi_volume_data.pos,
       multi_volume_data.col, multi_volume_data.label, multi_volume_data.mass,
-      multi_volume_data.inertia, multi_volume_data.radius, multi_volume_data.cda0asat,
-      multi_volume_data.amcamcp);
+      multi_volume_data.inertia, multi_volume_data.radius,
+      multi_volume_data.cda0asat, multi_volume_data.amcamcp);
 
   CudaGNSearcherPtr searcher;
   searcher = std::make_shared<CudaGNSearcher>(
@@ -256,17 +260,13 @@ void Seepage_Uni_Slide_DFSPH() {
 void main() {
   KiriLog::Init();
 
-
-          // vtk exporter params
+  // vtk exporter params
   auto vtk_export_path = String(EXPORT_PATH) + "vtk/" + ExampleName + "/";
 
   std::error_code error_code;
   std::filesystem::create_directories(vtk_export_path, error_code);
 
-
   Seepage_Uni_Slide_DFSPH();
-
-
 
   CUDA_SEEPAGEFLOW_APP_PARAMS.run = true;
 
@@ -299,37 +299,50 @@ void main() {
 
       if (CUDA_SEEPAGEFLOW_APP_PARAMS.enable_write2file) {
         auto particles = SFSystem->GetSFParticles();
-        auto cpu_pos = TransferGPUData2CPU(particles->GetPosPtr(),particles->Size());
-        auto cpu_label = TransferGPUData2CPU(particles->GetLabelPtr(),particles->Size());
-        auto cpu_id = TransferGPUData2CPU(particles->GetIdPtr(),particles->Size());
-        auto cpu_radius = TransferGPUData2CPU(particles->GetRadiusPtr(),particles->Size());
-        auto cpu_vel = TransferGPUData2CPU(particles->GetVelPtr(),particles->Size());
-        auto cpu_acc = TransferGPUData2CPU(particles->GetAccPtr(),particles->Size());
-        auto cpu_sat = TransferGPUData2CPU(particles->GetSaturationPtr(),particles->Size());
-        auto cpu_rho = TransferGPUData2CPU(particles->GetDensityPtr(),particles->Size());
-        
-            auto vtk_file_water = vtk_export_path +"water_" +UInt2Str4Digit(SimCount - RunLiquidNumber) + ".vtk";
-            auto vtk_file_sand = vtk_export_path +"sand_" +UInt2Str4Digit(SimCount - RunLiquidNumber) + ".vtk";
+        auto cpu_pos =
+            TransferGPUData2CPU(particles->GetPosPtr(), particles->Size());
+        auto cpu_label =
+            TransferGPUData2CPU(particles->GetLabelPtr(), particles->Size());
+        auto cpu_id =
+            TransferGPUData2CPU(particles->GetIdPtr(), particles->Size());
+        auto cpu_radius =
+            TransferGPUData2CPU(particles->GetRadiusPtr(), particles->Size());
+        auto cpu_vel =
+            TransferGPUData2CPU(particles->GetVelPtr(), particles->Size());
+        auto cpu_acc =
+            TransferGPUData2CPU(particles->GetAccPtr(), particles->Size());
+        auto cpu_sat = TransferGPUData2CPU(particles->GetSaturationPtr(),
+                                           particles->Size());
+        auto cpu_rho =
+            TransferGPUData2CPU(particles->GetDensityPtr(), particles->Size());
 
-            auto vtk_water_writer = std::make_shared<VTKPolygonalWriter>(vtk_file_water,cpu_pos,cpu_label,0);
-            vtk_water_writer->AddIntData("Id",cpu_id);
-            vtk_water_writer->AddVectorFloatData("Velocity",cpu_vel);
-             vtk_water_writer->AddVectorFloatData("Accelerate",cpu_acc);
-            vtk_water_writer->AddFloatData("Saturation",cpu_sat);
-            vtk_water_writer->AddFloatData("Rho",cpu_rho);
-            vtk_water_writer->AddFloatData("Radius",cpu_radius);
-            
-            vtk_water_writer->WriteToFile();
+        auto vtk_file_water = vtk_export_path + "water_" +
+                              UInt2Str4Digit(SimCount - RunLiquidNumber) +
+                              ".vtk";
+        auto vtk_file_sand = vtk_export_path + "sand_" +
+                             UInt2Str4Digit(SimCount - RunLiquidNumber) +
+                             ".vtk";
 
-            auto vtk_sand_writer = std::make_shared<VTKPolygonalWriter>(vtk_file_sand,cpu_pos,cpu_label,1);
-            vtk_sand_writer->AddIntData("Id",cpu_id);
-            vtk_sand_writer->AddVectorFloatData("Velocity",cpu_vel);
-             vtk_sand_writer->AddVectorFloatData("Accelerate",cpu_acc);
-            vtk_sand_writer->AddFloatData("Saturation",cpu_sat);
-            vtk_sand_writer->AddFloatData("Rho",cpu_rho);
-            vtk_sand_writer->AddFloatData("Radius",cpu_radius);
-            vtk_sand_writer->WriteToFile();
+        auto vtk_water_writer = std::make_shared<VTKPolygonalWriter>(
+            vtk_file_water, cpu_pos, cpu_label, 0);
+        vtk_water_writer->AddIntData("Id", cpu_id);
+        vtk_water_writer->AddVectorFloatData("Velocity", cpu_vel);
+        vtk_water_writer->AddVectorFloatData("Accelerate", cpu_acc);
+        vtk_water_writer->AddFloatData("Saturation", cpu_sat);
+        vtk_water_writer->AddFloatData("Rho", cpu_rho);
+        vtk_water_writer->AddFloatData("Radius", cpu_radius);
 
+        vtk_water_writer->WriteToFile();
+
+        auto vtk_sand_writer = std::make_shared<VTKPolygonalWriter>(
+            vtk_file_sand, cpu_pos, cpu_label, 1);
+        vtk_sand_writer->AddIntData("Id", cpu_id);
+        vtk_sand_writer->AddVectorFloatData("Velocity", cpu_vel);
+        vtk_sand_writer->AddVectorFloatData("Accelerate", cpu_acc);
+        vtk_sand_writer->AddFloatData("Saturation", cpu_sat);
+        vtk_sand_writer->AddFloatData("Rho", cpu_rho);
+        vtk_sand_writer->AddFloatData("Radius", cpu_radius);
+        vtk_sand_writer->WriteToFile();
       }
     } else if (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
       CUDA_SEEPAGEFLOW_APP_PARAMS.run = false;
