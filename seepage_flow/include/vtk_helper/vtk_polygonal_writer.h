@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-05-16 21:40:10
+ * @Date: 2023-05-19 20:19:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-19 20:19:17
- * @FilePath:
- * \sph_seepage_flows\seepage_flow\include\vtk_helper\vtk_polygonal_writer.h
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-05-19 21:41:31
+ * @FilePath: \sph_seepage_flows\seepage_flow\include\vtk_helper\vtk_polygonal_writer.h
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _VTK_POLYGONAL_WRITER_H_
 #define _VTK_POLYGONAL_WRITER_H_
@@ -147,6 +146,10 @@ private:
       if (!mEnableSplitExporter ||
           (mEnableSplitExporter && mLabel[i] == mLabelId)) {
         vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
+
+         if(p[i].x!=p[i].x)
+          std::cout << "VTK Data: "<< std::endl;
+
         mPoints->InsertNextPoint(p[i].x, p[i].y, p[i].z);
         vertex->GetPointIds()->SetId(0, counter++);
         vertices->InsertNextCell(vertex);

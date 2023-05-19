@@ -1,11 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-05-14 20:01:11
+ * @Date: 2023-05-19 20:19:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-17 21:04:09
+ * @LastEditTime: 2023-05-19 21:36:40
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 // clang-format off
 #include <sf_cuda_define.h>
@@ -37,7 +37,7 @@ void Seepage_Uni_Slide_DFSPH() {
   // scene config
   auto cuda_lowest_point =
       make_float3(-2.f, -2.f, -2.f); //左下角与右上角 坐标顺序 x y z
-  auto cuda_highest_point = make_float3(15.f, 10.f, 25.f);
+  auto cuda_highest_point = make_float3(15.f, 20.f, 25.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
   CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 8000000;
@@ -163,7 +163,7 @@ void Seepage_Uni_Slide_DFSPH() {
   Vec_String sand_shape_files;
 
   // object 1:
-  sand_shape_files.emplace_back(String(DB_PBR_PATH) + "vtk/slide.vtk");
+  sand_shape_files.emplace_back(String(DB_PBR_PATH) + "vtk/slide2.vtk");
 
   // object 2: dam/dam2.bego
   // shape_folders.emplace_back("dam");

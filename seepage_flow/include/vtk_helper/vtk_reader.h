@@ -1,3 +1,12 @@
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-05-19 20:19:24
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-05-19 21:38:53
+ * @FilePath: \sph_seepage_flows\seepage_flow\include\vtk_helper\vtk_reader.h
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ */
 
 #ifndef _VTK_READER_H_
 #define _VTK_READER_H_
@@ -27,6 +36,9 @@ public:
       for (auto i = 0; i < points->GetNumberOfPoints(); ++i) {
         double *coords = points->GetPoint(i);
         result.emplace_back(make_float3(coords[0], coords[1], coords[2]));
+
+        if(coords[0]!=coords[0] || coords[1]!=coords[1] || coords[2]!=coords[2])
+          std::cout << "VTK Data: " << coords[0]<<" "<<coords[1]<<" "<<coords[2] << std::endl;
       }
     } else {
       std::cout << "VTK File: " << filename << "; Cannot Read Point Data!!!"

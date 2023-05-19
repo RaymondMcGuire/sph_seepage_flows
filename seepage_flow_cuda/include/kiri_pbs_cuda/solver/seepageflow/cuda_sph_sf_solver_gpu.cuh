@@ -1,12 +1,11 @@
-/***
+/*** 
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-05-19 20:19:31
+ * @Date: 2023-05-19 20:33:47
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-19 20:31:32
- * @FilePath:
- * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
- * @Description:
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ * @LastEditTime: 2023-05-19 22:04:45
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_SPH_SF_SOLVER_GPU_CUH_
@@ -132,7 +131,7 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
 
     float dist = length(dij);
     float penetration_depth = rij - dist;
-    if (penetration_depth > 0.f) {
+    if (penetration_depth > 0.f && dist!=0.f) {
 
       float3 n = dij / dist;
       float alpha = rij / (rij - penetration_depth);
@@ -147,6 +146,13 @@ static __device__ void _ComputeSFMSDEMBoundaryForcesTorque(
         tangential_forces = normalize(vik) * length(normal_forces) * poisson;
 
       float3 restitute_forces = dot(vik, n) * n * 5.f;
+      if (vik.x!=vik.x)
+        printf("vik NaN! alppha=%.3f, dij=%.3f,%.3f,%.3f, dist==%.3f, \n",alpha,dij.x,dij.y,dij.z,dist);
+
+      // if (n.x!=n.x)
+      //  printf("n NaN! \n");
+
+
       float3 force = normal_forces + tangential_forces + restitute_forces;
       *f += force;
 
