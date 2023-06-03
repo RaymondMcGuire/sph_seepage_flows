@@ -841,7 +841,7 @@ __global__ void _ComputeSFWaterLinearMomentum_CUDA(
 
 static __global__ void
 _ComputeSFWetSandColor_CUDA(float *maxSaturation, float3 *col,
-                            const size_t *label, const float *saturation,
+                            const size_t *label, float *saturation,
                             const size_t num, const float3 dryCol,
                             const float3 wetCol) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -869,42 +869,42 @@ __global__ void _SFWaterBoundaryConstrain_CUDA(
     const float3 *bPos, const size_t *bLabel, const size_t *bCellStart,
     const int3 gridSize, Pos2GridXYZ p2xyz, GridXYZ2GridHash xyz2hash) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-  if (i >= num || label[i] != 0)
+  if (i >= num)
     return;
 
   float3 tmp_pos = pos[i];
   float3 tmp_vel = vel[i];
 
   // world boundary
-  // if (tmp_pos.x > highestPoint.x - 2 * radius) {
-  //   tmp_pos.x = highestPoint.x - 2 * radius;
-  //   tmp_vel.x = fminf(tmp_vel.x, 0.f);
-  // }
+  if (tmp_pos.x > highestPoint.x - 2 * radius) {
+    tmp_pos.x = highestPoint.x - 2 * radius;
+    tmp_vel.x = fminf(tmp_vel.x, 0.f);
+  }
 
-  // if (tmp_pos.x < lowestPoint.x + 2 * radius) {
-  //   tmp_pos.x = lowestPoint.x + 2 * radius;
-  //   tmp_vel.x = fmaxf(tmp_vel.x, 0.f);
-  // }
+  if (tmp_pos.x < lowestPoint.x + 2 * radius) {
+    tmp_pos.x = lowestPoint.x + 2 * radius;
+    tmp_vel.x = fmaxf(tmp_vel.x, 0.f);
+  }
 
-  // if (tmp_pos.y > highestPoint.y - 2 * radius) {
-  //   tmp_pos.y = highestPoint.y - 2 * radius;
-  //   tmp_vel.y = fminf(tmp_vel.y, 0.f);
-  // }
+  if (tmp_pos.y > highestPoint.y - 2 * radius) {
+    tmp_pos.y = highestPoint.y - 2 * radius;
+    tmp_vel.y = fminf(tmp_vel.y, 0.f);
+  }
 
-  // if (tmp_pos.y < lowestPoint.y + 2 * radius) {
-  //   tmp_pos.y = lowestPoint.y + 2 * radius;
-  //   tmp_vel.y = fmaxf(tmp_vel.y, 0.f);
-  // }
+  if (tmp_pos.y < lowestPoint.y + 2 * radius) {
+    tmp_pos.y = lowestPoint.y + 2 * radius;
+    tmp_vel.y = fmaxf(tmp_vel.y, 0.f);
+  }
 
-  // if (tmp_pos.z > highestPoint.z - 2 * radius) {
-  //   tmp_pos.z = highestPoint.z - 2 * radius;
-  //   tmp_vel.z = fminf(tmp_vel.z, 0.f);
-  // }
+  if (tmp_pos.z > highestPoint.z - 2 * radius) {
+    tmp_pos.z = highestPoint.z - 2 * radius;
+    tmp_vel.z = fminf(tmp_vel.z, 0.f);
+  }
 
-  // if (tmp_pos.z < lowestPoint.z + 2 * radius) {
-  //   tmp_pos.z = lowestPoint.z + 2 * radius;
-  //   tmp_vel.z = fmaxf(tmp_vel.z, 0.f);
-  // }
+  if (tmp_pos.z < lowestPoint.z + 2 * radius) {
+    tmp_pos.z = lowestPoint.z + 2 * radius;
+    tmp_vel.z = fmaxf(tmp_vel.z, 0.f);
+  }
 
   // boundary particles
   //   int3 grid_xyz = p2xyz(pos[i]);
