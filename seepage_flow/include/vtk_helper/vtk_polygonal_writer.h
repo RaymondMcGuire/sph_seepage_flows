@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-19 21:41:31
+ * @LastEditTime: 2023-06-08 23:53:48
  * @FilePath: \sph_seepage_flows\seepage_flow\include\vtk_helper\vtk_polygonal_writer.h
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -17,6 +17,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkIntArray.h>
+#include<vtkUnsignedLongLongArray.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -64,7 +65,7 @@ public:
   }
 
   void AddSizeTData(const std::string &name, const std::vector<size_t> &data) {
-    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New();
+    vtkSmartPointer<vtkUnsignedLongLongArray> array = vtkSmartPointer<vtkUnsignedLongLongArray>::New();
     array->SetName(name.c_str());
     for (auto i = 0; i < data.size(); i++)
       if (!mEnableSplitExporter ||

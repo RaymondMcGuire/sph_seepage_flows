@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-08 11:04:21
+ * @LastEditTime: 2023-06-08 23:49:45
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -21,7 +21,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_uni_slide_dfsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 180;
+auto TotalFrameNumber = 10;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -555,7 +555,7 @@ void main() {
 
         auto vtk_water_writer = std::make_shared<VTKPolygonalWriter>(
             vtk_file_water, cpu_pos, cpu_label, 0);
-        vtk_water_writer->AddIntData("Id", cpu_id);
+        vtk_water_writer->AddSizeTData("Id", cpu_id);
         vtk_water_writer->AddVectorFloatData("Velocity", cpu_vel);
         vtk_water_writer->AddVectorFloatData("Accelerate", cpu_acc);
         vtk_water_writer->AddFloatData("Saturation", cpu_sat);
@@ -566,7 +566,7 @@ void main() {
 
         auto vtk_sand_writer = std::make_shared<VTKPolygonalWriter>(
             vtk_file_sand, cpu_pos, cpu_label, 1);
-        vtk_sand_writer->AddIntData("Id", cpu_id);
+        vtk_sand_writer->AddSizeTData("Id", cpu_id);
         vtk_sand_writer->AddVectorFloatData("Velocity", cpu_vel);
         vtk_sand_writer->AddVectorFloatData("Accelerate", cpu_acc);
         vtk_sand_writer->AddFloatData("Saturation", cpu_sat);

@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:30
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-06 14:43:43
+ * @LastEditTime: 2023-06-08 23:45:48
  * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\particle\cuda_particles.cuh
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -35,7 +35,7 @@ public:
   inline size_t MaxSize() const { return mNumOfMaxParticles; }
 
   inline float3 *GetPosPtr() const { return mPos.Data(); }
-  inline int *GetIdPtr() const { return mId.Data(); }
+  inline size_t *GetIdPtr() const { return mId.Data(); }
 
   inline size_t *GetParticle2CellPtr() const { return mParticle2Cell.Data(); }
 
@@ -43,7 +43,7 @@ protected:
   size_t mNumOfParticles;
   size_t mNumOfMaxParticles;
 
-  CudaArray<int> mId;
+  CudaArray<size_t> mId;
   CudaArray<float3> mPos;
   CudaArray<size_t> mParticle2Cell;
 };
