@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-03 16:30:07
+ * @LastEditTime: 2023-06-08 11:04:21
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -541,7 +541,7 @@ void main() {
             TransferGPUData2CPU(particles->GetVelPtr(), particles->Size());
         auto cpu_acc =
             TransferGPUData2CPU(particles->GetAccPtr(), particles->Size());
-        auto cpu_sat = TransferGPUData2CPU(particles->GetSaturationPtr(),
+        auto cpu_sat = TransferGPUData2CPU(particles->GetMaxSaturationPtr(),
                                            particles->Size());
         auto cpu_rho =
             TransferGPUData2CPU(particles->GetDensityPtr(), particles->Size());
