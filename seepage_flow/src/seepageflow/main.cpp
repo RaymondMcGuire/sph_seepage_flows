@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:25
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-08 23:49:45
+ * @LastEditTime: 2023-06-12 00:22:16
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -384,6 +384,7 @@ void Seepage_Uni_Slide_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.sf_type = MULTI_SF;
 
   // shape sampling
+  auto sand_radius =0.01f;
   auto offset2Ground = false;
   SeepageflowMultiVolumeData multi_volume_data;
   auto volumeEmitter = std::make_shared<CudaVolumeEmitter>();
@@ -392,7 +393,7 @@ void Seepage_Uni_Slide_WCSPH() {
   Vec_String sand_shape_files;
 
   // object 1:
-  sand_shape_files.emplace_back(String(DB_PBR_PATH) + "vtk/slide2.vtk");
+  sand_shape_files.emplace_back(String(DB_PBR_PATH) + "vtk/dam.vtk");
 
   // object 2: dam/dam2.bego
   // shape_folders.emplace_back("dam");
@@ -422,7 +423,7 @@ void Seepage_Uni_Slide_WCSPH() {
     auto sand_shape = VTKReader::ReadPoints(sand_shape_files[i]);
 
     volumeEmitter->BuildSeepageflowShapeMultiVolume(
-        multi_volume_data, sand_shape, 0.1f,
+        multi_volume_data, sand_shape, sand_radius,
         CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
         CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp, true,
         offset2Ground, CUDA_BOUNDARY_PARAMS.lowest_point.y,
