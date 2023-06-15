@@ -1,19 +1,20 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-04-08 12:28:00
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-04-08 12:33:07
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @LastEditTime: 2023-05-17 20:40:34
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_dfsph_sf_solver_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_DFSPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_DFSPH_SF_SOLVER_GPU_CUH_
 
 #pragma once
 
-#include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
 #include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver_gpu.cuh>
+#include <kiri_pbs_cuda/solver/sph/cuda_dfsph_solver_common_gpu.cuh>
 namespace KIRI {
 
 static __global__ void _ComputeVelMag_CUDA(float *velMag, const size_t *label,
@@ -448,10 +449,6 @@ __global__ void _ComputeDFSFSandLinearMomentum_CUDA(
         bCellStart[hash_idx + 1]);
   }
 
-  _ComputeDEMWorldBoundaryForcesTorque(
-      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
-      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
-
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {
     float dragCoeff = cd * powf(voidage[i], 3.f) / powf(1.f - voidage[i], 2.f);
@@ -532,10 +529,6 @@ __global__ void _ComputeMultiDFSFSandLinearMomentum_CUDA(
         bLabel, bPos, young, poisson, tanFrictionAngle, bCellStart[hash_idx],
         bCellStart[hash_idx + 1]);
   }
-
-  _ComputeDEMWorldBoundaryForcesTorque(
-      &f, &torque, pos[i], vel[i], angularVel[i], radius[i], boundaryRadius,
-      young, poisson, tanFrictionAngle, num, lowestPoint, highestPoint);
 
   // sand-water interactive(drag term)
   if (voidage[i] < 1.f && voidage[i] > 0.f) {

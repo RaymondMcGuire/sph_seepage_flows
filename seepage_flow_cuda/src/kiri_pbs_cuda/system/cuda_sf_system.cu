@@ -25,7 +25,8 @@ CudaSFSystem::CudaSFSystem(CudaSFParticlesPtr &particles,
           boundaryParticles, std::static_pointer_cast<CudaBaseSolver>(solver),
           boundarySearcher, particles->MaxSize(), adaptiveSubTimeStep),
       mParticles(std::move(particles)), mSearcher(std::move(searcher)),
-      mEmitter(std::move(emitter)),mEmitterElapsedTime(0.f),mNextEmitTime(0.f),
+      mEmitter(std::move(emitter)), mEmitterElapsedTime(0.f),
+      mNextEmitTime(0.f),
       mCudaGridSize(CuCeilDiv(particles->MaxSize(), KIRI_CUBLOCKSIZE)) {
 
   if (CUDA_SPH_EMITTER_PARAMS.enable) {
@@ -68,11 +69,9 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
 
   // emitter
   if (mEmitter->GetEmitterStatus() && CUDA_SPH_EMITTER_PARAMS.run) {
-    
 
     mEmitterElapsedTime += this->GetCurrentTimeStep();
-    if(mEmitterElapsedTime>mNextEmitTime)
-        {
+    if (mEmitterElapsedTime > mNextEmitTime) {
       auto p = mEmitter->Emit();
       if (mParticles->Size() + p.size() < mParticles->MaxSize())
         mParticles->AddSphParticles(
@@ -82,10 +81,9 @@ void CudaSFSystem::OnUpdateSolver(float renderInterval) {
       else
         mEmitter->SetEmitterStatus(false);
 
-      mNextEmitTime+=2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius / length(mEmitter->GetEmitterVelocity());
+      mNextEmitTime += 2.f * CUDA_SEEPAGEFLOW_PARAMS.sph_particle_radius /
+                       length(mEmitter->GetEmitterVelocity());
     }
-
-    
   }
 
   cudaDeviceSynchronize();

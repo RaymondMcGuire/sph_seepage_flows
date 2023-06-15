@@ -63,7 +63,7 @@ struct CudaSphAppParams {
 
   int scene_data_idx = 0;
   char bgeo_file_name[32] = "default";
-  bool bgeo_export = false;
+  bool enable_write2file = false;
 };
 
 extern CudaSphParams CUDA_SPH_PARAMS;

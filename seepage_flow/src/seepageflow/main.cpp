@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-08 19:27:15
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-05-11 21:05:40
+ * @LastEditTime: 2023-06-15 10:38:09
  * @FilePath: \sph_seepage_flows\seepage_flow\src\seepageflow\main.cpp
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -19,7 +19,7 @@ using namespace KIRI;
 auto ExampleName = "seepageflow_bunny_wcsph";
 
 auto RunLiquidNumber = 0;
-auto TotalFrameNumber = 180;
+auto TotalFrameNumber = 120;
 auto SimCount = 0;
 auto TotalFrameTime = 0.f;
 auto RenderInterval = 1.f / 60.f;
@@ -224,8 +224,7 @@ void Seepage_UniBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -434,8 +433,7 @@ void Seepage_MSBunny_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -646,8 +644,7 @@ void Seepage_UniBunny_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -858,8 +855,7 @@ void Seepage_MSBunny_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -881,7 +877,7 @@ void Seepage_MSDam_WCSPH() {
 
   // scene config
   auto cuda_lowest_point = make_float3(0.f);
-  auto cuda_highest_point = make_float3(1.43f, 2.f, 3.f);
+  auto cuda_highest_point = make_float3(1.7f, 2.f, 3.f);
   auto cuda_world_size = cuda_highest_point - cuda_lowest_point;
   auto cuda_world_center = (cuda_highest_point + cuda_lowest_point) / 2.f;
   CUDA_SEEPAGEFLOW_APP_PARAMS.max_num = 1000000;
@@ -991,7 +987,7 @@ void Seepage_MSDam_WCSPH() {
 
   // object 1: bunny/bunny.bego
   shape_folders.emplace_back("dam");
-  shape_files.emplace_back("dam");
+  shape_files.emplace_back("dam_xprotosphere");
 
   std::vector<float3> cd_a0_asat;
   std::vector<float2> amc_amcp;
@@ -1013,7 +1009,7 @@ void Seepage_MSDam_WCSPH() {
           CUDA_SEEPAGEFLOW_PARAMS.sf_dry_sand_color,
           CUDA_SEEPAGEFLOW_PARAMS.dem_density, cda0asat, amcamcp,
           offset2Ground, CUDA_BOUNDARY_PARAMS.lowest_point.y,
-          make_float2(0.75f, 1.5f));
+          make_float2(0.82f, 1.5f));
 
       KIRI_LOG_DEBUG(
           "Object({0}) Params: Cd A0 Asat Amc Amcp = {1}, {2}, {3}, {4}, {5}", i + 1, cda0asat.x, cda0asat.y, cda0asat.z, amcamcp.x,
@@ -1058,8 +1054,7 @@ void Seepage_MSDam_WCSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = WCSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= WCSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -1273,8 +1268,7 @@ void Seepage_MSDam_OverTop_DFSPH() {
   CUDA_SEEPAGEFLOW_PARAMS.solver_type = DFSPH_SOLVER;
   KIRI_LOG_INFO("Current Fluid Solver= DFSPH");
 
-  // bgeo file export & render FPS
-  CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export = true;
+
 
   CudaGNBoundarySearcherPtr boundary_searcher =
       std::make_shared<CudaGNBoundarySearcher>(
@@ -1298,9 +1292,9 @@ void main() {
 
  //Seepage_MSBunny_DFSPH();
 
- //Seepage_MSDam_WCSPH();
+ Seepage_MSDam_WCSPH();
 
- Seepage_MSDam_OverTop_DFSPH();
+ //Seepage_MSDam_OverTop_DFSPH();
 
   // abc exporter params
   auto AbcDtScale = 120.f * RenderInterval;
@@ -1325,9 +1319,6 @@ void main() {
     if (CUDA_SEEPAGEFLOW_APP_PARAMS.run &&
         SimCount < TotalFrameNumber + RunLiquidNumber) {
       if (SimCount == RunLiquidNumber) {
-        // export bgeo file
-        CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export =
-            CUDA_SEEPAGEFLOW_APP_PARAMS.run;
         if (CUDA_SPH_EMITTER_PARAMS.enable)
           CUDA_SPH_EMITTER_PARAMS.run = CUDA_SEEPAGEFLOW_APP_PARAMS.run;
       }
@@ -1348,7 +1339,7 @@ void main() {
       KIRI_LOG_INFO("Time Per Frame={0}", PerFrameTimer.Elapsed());
       TotalFrameTime += PerFrameTimer.Elapsed();
 
-      if (CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export) {
+      // export
         auto particles = SFSystem->GetSFParticles();
         // ExportBgeoFileCUDA(
         //     CUDA_SEEPAGEFLOW_APP_PARAMS.bgeo_export_folder,
@@ -1367,7 +1358,7 @@ void main() {
 
         AbcColorData->SubmitCurrentStatusFloat3(particles->GetColPtr(),
                                                 particles->Size());
-      }
+      
     } else if (CUDA_SEEPAGEFLOW_APP_PARAMS.run) {
       CUDA_SEEPAGEFLOW_APP_PARAMS.run = false;
 
