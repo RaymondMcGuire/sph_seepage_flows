@@ -111,7 +111,7 @@ void CudaVolumeEmitter::BuildSeepageflowShapeMultiVolume(
   }
 
   if (offsetY) {
-    float offsetYVal = minY - (worldLowestY + data.min_radius * 5.f);
+    float offsetYVal = minY - (worldLowestY + 0.02f);
     for (size_t i = 0; i < data.pos.size(); i++)
       data.pos[i] -= make_float3(0.f, offsetYVal, 0.f);
   }
