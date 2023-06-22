@@ -1,11 +1,12 @@
-/*** 
+/***
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-06-02 23:30:52
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
  * @LastEditTime: 2023-06-12 00:26:04
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_sph_sf_solver_gpu.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
  */
 #ifndef _CUDA_SPH_SF_SOLVER_GPU_CUH_
 #define _CUDA_SPH_SF_SOLVER_GPU_CUH_
@@ -838,11 +839,9 @@ __global__ void _ComputeSFWaterLinearMomentum_CUDA(
   return;
 }
 
-static __global__ void
-_ComputeSFWetSandColor_CUDA(float *maxSaturation, float3 *col,
-                            const size_t *label, float *saturation,
-                            const size_t num, const float3 dryCol,
-                            const float3 wetCol) {
+static __global__ void _ComputeSFWetSandColor_CUDA(
+    float *maxSaturation, float3 *col, const size_t *label, float *saturation,
+    const size_t num, const float3 dryCol, const float3 wetCol) {
   const size_t i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
   if (i >= num)
     return;
@@ -855,8 +854,7 @@ _ComputeSFWetSandColor_CUDA(float *maxSaturation, float3 *col,
 
     if (maxSaturation[i] < saturation[i])
       maxSaturation[i] = saturation[i];
-  } else if (label[i] == 0)
-  {
+  } else if (label[i] == 0) {
     saturation[i] = 1.f;
     maxSaturation[i] = 1.f;
   }
