@@ -2,7 +2,7 @@
  * @Author: Xu.WANG raymondmgwx@gmail.com
  * @Date: 2023-05-19 20:19:24
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-08 23:53:48
+ * @LastEditTime: 2023-06-19 15:07:27
  * @FilePath: \sph_seepage_flows\seepage_flow\include\vtk_helper\vtk_polygonal_writer.h
  * @Description: 
  * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
@@ -68,9 +68,14 @@ public:
     vtkSmartPointer<vtkUnsignedLongLongArray> array = vtkSmartPointer<vtkUnsignedLongLongArray>::New();
     array->SetName(name.c_str());
     for (auto i = 0; i < data.size(); i++)
-      if (!mEnableSplitExporter ||
+    {
+       if (!mEnableSplitExporter ||
           (mEnableSplitExporter && mLabel[i] == mLabelId))
-        array->InsertNextValue(data[i]);
+          {
+                  array->InsertNextValue(data[i]);
+          }
+    }
+
 
     mPolyData->GetPointData()->AddArray(array);
   }

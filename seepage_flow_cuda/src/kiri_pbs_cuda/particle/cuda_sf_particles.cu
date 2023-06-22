@@ -1,8 +1,8 @@
 /***
  * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-03-15 15:35:49
+ * @Date: 2023-06-15 10:01:37
  * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-03-21 19:18:53
+ * @LastEditTime: 2023-06-19 15:06:21
  * @FilePath:
  * \sph_seepage_flows\seepage_flow_cuda\src\kiri_pbs_cuda\particle\cuda_sf_particles.cu
  * @Description:
@@ -10,8 +10,9 @@
  */
 
 #include <kiri_pbs_cuda/particle/cuda_sf_particles.cuh>
-
+#include <thrust/device_vector.h>
 #include <thrust/iterator/zip_iterator.h>
+#include <thrust/sequence.h>
 #include <thrust/tuple.h>
 
 namespace KIRI {
@@ -68,6 +69,12 @@ void CudaSFParticles::AddSphParticles(Vec_Float3 pos, float3 col, float3 vel,
 
   KIRI_CUCALL(cudaMemcpy(this->GetPosPtr() + this->Size(), &pos[0],
                          sizeof(float3) * num, cudaMemcpyHostToDevice));
+
+  // add id
+  thrust::device_vector<size_t> new_ids(num);
+  thrust::sequence(new_ids.begin(), new_ids.end(), this->Size() + 1);
+  thrust::copy(new_ids.begin(), new_ids.end(), this->GetIdPtr() + this->Size());
+
   thrust::fill(thrust::device, this->GetLabelPtr() + this->Size(),
                this->GetLabelPtr() + this->Size() + num, 0);
   thrust::fill(thrust::device, this->GetColPtr() + this->Size(),
