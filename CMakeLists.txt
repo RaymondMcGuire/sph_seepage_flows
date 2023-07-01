@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.18.0)
 
 # Project Name
-project(sph_seeage_flows LANGUAGES C CXX CUDA)
+project(sph_seeage_flow LANGUAGES C CXX CUDA)
 
 # Get CUDA INFO
 find_package(CUDA)
@@ -54,8 +54,9 @@ else()
   set(CMAKE_CUDA_ARCHITECTURES ${CUDA_FIXED_ARCH})
 endif()
 
-
 # Sub Projects
-add_subdirectory(KiriMathMini)
-add_subdirectory(seepage_flows_cuda)
-add_subdirectory(seepage_flows)
+add_subdirectory(math)
+add_subdirectory(seepage_flow_cuda)
+add_subdirectory(seepage_flow)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT seepage_flow)

@@ -1,0 +1,59 @@
+/***
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-03-15 15:35:48
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-03-18 19:19:15
+ * @FilePath:
+ * \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\solver\seepageflow\cuda_wcsph_sf_solver.cuh
+ * @Description:
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved.
+ */
+#ifndef _CUDA_WCSPH_SF_SOLVER_CUH_
+#define _CUDA_WCSPH_SF_SOLVER_CUH_
+
+#pragma once
+
+#include <kiri_pbs_cuda/solver/seepageflow/cuda_sph_sf_solver.cuh>
+
+namespace KIRI {
+class CudaWCSphSFSolver final : public CudaSphSFSolver {
+public:
+  explicit CudaWCSphSFSolver(const size_t num, const float negativeScale = 0.f,
+                             const float timeStepLimitScale = 3.f,
+                             const float speedOfSound = 100.f)
+      : CudaSphSFSolver(num), mNegativeScale(negativeScale),
+        mTimeStepLimitScale(timeStepLimitScale), mSpeedOfSound(speedOfSound) {}
+
+  virtual ~CudaWCSphSFSolver() noexcept {}
+
+  virtual void UpdateSolver(CudaSFParticlesPtr &particles,
+                            CudaBoundaryParticlesPtr &boundaries,
+                            const CudaArray<size_t> &cellStart,
+                            const CudaArray<size_t> &boundaryCellStart,
+                            float renderInterval, CudaSeepageflowParams params,
+                            CudaBoundaryParams bparams) override;
+
+  float GetSpeedOfSound() const;
+  float GetTimeStepLimitScale() const;
+
+  void SetTimeStepLimitScale(float newScale);
+  void SetSpeedOfSound(float newSpeedOfSound);
+
+protected:
+  virtual void ComputePressure(CudaSFParticlesPtr &particles, const float rho0,
+                               const float stiff) override;
+
+private:
+  float mNegativeScale, mTimeStepLimitScale, mSpeedOfSound;
+  const float mTimeStepLimitBySpeedFactor = 0.4f;
+  const float mTimeStepLimitByForceFactor = 0.25f;
+
+  void ComputeSubTimeStepsByCFL(CudaSFParticlesPtr &particles,
+                                const float sphMass, const float dt,
+                                const float kernelRadius, float renderInterval);
+};
+
+typedef SharedPtr<CudaWCSphSFSolver> CudaWCSphSFSolverPtr;
+} // namespace KIRI
+
+#endif /* _CUDA_WCSPH_SF_SOLVER_CUH_ */
