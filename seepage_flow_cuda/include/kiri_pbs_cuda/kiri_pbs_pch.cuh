@@ -1,10 +1,11 @@
-/*
- * @Author: Xu.WANG
- * @Date: 2021-02-04 12:36:10
- * @LastEditTime: 2022-03-20 11:32:40
- * @LastEditors: Xu.WANG
- * @Description:
- * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\kiri_pbs_pch.cuh
+/*** 
+ * @Author: Xu.WANG raymondmgwx@gmail.com
+ * @Date: 2023-06-15 10:01:37
+ * @LastEditors: Xu.WANG raymondmgwx@gmail.com
+ * @LastEditTime: 2023-06-26 11:20:56
+ * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\kiri_pbs_pch.cuh
+ * @Description: 
+ * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
  */
 
 #ifndef _KIRI_PBS_PCH_CUH_
@@ -27,6 +28,7 @@
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
+#include <thrust/sort.h>
 // clang-format on
 
 // CUDA Global Params & Macros
