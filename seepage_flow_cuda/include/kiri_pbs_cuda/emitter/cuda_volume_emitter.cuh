@@ -16,64 +16,87 @@
 
 #include <kiri_pbs_cuda/kiri_pbs_pch.cuh>
 
-namespace KIRI {
+namespace KIRI
+{
 
-struct SeepageflowVolumeData {
-  float min_radius;
-  Vec_Float3 pos;
-  Vec_Float3 col;
-  Vec_Float mass;
-  Vec_Float inertia;
-  Vec_Float radius;
-  Vec_SizeT label;
-};
+  struct VolumeFilesType
+  {
+    std::string name;
+    int type;
 
-struct SeepageflowMultiVolumeData {
-  float min_radius;
-  Vec_Float3 pos;
-  Vec_Float3 col;
-  Vec_Float mass;
-  Vec_Float inertia;
-  Vec_Float radius;
-  Vec_SizeT label;
-  Vec_Float2 amcamcp;
-  Vec_Float3 cda0asat;
-};
+    VolumeFilesType(std::string _name, int _type) : name(_name), type(_type) {}
+  };
 
-class CudaVolumeEmitter {
-public:
-  explicit CudaVolumeEmitter(bool enable = true) : bEnable(enable) {}
+  struct SeepageflowVolumeData
+  {
+    float min_radius;
+    Vec_Float3 pos;
+    Vec_Float3 col;
+    Vec_Float mass;
+    Vec_Float inertia;
+    Vec_Float radius;
+    Vec_SizeT label;
+  };
 
-  CudaVolumeEmitter(const CudaVolumeEmitter &) = delete;
-  CudaVolumeEmitter &operator=(const CudaVolumeEmitter &) = delete;
-  virtual ~CudaVolumeEmitter() noexcept {}
+  struct SeepageflowMultiVolumeData
+  {
+    float min_radius;
+    Vec_Float3 pos;
+    Vec_Float3 col;
+    Vec_Float mass;
+    Vec_Float inertia;
+    Vec_Float radius;
+    Vec_SizeT label;
+    Vec_Float2 amcamcp;
+    Vec_Float3 cda0asat;
+  };
 
-  void BuildSeepageflowShapeVolume(SeepageflowVolumeData &data,
-                                   Vec_Float4 shape, float3 color,
-                                   float sandDensity, bool offsetY = false,
-                                   float worldLowestY = 0.f,
-                                   float2 offsetXZ = make_float2(0.f));
+  class CudaVolumeEmitter
+  {
+  public:
+    explicit CudaVolumeEmitter(bool enable = true) : bEnable(enable) {}
 
-  void BuildSeepageflowShapeMultiVolume(SeepageflowMultiVolumeData &data,
-                                        Vec_Float4 shape, float3 color,
-                                        float sandDensity, float3 cda0asat,
-                                        float2 amcamcp, bool offsetY = false,
-                                        float worldLowestY = 0.f,
-                                        float2 offsetXZ = make_float2(0.f));
+    CudaVolumeEmitter(const CudaVolumeEmitter &) = delete;
+    CudaVolumeEmitter &operator=(const CudaVolumeEmitter &) = delete;
+    virtual ~CudaVolumeEmitter() noexcept {}
 
-  void BuildSeepageflowShapeMultiVolume(
-      SeepageflowMultiVolumeData &data, Vec_Float3 shape, float radius,
-      float3 color, float sandDensity, float3 cda0asat, float2 amcamcp,
-      bool axisChange = false, bool offsetY = false, float worldLowestY = 0.f,
-      float2 offsetXZ = make_float2(0.f));
+    void BuildSeepageflowShapeVolume(SeepageflowVolumeData &data,
+                                     Vec_Float4 shape, float3 color,
+                                     float sandDensity, bool offsetY = false,
+                                     float worldLowestY = 0.f,
+                                     float2 offsetXZ = make_float2(0.f));
 
-  inline constexpr bool GetEmitterStatus() const { return bEnable; }
+    void BuildSeepageflowShapeMultiVolume(SeepageflowMultiVolumeData &data,
+                                          Vec_Float4 shape, float3 color,
+                                          float sandDensity, float3 cda0asat,
+                                          float2 amcamcp, bool offsetY = false,
+                                          float worldLowestY = 0.f,
+                                          float2 offsetXZ = make_float2(0.f));
 
-private:
-  bool bEnable;
-};
+    void BuildSeepageflowShapeMultiVolume(
+        SeepageflowMultiVolumeData &data, Vec_Float3 shape, float radius,
+        float3 color, float sandDensity, float3 cda0asat, float2 amcamcp,
+        bool axisChange = false, bool offsetY = false, float worldLowestY = 0.f,
+        float2 offsetXZ = make_float2(0.f));
 
-typedef SharedPtr<CudaVolumeEmitter> CudaVolumeEmitterPtr;
+    void BuildSandVolumeData(SeepageflowMultiVolumeData &data,
+                             Vec_Float4 shape, float3 color,
+                             float sandDensity, float3 cda0asat,
+                             float2 amcamcp, bool offsetY = false,
+                             float worldLowestY = 0.f,
+                             float2 offsetXZ = make_float2(0.f));
+
+    void BuildWaterVolumeData(
+        SeepageflowMultiVolumeData &data, Vec_Float4 shape, float3 color,
+        float mass, float radius);
+
+    inline constexpr bool GetEmitterStatus() const { return bEnable; }
+
+  private:
+    bool bEnable;
+  };
+
+  typedef SharedPtr<CudaVolumeEmitter> CudaVolumeEmitterPtr;
 } // namespace KIRI
 
 #endif
