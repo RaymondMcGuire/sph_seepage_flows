@@ -13,6 +13,8 @@
 
 #pragma once
 
+#define CUDA_NO_HALF
+
 // clang-format off
 // Standard Libraries
 #include <iostream>
