@@ -3,7 +3,7 @@
  * @Date: 2021-02-04 12:36:10
  * @LastEditTime: 2022-03-20 11:32:40
  * @LastEditors: Xu.WANG
- * @Description: 
+ * @Description:
  * @FilePath: \Kiri\KiriPBSCuda\include\kiri_pbs_cuda\kiri_pbs_pch.cuh
  */
 
@@ -26,6 +26,7 @@
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
+#include <thrust/sort.h>
 
 // CUDA Global Params & Macros
 #define KIRI_CUBLOCKSIZE 256
@@ -51,9 +52,9 @@
 #define KIRI_EPSILON 1e-6f
 #define KIRI_RANDOM_SEEDS 1000
 #define KIRI_PI 3.141592653589793238462643383279502884197f
-#define KIRI_2PI 6.283185307179586476925286766559005768394f     
-#define KIRI_SQRTPI 1.772453850905516027298167483341145182797f 
-#define KIRI_SQRT2PI 2.506628274631000502415765284811045253006f 
+#define KIRI_2PI 6.283185307179586476925286766559005768394f
+#define KIRI_SQRTPI 1.772453850905516027298167483341145182797f
+#define KIRI_SQRT2PI 2.506628274631000502415765284811045253006f
 
 #define KIRI_EXPANDF3(p) p.x, p.y, p.z
 

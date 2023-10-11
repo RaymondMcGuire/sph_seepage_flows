@@ -5,6 +5,7 @@ build
 /export/bgeo/**/*.bgeo
 /export/bgeo/**/*.vtk
 /export/obj/**/*.obj
+/export/abc/**/*.abc
 /**/*.dat
 /houdini_template/backup
 /**/*.pyc
