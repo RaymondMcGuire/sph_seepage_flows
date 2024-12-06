@@ -22,9 +22,9 @@ struct AdvectVelForDFFluid {
   __host__ __device__ AdvectVelForDFFluid(const float dt) : mDt(dt) {}
 
   __host__ __device__ float3 operator()(const DFSFAccDataType &data) const {
-    size_t label = data.get<0>();
-    float3 acc = data.get<1>();
-    float3 lv = data.get<2>();
+    size_t label = data.__get_impl<0>();
+    float3 acc = data.__get_impl<1>();
+    float3 lv = data.__get_impl<2>();
 
     if (label == 0)
       return lv + mDt * acc;
@@ -38,9 +38,9 @@ struct AdvectVelForDFSand {
   __host__ __device__ AdvectVelForDFSand(const float dt) : mDt(dt) {}
 
   __host__ __device__ float3 operator()(const DFSFAccDataType &data) const {
-    size_t label = data.get<0>();
-    float3 acc = data.get<1>();
-    float3 lv = data.get<2>();
+    size_t label = data.__get_impl<0>();
+    float3 acc = data.__get_impl<1>();
+    float3 lv = data.__get_impl<2>();
 
     if (label == 1)
       return lv + mDt * acc;

@@ -24,9 +24,9 @@ struct AccDampingForSand {
       : mDt(dt), mDamping(damping) {}
 
   __host__ __device__ float3 operator()(const SFDataType &data) const {
-    size_t label = data.get<0>();
-    float3 acc = data.get<1>();
-    float3 lv = data.get<2>();
+    size_t label = data.__get_impl<0>();
+    float3 acc = data.__get_impl<1>();
+    float3 lv = data.__get_impl<2>();
 
     if (label == 1)
       return acc *
