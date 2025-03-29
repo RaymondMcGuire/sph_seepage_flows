@@ -985,7 +985,7 @@ void Seepage_MSDam_WCSPH() {
 
   // object 1: bunny/bunny.bego
   shape_folders.emplace_back("dam");
-  shape_files.emplace_back("dam");
+  shape_files.emplace_back("dam_xprotosphere");
 
   std::vector<float3> cd_a0_asat;
   std::vector<float2> amc_amcp;
