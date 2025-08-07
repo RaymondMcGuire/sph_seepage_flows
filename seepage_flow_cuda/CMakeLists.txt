@@ -19,6 +19,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ../lib/Debug)
 add_library(${PROJECT_NAME} ${PROJECT_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+get_target_property(_cuda_arch seepage_flow_cuda CUDA_ARCHITECTURES)
+message(STATUS "CUDA_ARCHITECTURES for target seepage_flow_cuda = ${CMAKE_CUDA_ARCHITECTURES}")
+
 # optimization options for CUDA C/C++
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -use_fast_math -Xcompiler \"/wd 4819 /wd 4267 /FS\"")
 set_target_properties(

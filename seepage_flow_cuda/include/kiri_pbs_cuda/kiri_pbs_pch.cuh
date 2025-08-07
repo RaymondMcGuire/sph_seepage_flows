@@ -1,17 +1,21 @@
-/*** 
- * @Author: Xu.WANG raymondmgwx@gmail.com
- * @Date: 2023-06-15 10:01:37
- * @LastEditors: Xu.WANG raymondmgwx@gmail.com
- * @LastEditTime: 2023-06-26 11:20:56
- * @FilePath: \sph_seepage_flows\seepage_flow_cuda\include\kiri_pbs_cuda\kiri_pbs_pch.cuh
- * @Description: 
- * @Copyright (c) 2023 by Xu.WANG, All Rights Reserved. 
+/*
+ * File: kiri_pbs_pch.cuh
+ * Module: kiri_pbs_cuda
+ * Created Date: 2025-08-07
+ * Author: Xu WANG
+ * -----
+ * Last Modified: 2025-08-07
+ * Modified By: Xu WANG
+ * -----
+ * Copyright (c) 2025 Xu WANG
  */
 
 #ifndef _KIRI_PBS_PCH_CUH_
 #define _KIRI_PBS_PCH_CUH_
 
 #pragma once
+
+#define CUDA_NO_HALF
 
 // clang-format off
 // Standard Libraries
